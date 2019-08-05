@@ -1,9 +1,10 @@
 import logging
 import telnetlib
 from base_cmd import log
+# import log
 
 
-promot = [b'Login:', b'Password:', b'User>',  b'stop--', b'#']
+PROMOT = [b'ogin:', b'assword:', b'ser>',  b'stop--', b'#', b'$']
 
 # console
 logger = logging.getLogger(__name__)
@@ -16,7 +17,9 @@ console.setFormatter(fomatter)
 
 logger.addHandler(console)
 
-filelog = log.Logger()
+# 文档log
+consolelog = log.Logger()
+filelog = log.Logger("./log/log_test.log")
 
 # Fiberhome OLT 登录 用户名及密码
 USERNAME = b'GEPON'
@@ -26,8 +29,7 @@ ENABLE = b'enable'
 # 重连次数
 CONNECT_TIMES = 5
 
-
-def login_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE):
+def login_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE, promot=b'#'):
     """
     OLT telnet login
     """
@@ -37,40 +39,30 @@ def login_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE):
     logger.info("try login %s..." % host)
     while True:
 
-        i, m, data = tn.expect(promot, 5)
-        # logger.info("status:%s" % i)
-        logger.info(bytes.decode(data))
-        filelog.log_info(bytes.decode(data))
-        print('i is ' + str(i))
+        i, m, data = tn.expect(PROMOT, 5)
+        filelog.log_info(data.decode('utf-8'))
 
         if i == 0:                                 # Login
-            # logger.info("Login: %s" % username)
             tn.write(username + b"\n")
-            # i, m, data = tn.expect(promot, 5)
             continue
 
         if i == 1:                                  # Password
-            # logger.info("Password: %s" % password)
             tn.write(password + b"\n")
-            # i, m, data = tn.expect(promot, 5)
             continue
 
-        if i == 2:
-            # logger.info("User> %s" % enable)        # User>
+        if i == 2:                                    # User>
             tn.write(enable + b"\n")
-            # i, m, data = tn.expect(promot, 5)
             continue
 
         if i == 3:
             tn.write(b' \r\n')
             continue
 
-        if i == 4:                                  # Admin#
-            logger.info("Login OLT(%s) success!\n" % host)
-
+        if i in (4, 5):                                  # Admin#
+            filelog.log_info("Login Host(%s) successful!\n" % host)
             return tn
 
-        if i == -1:
+        if m is None:
             return None
 
 
@@ -103,10 +95,3 @@ def send_cmd(tn, cmd, promot=b'#'):
         filelog.log_error("Error!")
         return None
 
-
-if __name__ == "__main__":
-    ip = '192.168.10.80'
-    ret = login_olt_telnet(ip)
-    print(ret)
-    if ret:
-        ret.close()

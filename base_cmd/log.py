@@ -16,11 +16,15 @@ import logging
 
 
 class Logger():
-    def __init__(self, logfile='./log/log.txt', level=logging.DEBUG):
+    def __init__(self, logfile=None, level=logging.DEBUG):
         self.log__ = logging.getLogger(None)
         self.log__.setLevel(level)
 
-        file_log__ = logging.FileHandler(logfile)
+        if logfile:
+            file_log__ = logging.FileHandler(logfile)
+        else:
+            file_log__ = logging.StreamHandler()
+
         file_log__.setLevel(level)
         fomatter__ = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
         file_log__.setFormatter(fomatter__)
@@ -43,3 +47,8 @@ if __name__ == "__main__":
     log.log_info("info")
     log.log_warning("warning")
     log.log_error("error")
+    
+    flog = Logger("./log/log_test.log")
+    flog.log_info("info")
+    flog.log_warning("warning")
+    flog.log_error("error")

@@ -9,5 +9,10 @@
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
     "python.linting.pep8Enabled": false,
-    "python.formatting.autopep8Args": ["--max-line-length", "120", "--experimental"],
+    "python.formatting.autopep8Args": [
+        "--max-line-length",
+        "120",
+        "--experimental"
+    ],
+    "python.linting.flake8Enabled": false,
 }
