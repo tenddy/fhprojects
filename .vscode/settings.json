@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "env\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Program Files\\Python37\\python.exe",
     "python.testing.pytestArgs": [
         "."
     ],
@@ -8,6 +8,11 @@
     "python.testing.pytestEnabled": true,
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
-    "python.linting.pep8Enabled": false,
-    "python.formatting.autopep8Args": ["--max-line-length", "120", "--experimental"],
+    "python.linting.pycodestyleEnabled": false,
+    "python.formatting.autopep8Args": [
+        "--max-line-length",
+        "120",
+        "--experimental"
+    ],
+    "python.formatting.provider": "autopep8",
 }

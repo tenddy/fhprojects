@@ -4,15 +4,17 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime: 2019-08-04 20:50:37
-@LastEditors:  Teddy.tu
+@LastEditTime: 2019-09-11 14:16:44
+@LastEditors: Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 
-from base_cmd import dut_connct_telnet
 import sys
 import time
+from base_cmd import dut_connct_telnet
+from FHAT import ServiceConfig
+from fhlib import OLT_V5
 
 
 def testcase():
@@ -62,11 +64,10 @@ def service_config_ONUs(tn, slots):
 
 
 if __name__ == "__main__":
-    host = "192.168.10.80"
-    obj_tn = dut_connct_telnet.login_olt_telnet(host)
-    # dut_connct_telnet.send_cmd(obj_tn, b"config\n")
-    # dut_connct_telnet.send_cmd(obj_tn, b'terminalexit length 0\n')
-    # slots = [1, 2, 3, 4]
-    # service_config_ONUs(obj_tn, slots)
-    # obj_tn.close()
+    host = "10.182.32.147"
     print("test")
+    test_obj = ServiceConfig(host)
+    send_cmdline = ""
+    send_cmline =  send_cmdline + OLT_V5.add_uplink_vlan(uplinkslot=9, uplinkport=1, vlan_mode="tag", vlan_begin=100, vlan_end=100)
+
+    test_obj.send_cmd(send_cmdline)

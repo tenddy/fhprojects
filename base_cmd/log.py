@@ -16,16 +16,27 @@ import logging
 
 
 class Logger():
-    def __init__(self, logfile='./log/log.txt', level=logging.DEBUG):
+    def __init__(self, logfile=None, level=logging.DEBUG):
         self.log__ = logging.getLogger(None)
         self.log__.setLevel(level)
 
-        file_log__ = logging.FileHandler(logfile)
-        file_log__.setLevel(level)
-        fomatter__ = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
-        file_log__.setFormatter(fomatter__)
+        if logfile is None:
+            log = logging.StreamHandler()
+        else:
+            log = logging.FileHandler(logfile)
 
-        self.log__.addHandler(file_log__)
+            log.setLevel(level)
+            fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
+            log.setFormatter(fomatter)
+        self.log__.addHandler(log)
+
+    def __del__(self):
+        handlers = self.log__.handlers
+        for hd in handlers:
+            hd_thread = hd.acquire()
+            hd.release()
+            hd.close()
+            print("log debug del")
 
     def log_info(self, msg):
         self.log__.info(msg)
