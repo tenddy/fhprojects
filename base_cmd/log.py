@@ -31,12 +31,13 @@ class Logger():
         self.log__.addHandler(log)
 
     def __del__(self):
-        handlers = self.log__.handlers
-        for hd in handlers:
-            hd_thread = hd.acquire()
-            hd.release()
-            hd.close()
-            print("log debug del")
+        # handlers = self.log__.handlers
+        # for hd in handlers:
+        #     hd_thread = hd.acquire()
+        #     hd.release()
+        #     hd.close()
+        print("log debug del")
+        del self
 
     def log_info(self, msg):
         self.log__.info(msg)

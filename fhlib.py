@@ -17,7 +17,7 @@ class OLT_V4():
     @classmethod
     def reboot_system(cls):
         cmdline = ""
-        cmdline = cmdline.join("reboot\nn\n")
+        cmdline = cmdline.join("reboot\ny\n")
        # self.cmdline__ = cmdline__.join(cmdline)
         return cmdline
 
@@ -41,10 +41,10 @@ class OLT_V5():
 
         引用函数：Admin(config)# port vlan 101 to 101 tag 1/9 1
         """
-        cmdline = ""
-        cmdline = cmdline + "config\n"
-        cmdline = cmdline + "port vlan {0} to {1} {2} 1/{3} {4} \n".format(
-            vlan_begin, vlan_end, vlan_mode, uplinkslot, uplinkport)
+        cmdline = []
+        cmdline.append("config\n")
+        cmdline.append("port vlan {0} to {1} {2} 1/{3} {4} \n".format(
+            vlan_begin, vlan_end, vlan_mode, uplinkslot, uplinkport))
 
         return cmdline
 
@@ -55,3 +55,16 @@ class OLT_V5():
         cmdline = ""
 
         return cmdline
+
+    @classmethod
+    def get_onu_version(cls, slotno, ponno, onuno):
+        """
+        函数功能： 通过线卡Telnet到MDU，并获取MDU的编译时间
+        """
+        cmdline = []
+        cmdline.append("config\n")
+        cmdline.append('t l 0 \n')
+        cmdline.append('telnet slot 1/%s' % slotno)
+        cmdline.append('cd service \n')
+        cmdline.append('telnetdata pon % onu % \n')
+        cmdline.append('')

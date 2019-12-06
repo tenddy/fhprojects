@@ -46,7 +46,7 @@ def connect_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE
         # logger.warning("try connect %s of %d times" % (host, count))
         print("try connect %s of %d times" % (host, count))
         i, m, data = tn.expect(promot, 5)
-        print("status:%s" % i)
+        # print("status:%s" % i)
         if i == -1:
             tn.write(b' \r\n')
             count += 1
@@ -69,12 +69,12 @@ def connect_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE
 
         if i == 3:                                  # Admin#
             logger.info("Login OLT(%s) success!\n" % host)
-            print("handlers", logger.handlers)
-            hd = logger.handlers
-            for h in hd:
-                h.flush()
-                h.close()
-                print("close", h)
+            # print("handlers", logger.handlers)
+            # hd = logger.handlers
+            # for h in hd:
+            #     h.flush()
+            #     h.close()
+            #     print("close", h)
             return tn
 
         if count > CONNECT_TIMES:
