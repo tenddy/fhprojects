@@ -2,17 +2,6 @@
 # coding=UTF-8
 '''
 @Description:
-@Author:  Teddy.tu
-@Date: 2019-12-06 21:38:44
-@LastEditTime: 2019-12-08 22:10:25
-@LastEditors:  Teddy.tu
-@Email:  teddy_tu@126.com
-@License:  (c)Copyright 2019-2020 Teddy_tu
-'''
-#!/usr/bin/python3
-# coding=UTF-8
-'''
-@Description:
 通过AN5516 OLT的配置文件，提取对应ONU的所有的配置信息。
 
 提取信息：
@@ -42,7 +31,10 @@ set ep sl 17 p 8 o 7 p 4 serv 1 qinq en 255 33024 LGPPPOE_LAN ftthdata1 2567
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 
+
 import re
+
+
 ONUTYPE = 1
 ONUID = 2
 
