@@ -39,7 +39,9 @@ class ServiceConfig():
             for item in cmdline:
                 # print("debug:", item)
                 self.tn__.write(bytes(item, encoding='utf8'))
-                cmd_ret = cmd_ret + self.tn__.read_until(promot, timeout).decode('utf-8')
+                ret = self.tn__.read_until(promot, timeout).decode('utf-8')
+                print(ret)
+                cmd_ret = cmd_ret + ret
                 if len(item) == 0:
                     continue
 
