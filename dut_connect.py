@@ -1,6 +1,6 @@
 import logging
 import telnetlib
-
+import time
 
 promot = [b'Login:', b'Password:', b'User>', b'# ']
 
@@ -35,11 +35,11 @@ ENABLE = b'enable'
 CONNECT_TIMES = 5
 
 
-def connect_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE):
+def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enable=ENABLE):
     """
     OLT telnet login
     """
-    tn = telnetlib.Telnet(host)
+    tn = telnetlib.Telnet(host, port=port)
     count = 1
     logger.info("login...")
     while True:
@@ -82,11 +82,73 @@ def connect_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE
             return None
 
 
+def dut_connect_tl1(host, port=3337, username='admin', password='admin'):
+    # tn = telnetlib.Telnet(host, port=port, timeout=5)
+    # login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;" % (username, password)
+    # tn.write(bytes(login_str, encoding='utf-8'))
+    # ret = tn.read_until(";")
+    # print(ret)
+
+    try:
+        tn = telnetlib.Telnet(host, port=port)
+        login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;\n" % (username, password)
+
+        ret = tn.write(bytes(login_str, encoding='utf8'))
+        line_b = tn.read_until(b';', 5)
+        line_s = str(line_b, encoding='utf8')
+        logger.info(line_s)
+        return tn
+    except Exception as err:
+        print(err)
+        return None
+
+
+def dut_disconnect_tl1(tn_obj):
+    try:
+        # tn = telnetlib.Telnet(host, port=port)
+        logout_str = "LOGOUT:::CTAG::;\n"
+        ret = tn_obj.write(bytes(logout_str, encoding='utf8'))
+        line_b = tn_obj.read_until(b';', 5)
+        line_s = str(line_b, encoding='utf8')
+        logger.info(line_s)
+        tn_obj.close()
+        return True
+    except Exception as err:
+        print(err)
+        return None
+
+
 if __name__ == "__main__":
-    ip = '10.182.32.243'
+    ip = '10.182.1.161'
     # ret = login_olt_telnet(ip)
     # print(ret)
-    # dut_connect_tl1(ip)
+    olt_ip = '35.35.35.109'
+    slotno = "17"
+    ponno = "16"
+    svlan = "2701"
+    cvlan = ["41", "45", "46"]
+    uv = ["1701", "45", "46"]
+
+    tn_obj = dut_connect_tl1(ip)
+    for i in range(1, 33):
+        onu_sn = "fiberhome6666%02d" % i
+        internet_uv = 1700 + i*1
+
+        print(onu_sn)
+
+        qinq_tl1_cmd1 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%s,UV=%d,SCOS=1,CCOS=1;\n" \
+            % (olt_ip, slotno, ponno, onu_sn, svlan, cvlan[0], internet_uv)
+        qinq_tl1_cmd2 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%s,UV=%s,SCOS=5,CCOS=5;\n" \
+            % (olt_ip, slotno, ponno, onu_sn, svlan, cvlan[1], uv[1])
+        qinq_tl1_cmd3 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%s,UV=%s,SCOS=7,CCOS=7;\n" \
+            % (olt_ip, slotno, ponno, onu_sn, svlan, cvlan[2], uv[2])
+        qinq_cmd = qinq_tl1_cmd1 + qinq_tl1_cmd2 + qinq_tl1_cmd3
+        print("cmd:", qinq_cmd)
+        cmd_ret = tn_obj.write(bytes(qinq_cmd, encoding="utf8"))
+        ret = tn_obj.read_until(b';', 5)
+        print(str(ret, encoding="utf8"))
+        time.sleep(0.5)
+    dut_disconnect_tl1(tn_obj)
     # # manage vlan
     # cmd_vlan10 = b'CFG-LANPORTVLAN::OLTID=10.182.32.15,PONID=NA-NA-1-1,ONUIDTYPE=ONU_NUMBER,ONUID=9,ONUPORT=NA-NA-NA-2:CTAG::UV=10,CVLAN=10;'
     # send_cmd_tl1(ip, cmd_vlan10)

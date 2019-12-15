@@ -4,18 +4,17 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime: 2019-12-08 22:14:48
-@LastEditors:  Teddy.tu
+@LastEditTime: 2019-12-13 10:22:01
+@LastEditors: Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 
-from base_cmd import dut_connect_telnet
 import sys
 import time
-from base_cmd import dut_connct_telnet
 from FHAT import ServiceConfig
 from fhlib import OLT_V5
+from base_cmd import dut_connect_telnet
 
 
 def testcase():
@@ -65,11 +64,13 @@ def service_config_ONUs(tn, slots):
 
 
 if __name__ == "__main__":
-    host = "10.182.32.147"
-
+    host = "35.35.35.109"
+    tn = dut_connect_telnet.login_olt_telnet(host)
     print("test")
-    test_obj = ServiceConfig(host)
-    send_cmdline = ""
-    send_cmline =  send_cmdline + OLT_V5.add_uplink_vlan(uplinkslot=9, uplinkport=1, vlan_mode="tag", vlan_begin=100, vlan_end=100)
+    test_obj = ServiceConfig(tn)
+    send_cmdline = "config\n show discovery 1/17/8"
+    # send_cmline = send_cmdline + OLT_V5.add_uplink_vlan(uplinkslot=9,
+    #                                                     uplinkport=1, vlan_mode="tag", vlan_begin=100, vlan_end=100)
 
-    test_obj.send_cmd(send_cmdline)
+    ret = test_obj.send_cmd(send_cmdline)
+    print(ret)

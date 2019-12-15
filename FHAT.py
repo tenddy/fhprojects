@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-''' 
+'''
 @File    : FHAT.py
 @Date    : 2019/08/13 08:18:10
 @Author  : Teddy.tu
@@ -11,7 +11,7 @@
 
 import time
 import argparse
-from dut_connct import connect_olt_telnet
+from dut_connect import connect_olt_telnet
 from base_cmd.log import Logger
 from fhlib import OLT_V5
 from fhlib import OLT_V4
@@ -46,7 +46,7 @@ class ServiceConfig():
             cmd_ret = "Admin# "  # 返回参数
             for item in cmdline:
                 # print("debug:", item)
-                self.tn__.write(item.encode('utf-8'))
+                self.tn__.write(bytes(item, encoding='utf8'))
                 cmd_ret = cmd_ret + self.tn__.read_until(promot, timeout).decode('utf-8')
                 if len(item) == 0:
                     continue
@@ -93,32 +93,59 @@ def tc_reboot_system(host):
         del dut
 
 
-if __name__ == "__main__":
+def auth_onu():
     log = Logger()
-    host = "35.35.35.109"
-    tn_obj = connect_olt_telnet(host)
+    # host = "35.35.35.109"
+    host = '192.168.0.168'
+    tn_obj = connect_olt_telnet(host, 8003)
+    # a = tn_obj.read_until(b"#")
+    # print(str(a, encoding='utf8'))
     dut_host = ServiceConfig(tn_obj, log)
-    # dut_host.send_cmd('config\n')
 
-    cli = OLT_V5.add_uplink_vlan(uplinkslot=9, uplinkport=1, vlan_mode="tag", vlan_begin=100, vlan_end=100)
-    dut_host.send_cmd(cli)
+    cmd_ret = dut_host.send_cmd(["config\n", "t l 0\n"])
+    # s_cmd = cmd_ret.split('\n')
+    onuid = 1
+    while True:
+        cmd_ret = dut_host.send_cmd(["show discovery 1/17/8\n"])
+        s_cmd = cmd_ret.split('\n')
+        print(len(s_cmd))
+        if len(s_cmd) >= 8:
+            for index in range(4, len(s_cmd)-3):
+                # print(len(s_cmd),  s_cmd[index])
+                onu_info = s_cmd[index].split()
+                if len(onu_info) == 0:
+                    break
 
-    # reboot OLT
-    # while (True):
-    #     tc_reboot_system("10.182.5.81")
-    #     time.sleep(600)
-    #     print("waiting for 600s...")
+                print("onu_info:", onu_info)
+                print("onuid:", onuid)
+                auth_str = 'whitelist add phy-id %s type %s slot 17 pon 8 onuid %d\n' % (
+                    onu_info[2], onu_info[1], 129-onuid)
+                ret = dut_host.send_cmd([auth_str])
+                if -1 == ret.find("failed") or -1 == ret.find("Unknown"):
+                    onuid = onuid + 1
+                    print("onuid:", onuid)
+        time.sleep(5)
 
-    # read config cli and send to DUT
-    # config = r'E:/中试项目/5000转6000/广西/config_bak/6000config/10.182.5.68_FTTB_AN6000_s3p5.txt'
-    # with open(config, 'r') as f:
-    #     # print(f)
-    #     commandlines = f.readlines()
-    #     for command in commandlines:
-    #         print("command:", command)
-    #         ret = dut_host.send_cmd(command)
-    #         print(ret)
-    #         if verify_string_match(str(ret), ['Unknown', 'error', 'failed']) or ret is None:
-    #             print("Error!---" + command)
-    #             input("press ENTER to continue...")
-    # tn_obj.close()
+    # for index in s_cmd:
+    #     print(index)
+    # time.sleep(10)
+
+    tn_obj.close()
+
+
+def send_cmd_file(file):
+    with open(file) as f:
+        lines = f.readlines()
+        log = Logger()
+        host = '35.35.35.109'
+        tn_obj = connect_olt_telnet(host)
+        dut_host = ServiceConfig(tn_obj, log)
+        dut_host.send_cmd(["config\n", "t l 0\n"])
+        # print(len(lines), lines)
+        # for line in lines:
+        dut_host.send_cmd(lines)
+
+
+if __name__ == "__main__":
+    olt_config = r'e:/old_config.txt'
+    send_cmd_file(olt_config)

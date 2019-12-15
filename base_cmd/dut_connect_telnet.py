@@ -29,6 +29,7 @@ ENABLE = b'enable'
 # 重连次数
 CONNECT_TIMES = 5
 
+
 def login_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE, promot=b'#'):
     """
     OLT telnet login
@@ -43,15 +44,15 @@ def login_olt_telnet(host, username=USERNAME, password=PASSWORD, enable=ENABLE, 
         filelog.log_info(data.decode('utf-8'))
 
         if i == 0:                                 # Login
-            tn.write(username + b"\n")
+            tn.write(bytes(username + "\n", encoding='utf8'))
             continue
 
         if i == 1:                                  # Password
-            tn.write(password + b"\n")
+            tn.write(bytes(password + "\n", encoding='utf8'))
             continue
 
         if i == 2:                                    # User>
-            tn.write(enable + b"\n")
+            tn.write(bytes(enable + "\n", encoding='utf8'))
             continue
 
         if i == 3:
@@ -75,7 +76,7 @@ def send_cmd_once(host, cmd, promot=b'#'):
         logger.info(str(lines, encoding='utf8'))
         filelog.log_info(str(lines, encoding='utf8'))
         obj_tn.close()
-        return lines
+        return str(lines, encoding='utf8')
     except Exception as err:
         logger.error("Error!")
         filelog.log_error("Error!")
@@ -94,4 +95,3 @@ def send_cmd(tn, cmd, promot=b'#'):
         logger.error("Error!")
         filelog.log_error("Error!")
         return None
-
