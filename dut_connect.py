@@ -61,6 +61,7 @@ def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enab
             logger.info("Password: %s" % password)
             tn.write(password + b"\n")
             i, m, data = tn.expect(promot, 5)
+            time.sleep(1)
 
         if i == 2:
             logger.info("User> %s" % enable)        # User>
@@ -69,12 +70,6 @@ def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enab
 
         if i == 3:                                  # Admin#
             logger.info("Login OLT(%s) success!\n" % host)
-            # print("handlers", logger.handlers)
-            # hd = logger.handlers
-            # for h in hd:
-            #     h.flush()
-            #     h.close()
-            #     print("close", h)
             return tn
 
         if count > CONNECT_TIMES:

@@ -29,14 +29,6 @@ class ServiceConfig():
 
     def __del__(self):
         pass
-        # if self.tn__ is not None:
-        #     self.tn__.close()
-        # del self.filelog__
-        # del self.console__
-        # self.log__.close()
-
-        print("__del__ func....")
-        del self
 
     def send_cmd(self, cmdline,  promot=b"#", timeout=5):
         """
@@ -65,6 +57,10 @@ class ServiceConfig():
 
 def verify_string_match(dst_str, cmp_str):
     '''
+    @func: 查找目的字符串dst_str中是否存在指定的字符串（字符串列表cmp_str）
+    @dst_str:str
+    @cmp_str:list
+    @return: bool
     '''
     ret = 0
     for s in cmp_str:
@@ -72,10 +68,7 @@ def verify_string_match(dst_str, cmp_str):
             ret = 1
             break
 
-    if ret == 1:
-        return True
-    else:
-        return False
+    return bool(ret == 1)
 
 
 def tc_reboot_system(host):
