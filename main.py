@@ -4,23 +4,24 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime: 2019-12-13 10:22:01
-@LastEditors: Teddy.tu
+@LastEditTime : 2019-12-26 16:34:12
+@LastEditors  : Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 
+from lib import log
+from lib.dut_connect import connect_olt_telnet
+from lib.fhlib import OLT_V5
 import sys
 import time
-from FHAT import ServiceConfig
-from fhlib import OLT_V5
-from base_cmd import dut_connect_telnet
+from src.FHAT import ServiceConfig
 
 
 def testcase():
     print("test...")
     host = "10.182.32.15"
-    tn = dut_connect_telnet.login_olt_telnet(host)
+    tn = connect_olt_telnet.login_olt_telnet(host)
     tn.close()
 
 
@@ -35,7 +36,7 @@ def service_config(tn, slotno, ponno, onuno, ethno, uni_vid, multi_vid=4000):
     cmds = [ser_cmd1, ser_cmd2, ser_cmd3, ser_cmd4, ser_cmd5, ser_cmd6]
     for cmd in cmds:
         byte_cmd = bytes(cmd, encoding='utf8')
-        ret = dut_connect_telnet.send_cmd(tn, byte_cmd)
+        ret = connect_olt_telnet.send_cmd(tn, byte_cmd)
         # dut_connct_telnet.log.info(ret)
 
 
@@ -44,10 +45,11 @@ def service_config_test(tn, slotno, ponno, onuno, ethno, uni_vid):
     ser_cmd2 = "onu port vlan {0} eth {1} service count 0\n".format(onuno, ethno)
     ser_cmd3 = "onu port vlan {0} eth {1} service count 1\n".format(onuno, ethno)
     ser_cmd4 = "onu port vlan {0} eth {1} service 1 tag priority 1 tpid 33024 vid {2}\n".format(onuno, ethno, uni_vid)
+
     cmds = [ser_cmd1, ser_cmd2, ser_cmd3, ser_cmd4]
     for cmd in cmds:
         byte_cmd = bytes(cmd, encoding='utf8')
-        ret = dut_connect_telnet.send_cmd(tn, byte_cmd)
+        ret = connect_olt_telnet.send_cmd(tn, byte_cmd)
         # dut_connct_telnet.log.info(ret)
 
 
@@ -65,12 +67,10 @@ def service_config_ONUs(tn, slots):
 
 if __name__ == "__main__":
     host = "35.35.35.109"
-    tn = dut_connect_telnet.login_olt_telnet(host)
+    tn = connect_olt_telnet(host, 23, b'admin', b'admin')
     print("test")
-    test_obj = ServiceConfig(tn)
-    send_cmdline = "config\n show discovery 1/17/8"
-    # send_cmline = send_cmdline + OLT_V5.add_uplink_vlan(uplinkslot=9,
-    #                                                     uplinkport=1, vlan_mode="tag", vlan_begin=100, vlan_end=100)
+    test_obj = ServiceConfig(tn, log.Logger())
+    send_cmdline = ["config\n", "show discovery 1/3/16\n"]
 
     ret = test_obj.send_cmd(send_cmdline)
     print(ret)

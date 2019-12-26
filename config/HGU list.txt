@@ -1,0 +1,14 @@
+3   8   1   OTHER2         A  0   up  0c2a86bffadf            0773004159963513                      
+3   8   2   OTHER2         A  0   up  48555ff78014            fiberhomeHG221GS                      
+3   8   3   OTHER2         A  0   dn  20896fff493f            fiberhomeHG220GSU                     
+3   8   4   OTHER2         A  0   up  b046fc5e08f6            fiberhomHG220                         
+3   8   5   OTHER2         A  0   up  5c0979f8009a            0773002933129388                      
+3   8   6   OTHER2         A  0   up  04885f0e6422            0773001144062363                      
+3   8   7   OTHER2         A  0   up  486276ef97ee            077320191029                          
+3   8   8   OTHER2         A  0   up  10d0ab7bddd0            zte_F460                              
+3   8   9   OTHER2         A  0   up  98f42877d6ad            0773001854800079                      
+3   8   10  OTHER2         A  0   up  dc028e4f41aa            0773000010903217                      
+3   8   11  OTHER2         A  0   up  c4b8b5261336            0773002616983722                      
+3   8   12  OTHER2         A  0   up  a429409e864d            0773003200516376                      
+3   8   13  OTHER2         A  0   up  a8e2c3637f68            0773002285961477                      
+3   8   14  OTHER2         A  0   up  98007422ef05            0773001063453042
