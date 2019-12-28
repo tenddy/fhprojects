@@ -209,3 +209,45 @@ class OLT_V5():
                 with open(r'E:/config1.txt', 'w') as f:
                     f.write(''.join(send_cmd))
                 return send_cmd
+
+    @classmethod
+    def get_MDU_ngn_ip(cls, slot, pon, onu, ip):
+        cmdline = []
+        cmdline.append('config\n')
+        cmdline.append('telnet slot 1/%d \n' % slot)
+        cmdline.append('')
+
+    @classmethod
+    def model1_config(cls):
+        '''
+        onu port vlan 1 eth 1 service count 1
+        onu port vlan 1 eth 1 service 1 tag priority 1 tpid 33024 vid 301 
+        onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+        '''
+        onu_count = 18
+        ONUID_NEW = range(1,onu_count+1)
+        PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,8]
+
+        with open(r'E:/config_model1.txt','w') as f:
+            # onu1
+            # onuid = 1
+            # portno = 8
+            ser_count = 1
+            # trans_ser_vlan = 41
+            svlan = 2701
+            send_cmd = []
+            for index in range(onu_count):
+                onuid = ONUID_NEW[index]
+                portno = PORTNO[index]
+                for p in range(portno):
+                    
+                    cmd0 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, 0)
+                    send_cmd.append(cmd0)
+                    cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, ser_count)
+                    send_cmd.append(cmd1)
+                    cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (onuid, p+1, 1, 301+(onuid-1)*24 + p)
+                    send_cmd.append(cmd2)
+                    cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (onuid, p+1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
+                    send_cmd.append(cmd4)
+                    send_cmd.append(cmd2)
+            f.write(''.join(send_cmd))

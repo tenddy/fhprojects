@@ -11,10 +11,11 @@
 
 import time
 import argparse
-from dut_connect import connect_olt_telnet
-from base_cmd.log import Logger
-from fhlib import OLT_V5
-from fhlib import OLT_V4
+from lib import dut_connect
+# from dut_connect import connect_olt_telnet
+from lib import log
+from lib.fhlib import OLT_V5
+from lib.fhlib import OLT_V4
 
 CONNECT_DUT_ERROR = 1
 
@@ -28,7 +29,8 @@ class ServiceConfig():
             return None
 
     def __del__(self):
-        pass
+        print("__del__ func....")
+        del self
 
     def send_cmd(self, cmdline,  promot=b"#", timeout=5):
         """
@@ -36,24 +38,22 @@ class ServiceConfig():
         """
         try:
             cmd_ret = "Admin# "  # 返回参数
+            i = 0
             for item in cmdline:
-                # print("debug:", item)
                 self.tn__.write(bytes(item, encoding='utf8'))
+                i = i + 1
                 ret = self.tn__.read_until(promot, timeout).decode('utf-8')
                 print(ret)
                 cmd_ret = cmd_ret + ret
                 if len(item) == 0:
                     continue
-
-            print("debug:info log")
+                if i % 10 == 0:
+                    time.sleep(0.5)
             self.log__.log_info(cmd_ret)
-            # print(cmd_ret)
             return cmd_ret
         except Exception as err:
             print("send cmd Error!!!")
-            # log__ = log.Logger(self.filelog)
-            # log__.log_info("Error!")
-            self.log__.log_error("Error!")
+            self.log__.log_error("Error:" + err)
             return None
 
 
@@ -74,13 +74,13 @@ def verify_string_match(dst_str, cmp_str):
 
 
 def tc_reboot_system(host):
-    tn_obj = connect_olt_telnet(host)
+    tn_obj = dut_connect.connect_olt_telnet(host)
     # log = Logger(logfile="log_test.log")
-    log = Logger()
+    log = log.Logger()
 
     if tn_obj is None:
         time.sleep(60)
-        tn_obj = connect_olt_telnet(host)
+        tn_obj = dut_connect.connect_olt_telnet(host)
     else:
         dut = ServiceConfig(tn_obj, log)
         dut.send_cmd(OLT_V4.reboot_system())
@@ -88,11 +88,11 @@ def tc_reboot_system(host):
         del dut
 
 
-def auth_onu():
-    log = Logger()
+def auth_onu_auto():
+    log = log.Logger()
     # host = "35.35.35.109"
     host = '192.168.0.168'
-    tn_obj = connect_olt_telnet(host, 8003)
+    tn_obj = dut_connect.connect_olt_telnet(host, 8003)
     # a = tn_obj.read_until(b"#")
     # print(str(a, encoding='utf8'))
     dut_host = ServiceConfig(tn_obj, log)
@@ -120,27 +120,31 @@ def auth_onu():
                     onuid = onuid + 1
                     print("onuid:", onuid)
         time.sleep(5)
-
-    # for index in s_cmd:
-    #     print(index)
-    # time.sleep(10)
-
     tn_obj.close()
 
 
-def send_cmd_file(file):
+def send_cmd_file(host, file):
     with open(file) as f:
         lines = f.readlines()
-        log = Logger()
-        host = '35.35.35.109'
-        tn_obj = connect_olt_telnet(host)
+        log = log.Logger()
+        tn_obj = dut_connect.connect_olt_telnet(host)
         dut_host = ServiceConfig(tn_obj, log)
         dut_host.send_cmd(["config\n", "t l 0\n"])
         # print(len(lines), lines)
         # for line in lines:
         dut_host.send_cmd(lines)
+        dut_host.send_cmd(["quit\n", "quit\n"])
 
 
 if __name__ == "__main__":
-    olt_config = r'e:/old_config.txt'
-    send_cmd_file(olt_config)
+    host = '35.35.35.109'
+
+    config = True
+    tn = dut_connect.connect_olt_telnet(host, 23, username='admin', password='admin')
+    tn.close()
+    # if config:
+    #     olt_config = r'./config/new_config.txt'
+    #     send_cmd_file(host, olt_config)
+    # else:
+    #     olt_config = r'./config/new_config1.txt'
+    #     send_cmd_file(host, olt_config)
