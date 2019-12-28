@@ -28,8 +28,37 @@ class OLT_V5():
 
     @classmethod
     def query_debugip(cls):
-        cmdline = ""
-        cmdline += "show debugip\n"
+        """
+        函数功能：回读debug ip
+        函数参数: 
+        参考命令行：
+
+        引用函数：
+        """
+        cmdline = []
+        cmdline.append['config\n', 'interface meth 1/1\n', "show ip address\n"]
+        return cmdline
+
+    @classmethod
+    def authorize_onu(cls, slotno, ponno, onuid, auth_type, sn, onutype):
+        """
+        函数功能：授权ONU
+        函数参数:
+        @lsotno:
+        @ponno: 
+        @onuid: 
+        @auth_type： string, phy-id/log-id
+        @sn: phy address or logic sn
+        @onutye: 
+        参考命令行：
+        whitelist add <phy-id/log-id> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
+
+        引用函数：
+        """
+        cmdline = []
+        cmdline.append("config\n")
+        cmdline.append("whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(auth_type, sn, onutype, slotno, ponno, onuid))
+
         return cmdline
 
     @classmethod
@@ -38,8 +67,8 @@ class OLT_V5():
         函数功能：配置上联端口VLAN
         函数参数: 
         参考命令行：
-
-        引用函数：Admin(config)# port vlan 101 to 101 tag 1/9 1
+            Admin(config)# port vlan 101 to 101 tag 1/9 1
+        引用函数：
         """
         cmdline = []
         cmdline.append("config\n")
@@ -52,7 +81,7 @@ class OLT_V5():
     def config_onu_lan_service(cls, slotno, ponno, onuno):
         """
         """
-        cmdline = ""
+        cmdline = []
 
         return cmdline
 
@@ -70,7 +99,7 @@ class OLT_V5():
         cmdline.append('')
 
     @classmethod
-    def create_config():
+    def create_config(cls):
         '''
         onu port vlan 1 eth 1 service count 3
         onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
@@ -89,12 +118,12 @@ class OLT_V5():
         ser_count = 3
         svlan = 2701
         send_cmd = []
-        for index in range(14):
+        onu_count = len(ONUID)
+        for index in range(onu_count):
             onuid = ONUID[index]
             portno = PORTNO[index]
             ser_count = 3
             for p in range(portno):
-
                 cmd0 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, 0)
                 send_cmd.append(cmd0)
                 cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, ser_count)
@@ -126,7 +155,7 @@ class OLT_V5():
         return send_cmd
 
     @classmethod
-    def create_config1():
+    def create_config1(cls):
         '''
         onu port vlan 1 eth 1 service count 3
         onu port vlan 1 eth 1 service 1 tag priority 1 tpid 33024 vid 41 

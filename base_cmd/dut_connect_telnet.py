@@ -1,7 +1,6 @@
 import logging
 import telnetlib
 from base_cmd import log
-# import log
 
 
 PROMOT = [b'ogin:', b'assword:', b'ser>',  b'stop--', b'#', b'$']
