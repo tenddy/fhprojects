@@ -4,8 +4,8 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime : 2019-12-26 16:34:12
-@LastEditors  : Teddy.tu
+@LastEditTime : 2019-12-28 22:24:36
+@LastEditors  :  Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
@@ -13,9 +13,9 @@
 from lib import log
 from lib.dut_connect import connect_olt_telnet
 from lib.fhlib import OLT_V5
+from src.FHAT import ServiceConfig
 import sys
 import time
-from src.FHAT import ServiceConfig
 
 
 def testcase():
@@ -65,12 +65,29 @@ def service_config_ONUs(tn, slots):
                 # service_config(tn, slotno, ponno, onuno, 1, vid, 4000)
 
 
-if __name__ == "__main__":
-    host = "35.35.35.109"
-    tn = connect_olt_telnet(host, 23, b'admin', b'admin')
-    print("test")
-    test_obj = ServiceConfig(tn, log.Logger())
-    send_cmdline = ["config\n", "show discovery 1/3/16\n"]
+def func1(method, onutype, *onu):
+    print("method: ", method, "\nonutype: ", onutype, "\nonu: ", onu)
 
-    ret = test_obj.send_cmd(send_cmdline)
-    print(ret)
+
+if __name__ == "__main__":
+    # host = "35.35.35.109"
+    # tn = connect_olt_telnet(host, 23, b'admin', b'admin')
+    # print("test")
+    # test_obj = ServiceConfig(tn, log.Logger())
+    # send_cmdline = ["config\n", "show discovery 1/3/16\n"]
+
+    # ret = test_obj.send_cmd(send_cmdline)
+    # print(ret)
+    # func1("add", "other2", *(9, 9, 1))
+    # func1("add", "other2", {'a': 1}, {'b': 2})
+    # cmd = OLT_V5.authorize_onu("phy-id", "FHTT01010001", "5006-10", 1, 1, 1)
+    # print(cmd)
+    cmd = OLT_V5.onu_lan_service(
+        (1, 1, 1, 1),
+        2,
+        {'cvlan': ('tag', 1, 2001),
+         'translate': ('enable', 3, 301),
+         'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')},
+        {'cvlan': ('transparent', 1, 302),
+         'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')})
+    print(cmd)

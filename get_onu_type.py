@@ -144,6 +144,7 @@ def model2_config(version="V5", file=r'E:/config_model2.txt'):
 
 def create_config1():
     '''
+    # serv_count, (vlan_mode, cpri, cvlan, *translate, *qinq)  
     onu port vlan 1 eth 1 service count 3
     onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
     onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301
@@ -155,6 +156,7 @@ def create_config1():
     onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
     onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 voip SVLAN2
     '''
+    
     onu_count = 21
     PORTNO =  [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8]
     with open(r'E:/config_model4.txt','w') as f:

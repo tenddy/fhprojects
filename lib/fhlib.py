@@ -12,19 +12,19 @@
 
 class OLT_V4():
     def __init__(self):
-        self.cmdline__ = ""
+        self.cmdlines__ = ""
 
     @classmethod
     def reboot_system(cls):
-        cmdline = ""
-        cmdline = cmdline.join("reboot\ny\n")
-       # self.cmdline__ = cmdline__.join(cmdline)
-        return cmdline
+        cmdlines = ""
+        cmdlines = cmdlines.join("reboot\ny\n")
+       # self.cmdlines__ = cmdlines__.join(cmdlines)
+        return cmdlines
 
 
 class OLT_V5():
     def __init__(self):
-        self.cmdline__ = "version"
+        self.cmdlines__ = "version"
 
     @classmethod
     def query_debugip(cls):
@@ -35,68 +35,112 @@ class OLT_V5():
 
         引用函数：
         """
-        cmdline = []
-        cmdline.append['config\n', 'interface meth 1/1\n', "show ip address\n"]
-        return cmdline
+        cmdlines = []
+        cmdlines.append['config\n', 'interface meth 1/1\n', "show ip address\n"]
+        return cmdlines
 
     @classmethod
-    def authorize_onu(cls, slotno, ponno, onuid, auth_type, sn, onutype):
+    def authorize_onu(cls, auth_type, onu_sn, onutype, *onu):
         """
         函数功能：授权ONU
         函数参数:
-        @lsotno:
-        @ponno: 
-        @onuid: 
-        @auth_type： string, phy-id/log-id
-        @sn: phy address or logic sn
-        @onutye: 
+        @slotno(string):phy-id,log-id
+        @onu_sn(string):onu physics address or logic sn 
+        @onutye: Type of onu, eg. 5006-10, OTHER2
+        @*onu: (slotno, ponno, onuno)
         参考命令行：
         whitelist add <phy-id/log-id> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
 
         引用函数：
         """
-        cmdline = []
-        cmdline.append("config\n")
-        cmdline.append("whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(auth_type, sn, onutype, slotno, ponno, onuid))
+        cmdlines = []
+        try:
+            cmdlines.append("config\n")
+            cmdlines.append("whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(auth_type, onu_sn,onutype, *onu))
+        except Exception as err:
+            print("Error:", err)
 
-        return cmdline
+        return cmdlines
+
 
     @classmethod
     def add_uplink_vlan(cls, uplinkslot, uplinkport, vlan_mode, vlan_begin, vlan_end):
         """
-        函数功能：配置上联端口VLAN
+        函数功能：配置上联端口VLAN                
         函数参数: 
         参考命令行：
             Admin(config)# port vlan 101 to 101 tag 1/9 1
         引用函数：
         """
-        cmdline = []
-        cmdline.append("config\n")
-        cmdline.append("port vlan {0} to {1} {2} 1/{3} {4} \n".format(
+        cmdlines = []
+        cmdlines.append("config\n")
+        cmdlines.append("port vlan {0} to {1} {2} 1/{3} {4} \n".format(
             vlan_begin, vlan_end, vlan_mode, uplinkslot, uplinkport))
 
-        return cmdline
+        return cmdlines
 
     @classmethod
-    def config_onu_lan_service(cls, slotno, ponno, onuno):
+    def onu_lan_service(cls, onu_port, ser_count, *lan_service):
         """
-        """
-        cmdline = []
+        函数功能：配置ONU端口业务                
+        函数参数:
+        @onu_port: (slotno, ponno, onuno, port)
+        @ser_count : count for services
+        @lan_service: ({'cvlan':(cvlan_mode, ccos, cvlan), 'translate':(tflag, tcos, tvid), 'qinq':(sflag, scos, svlan, qinqprf, svlan_service)},) 
+        
+        参考命令行：
+            Admin(config-pon)#
+            onu port vlan 1 eth 1 service count 3
+            onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
+            onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301
+            onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+            
+            onu port vlan 1 eth 1 service 2 tag priority 3 tpid 33024 vid 45 
+            onu port vlan 1 eth 1 service 2 qinq enable priority 3 tpid 33024 vid 2701 iptv SVLAN2
 
-        return cmdline
+            onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
+            onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 voip SVLAN2
+        引用函数：
+    
+        """
+        cmdlines = []
+        if len(lan_service) < ser_count:
+            print("Error: service count(%d) > lan_service(%d)" % ser_count, len(lan_service))
+            return cmdlines
+
+        print("debug:", lan_service)
+        slotno, ponno, onuno, port = onu_port
+        cmdlines.append('config\n')
+        cmdlines.append('interface pon 1/%d/%d\n' % (slotno, ponno))
+        cmdlines.append('onu port vlan %d eth %d service count %d\n' % (onuno, port, ser_count))
+        for index in range(ser_count):
+            # cvlan service
+            # print("debug:", lan_service[index]['cvlan'])
+            # print(lan_service[index].keys())
+            cmdlines.append('onu port vlan %d eth %d service %d %s priority %d tpid 33024 vid %d\n' % (onuno, port, index+1, *lan_service[index]['cvlan']))
+
+            # translate
+            if 'translate' in lan_service[index]:
+                cmdlines.append('onu port vlan %d eth %d service %d translate %s priority %d tpid 33024 vid %d\n' % (onuno, port, index+1, *lan_service[index]['translate']))
+            
+            # qinq
+            if 'qinq' in lan_service[index]:
+                cmdlines.append('onu port vlan %d eth %d service %d qinq %s priority %d tpid 33024 vid %d %s %s\n' % (onuno, port, index+1, *lan_service[index]['qinq']))
+    
+        return cmdlines
 
     @classmethod
     def get_onu_version(cls, slotno, ponno, onuno):
         """
         函数功能： 通过线卡Telnet到MDU，并获取MDU的编译时间
         """
-        cmdline = []
-        cmdline.append("config\n")
-        cmdline.append('t l 0 \n')
-        cmdline.append('telnet slot 1/%s' % slotno)
-        cmdline.append('cd service \n')
-        cmdline.append('telnetdata pon % onu % \n')
-        cmdline.append('')
+        cmdlines = []
+        cmdlines.append("config\n")
+        cmdlines.append('t l 0 \n')
+        cmdlines.append('telnet slot 1/%s' % slotno)
+        cmdlines.append('cd service \n')
+        cmdlines.append('telnetdata pon % onu % \n')
+        cmdlines.append('')
 
     @classmethod
     def create_config(cls):
@@ -212,10 +256,10 @@ class OLT_V5():
 
     @classmethod
     def get_MDU_ngn_ip(cls, slot, pon, onu, ip):
-        cmdline = []
-        cmdline.append('config\n')
-        cmdline.append('telnet slot 1/%d \n' % slot)
-        cmdline.append('')
+        cmdlines = []
+        cmdlines.append('config\n')
+        cmdlines.append('telnet slot 1/%d \n' % slot)
+        cmdlines.append('')
 
     @classmethod
     def model1_config(cls):

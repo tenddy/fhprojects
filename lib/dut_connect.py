@@ -44,7 +44,7 @@ def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enab
     logger.info("login...")
     while True:
         # logger.warning("try connect %s of %d times" % (host, count))
-        print("try connect %s of %d times" % (host, count))
+        print("try connect %s of %d times" % (host, count)) 
         i, m, data = tn.expect(promot, 5)
         # print("status:%s" % i)
         if i == -1:
@@ -52,12 +52,12 @@ def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enab
             count += 1
             continue
 
-        if i == 0:                                 # Login
+        if i == 0:                                 # Login:
             logger.info("Login: %s" % username)
             tn.write(username + b"\n")
             i, m, data = tn.expect(promot, 5)
 
-        if i == 1:                                  # Password
+        if i == 1:                                  # Password:
             logger.info("Password: %s" % password)
             tn.write(password + b"\n")
             i, m, data = tn.expect(promot, 5)
