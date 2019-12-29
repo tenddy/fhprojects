@@ -5,7 +5,7 @@
 广西EPON MDU 业务模型配置
 @Author:  Teddy.tu
 @Date: 2019-12-29 20:22:02
-@LastEditTime : 2019-12-29 22:20:59
+@LastEditTime : 2019-12-29 22:36:28
 @LastEditors  :  Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
@@ -46,6 +46,8 @@ def service_model1_cmd(slotno, ponno, *onu_info):
     svlan_service = "SVLAN2"
 
     onu_id = 0
+    send_cmdlines.append('config\n')
+    send_cmdlines.append('interface pon 1/%d/%d\n' % (slotno, ponno))
 
     for index in range(onu_num):
         onuno, portnum = onu_info[index]
@@ -60,4 +62,5 @@ def service_model1_cmd(slotno, ponno, *onu_info):
         onu_id += 1
 
     # print("send cmd lines:", send_cmdlines)
+    send_cmdlines.append('quit\n')
     return send_cmdlines
