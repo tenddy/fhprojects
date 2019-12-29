@@ -82,13 +82,13 @@ class OLT_V5():
     @classmethod
     def onu_lan_service(cls, onu_port, ser_count, *lan_service):
         """
-        函数功能：配置ONU端口业务                
+        函数功能: 配置ONU端口业务                
         函数参数:
         @onu_port: (slotno, ponno, onuno, port)
-        @ser_count : count for services
+        @ser_count : ONU端口业务数量，0表示删除端口业务
         @lan_service: ({'cvlan':(cvlan_mode, ccos, cvlan), 'translate':(tflag, tcos, tvid), 'qinq':(sflag, scos, svlan, qinqprf, svlan_service)},) 
         
-        参考命令行：
+        参考命令行:
             Admin(config-pon)#
             onu port vlan 1 eth 1 service count 3
             onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
@@ -100,7 +100,7 @@ class OLT_V5():
 
             onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
             onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 voip SVLAN2
-        引用函数：
+        引用函数:
     
         """
         cmdlines = []
@@ -108,15 +108,13 @@ class OLT_V5():
             print("Error: service count(%d) > lan_service(%d)" % ser_count, len(lan_service))
             return cmdlines
 
-        print("debug:", lan_service)
+        # print("debug:", lan_service)
         slotno, ponno, onuno, port = onu_port
-        cmdlines.append('config\n')
-        cmdlines.append('interface pon 1/%d/%d\n' % (slotno, ponno))
+        # cmdlines.append('config\n')
+        # cmdlines.append('interface pon 1/%d/%d\n' % (slotno, ponno))
         cmdlines.append('onu port vlan %d eth %d service count %d\n' % (onuno, port, ser_count))
         for index in range(ser_count):
             # cvlan service
-            # print("debug:", lan_service[index]['cvlan'])
-            # print(lan_service[index].keys())
             cmdlines.append('onu port vlan %d eth %d service %d %s priority %d tpid 33024 vid %d\n' % (onuno, port, index+1, *lan_service[index]['cvlan']))
 
             # translate
@@ -130,17 +128,24 @@ class OLT_V5():
         return cmdlines
 
     @classmethod
-    def get_onu_version(cls, slotno, ponno, onuno):
+    def get_onu_version(cls, *onu):
         """
-        函数功能： 通过线卡Telnet到MDU，并获取MDU的编译时间
+        函数功能: 通过线卡Telnet到MDU，并获取MDU的编译时间
+        函数参数:
+        @onu: (slotno, ponno, onuno)
+        参考命令行:
+        引用函数:
         """
+        slotno, ponno, onuno = onu
+
         cmdlines = []
         cmdlines.append("config\n")
-        cmdlines.append('t l 0 \n')
+        cmdlines.append('t l 512\n')
         cmdlines.append('telnet slot 1/%s' % slotno)
-        cmdlines.append('cd service \n')
-        cmdlines.append('telnetdata pon % onu % \n')
+        cmdlines.append('cd service\n')
+        cmdlines.append('telnetdata pon %d onu %d \n' % (ponno, onuno))
         cmdlines.append('')
+        # TODO
 
     @classmethod
     def create_config(cls):

@@ -144,7 +144,6 @@ def model2_config(version="V5", file=r'E:/config_model2.txt'):
 
 def create_config1():
     '''
-    # serv_count, (vlan_mode, cpri, cvlan, *translate, *qinq)  
     onu port vlan 1 eth 1 service count 3
     onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
     onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301

@@ -4,18 +4,18 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime : 2019-12-28 22:24:36
+@LastEditTime : 2019-12-29 22:18:20
 @LastEditors  :  Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
-
+import sys
+import time
 from lib import log
 from lib.dut_connect import connect_olt_telnet
 from lib.fhlib import OLT_V5
 from src.FHAT import ServiceConfig
-import sys
-import time
+import EPON_FTTB
 
 
 def testcase():
@@ -90,4 +90,9 @@ if __name__ == "__main__":
          'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')},
         {'cvlan': ('transparent', 1, 302),
          'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')})
-    print(cmd)
+    # print(cmd)
+    cmd1 = OLT_V5.onu_lan_service((2, 1, 1, 1), 0)
+    print(cmd1)
+    cmd = EPON_FTTB.service_model1_cmd(1, 1, (1, 24), (2, 8))
+    for item in cmd:
+        print(item)
