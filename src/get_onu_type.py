@@ -74,7 +74,7 @@ def model1_config(version="V5", file=r'E:/config_model1.txt'):
         svlan = 2701
         send_cmd = []
         for index in range(onu_count):
-            onuid = ONUID_NEW[index]
+            onuid = ONUID_NEW[index] + 60
             portno = PORTNO[index]
             for p in range(portno):
                 if version == "V5":
@@ -83,7 +83,7 @@ def model1_config(version="V5", file=r'E:/config_model1.txt'):
                     send_cmd.append(cmd0)
                     cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuno, p+1, ser_count)
                     send_cmd.append(cmd1)
-                    cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (onuno, p+1, 1, 301+(onuid-1)*24 + p)
+                    cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (onuno, p+1, 1, 301+(onuid-61)*24 + p)
                     send_cmd.append(cmd2)
                     cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (onuno, p+1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
                     if index < 14:
@@ -378,9 +378,10 @@ if __name__ == "__main__":
     # f = open(r"E:/d.txt", "w")
     # f.write("ddd\n")
     # f.close()
-    create_config1()
-    create_config2()
-    autho_onu_config(version='V5')
+    model1_config()
+    # create_config1()
+    # create_config2()
+    # autho_onu_config(version='V5')
     # model1_config('V4', r'E:/config_model1_AN5516.txt')
     model1_config('V5', r'E:/config_model1_AN6000.txt')
     # switch_config()
