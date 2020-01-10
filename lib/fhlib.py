@@ -10,215 +10,314 @@
 '''
 
 
+class TL1_CMD():
+    def __init__(self):
+       self.version__ = ""
+       pass
+    
+    @staticmethod
+    def add_onu(oltid, slotno, ponno, onuidtype, onuid, onutype, bandtype=None,**kwargs):
+        """
+        函数功能：TL1授权ONU
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU 
+        @cvlan(string/int): cvlan, 1-4095
+        @**kwargs: 其他可选字段
+        参考命令行：
+        ADD-ONU::OLTID=olt-name,PONID=ponport_location:CTAG::[AUTHTYPE=auth-type],ONUID=onu-index[,PWD=onu password][,ONUNO=onu-no][,NAME=name][,DESC=onudescription],ONUTYPE=onu type[,BANDTYPE = BandWidthType];
+        引用函数：
+        使用示例:
+        
+        """
+        cmdlines = []
+        add_onu_cmds = 'ADD-ONU::OLTID={0},PONID=NA-NA-{1}-{2}:CTAG::AUTHTYPE={3},ONUID={4}'.format(oltid,slotno,ponno,onuidtype,onuid)
+        for key in kwargs.keys():
+            add_onu_cmds += ',{0}={1}'.format(key, kwargs[key])
+        
+        if bandtype is not None:
+            add_onu_cmds += ',BANDTYPE=%s' % bandtype
+        
+        add_onu_cmds += ';\n'
+        return add_onu_cmds
+    
+    @staticmethod
+    def add_ponvlan(oltid, slotno, ponno, onuidtype, onuid, cvlan,**kwargs):
+        """
+        函数功能：TL1配置ONUqinq域
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU 
+        @cvlan(string/int): cvlan, 1-4095
+        @**kwargs: 其他可选字段
+        参考命令行：
+        ADD-PONVLAN::OLTID=olt-name,PONID=机架-框-槽-PON口号,ONUIDTYPE=onuidtype,ONUID=onu-index:CTAG::[SVLAN=outervlan,]CVLAN=Innervlan[,UV=uservlan][,SCOS=outerqos][,CCOS=innerqos][,UCOS=ucos][,SERVICETYPE=servicetype][,SVCMODPROFILE=servicemodelprofile][,GEMPORT=0]；
+        引用函数：
+        """
+        cmdlines = []
+        
+        if 'SVLAN' in kwargs.keys():
+            add_ponvlan_cmd = "ADD-PONVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4}:CTAG::SVLAN={5},CVLAN={6}".format(oltid,slotno,ponno,onuidtype,onuid,kwargs['SVLAN'],cvlan)
+        else:
+            add_ponvlan_cmd = "ADD-PONVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4}:CTAG::CVLAN={5}".format(oltid,slotno,ponno,onuidtype,onuid,cvlan)
+        
+        for key in kwargs.keys():
+            if 'SVLAN' != key:
+                add_ponvlan_cmd += ',{0}={1}'.format(key, kwargs[key])
+        add_ponvlan_cmd += ';\n'
+
+        cmdlines.append(add_ponvlan_cmd)
+        return add_ponvlan_cmd
+    
+    @staticmethod
+    def del_ponvlan(oltid, slotno, ponno, onuidtype, onuid, cvlan):
+        """
+        函数功能：TL1删除ONUqinq域
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU 
+        @cvlan(string/int): cvlan, 1-4095
+        @**kwargs: 其他可选字段
+        参考命令行：
+        DEL-PONVLAN::OLTID=$::OLT(telnet_ip),PONID=NA-NA-$::SLOTNO-$::PONNO,ONUIDTYPE=LOID,ONUID=$::ONULOID:CTAG::UV=45;
+        引用函数：
+        """
+        cmdlines = []
+        
+        del_ponvlan_cmd = "DEL-PONVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4}:CTAG::UV={5};\n".format(oltid,slotno,ponno,onuidtype,onuid,cvlan)
+        
+        cmdlines.append(del_ponvlan_cmd)
+        return del_ponvlan_cmd
+
+
+
 class OLT_V4():
     def __init__(self):
-        self.cmdline__ = ""
+        self.cmdlines__ = ""
 
     @classmethod
     def reboot_system(cls):
-        cmdline = ""
-        cmdline = cmdline.join("reboot\ny\n")
-       # self.cmdline__ = cmdline__.join(cmdline)
-        return cmdline
+        cmdlines = ""
+        cmdlines = cmdlines.join("reboot\ny\n")
+       # self.cmdlines__ = cmdlines__.join(cmdlines)
+        return cmdlines
 
 
 class OLT_V5():
-    def __init__(self):
-        self.cmdline__ = "version"
+    def __init__(self, tn=None):
+        self.cmdlines__ = "version"
+        self.tn__ = tn
 
-    @classmethod
-    def query_debugip(cls):
-        cmdline = ""
-        cmdline += "show debugip\n"
-        return cmdline
-
-    @classmethod
-    def add_uplink_vlan(cls, uplinkslot, uplinkport, vlan_mode, vlan_begin, vlan_end):
+    @staticmethod
+    def query_debugip():
         """
-        函数功能：配置上联端口VLAN
+        函数功能：回读debug ip
         函数参数: 
         参考命令行：
 
-        引用函数：Admin(config)# port vlan 101 to 101 tag 1/9 1
+        引用函数：
         """
-        cmdline = []
-        cmdline.append("config\n")
-        cmdline.append("port vlan {0} to {1} {2} 1/{3} {4} \n".format(
+        cmdlines = []
+        cmdlines.append(['config\n', 'interface meth 1/1\n', "show ip address\n"])
+        return cmdlines
+
+    @staticmethod
+    def authorize_onu(auth_type, onu_sn, onutype, *onu):
+        """
+        函数功能：授权ONU
+        函数参数:
+        @auth_type(string):phy-id,log-id
+        @onu_sn(string):onu physics address or logic sn 
+        @onutye: Type of onu, eg. 5006-10, OTHER2
+        @*onu: (slotno, ponno, onuno)
+        参考命令行：
+        whitelist add <phy-id/log-id> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
+
+        引用函数：
+        """
+        cmdlines = []
+        try:
+            cmdlines.append("whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(auth_type, onu_sn,onutype, *onu))
+        except Exception as err:
+            print("Error:", err)
+
+        return cmdlines
+
+    @staticmethod
+    def unauth_onu(auth_type, slotno, ponno, onu_sn, **kwargs):
+        """
+        函数功能：去授权ONU
+        函数参数:
+        @auth_type(string):phy-id,log-id
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON 口号
+        @onu_sn(string):onu physics address or logic sn 
+        @**kwargs: checkcode
+        参考命令行：
+        no whitelist [phy-id|logic-id|password] <slotno> <ponno> <sn> {<checkcode>}*1
+        引用函数：
+        """
+        checkcode = ""
+        if 'checkcode' in kwargs.values():
+            checkcode = kwargs['checkcode']
+
+        cmdlines = []
+        cmdlines.append("no whitelist {0} {1} {2} {3} {4}\n".format(auth_type, slotno, ponno, onu_sn, checkcode))
+
+        return cmdlines 
+
+    @staticmethod
+    def add_uplink_vlan(uplinkslot, uplinkport, vlan_mode, vlan_begin, vlan_end):
+        """
+        函数功能：配置上联端口VLAN                
+        函数参数: 
+        参考命令行：
+            Admin(config)# port vlan 101 to 101 tag 1/9 1
+        引用函数：
+        """
+        cmdlines = []
+        # cmdlines.append("config\n")
+        cmdlines.append("port vlan {0} to {1} {2} 1/{3} {4} \n".format(
             vlan_begin, vlan_end, vlan_mode, uplinkslot, uplinkport))
 
-        return cmdline
+        return cmdlines
 
-    @classmethod
-    def config_onu_lan_service(cls, slotno, ponno, onuno):
+    @staticmethod
+    def onu_lan_service(onu_port, ser_count, *lan_service):
         """
+        函数功能: 配置ONU端口业务                
+        函数参数:
+        @onu_port: (slotno, ponno, onuno, port)
+        @ser_count : ONU端口业务数量，0表示删除端口业务
+        @lan_service: ({'cvlan':(cvlan_mode, ccos, cvlan), 'translate':(tflag, tcos, tvid), 'qinq':(sflag, scos, svlan, qinqprf, svlan_service)},) 
+        
+        参考命令行:
+            Admin(config-pon)#
+            onu port vlan 1 eth 1 service count 3
+            onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
+            onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301
+            onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+            
+            onu port vlan 1 eth 1 service 2 tag priority 3 tpid 33024 vid 45 
+            onu port vlan 1 eth 1 service 2 qinq enable priority 3 tpid 33024 vid 2701 iptv SVLAN2
+
+            onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
+            onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 voip SVLAN2
+        引用函数:
+    
         """
-        cmdline = ""
+        cmdlines = []
+        if len(lan_service) < ser_count:
+            print("Error: service count(%d) > lan_service(%d)" % ser_count, len(lan_service))
+            return cmdlines
 
-        return cmdline
+        # print("debug:", lan_service)
+        onuno, port = onu_port[2:]
+        # cmdlines.append('config\n')
+        # cmdlines.append('interface pon 1/%d/%d\n' % (slotno, ponno))
+        cmdlines.append('onu port vlan {0} eth {1} service count {2}\n'.format(onuno, port, ser_count))
+        for index in range(ser_count):
+            # cvlan service
+            cmdlines.append('onu port vlan {0} eth {1} service {2} {3} priority {4} tpid 33024 vid {5}\n'.format(onuno, port, index+1, *lan_service[index]['cvlan']))
 
-    @classmethod
-    def get_onu_version(cls, slotno, ponno, onuno):
+            # translate
+            if 'translate' in lan_service[index]:
+                cmdlines.append('onu port vlan {0} eth {1} service {2} translate {3} priority {4} tpid 33024 vid {5}\n'.format(onuno, port, index+1, *lan_service[index]['translate']))
+            
+            # qinq
+            if 'qinq' in lan_service[index]:
+                cmdlines.append('onu port vlan {0} eth {1} service {2} qinq {3} priority {4} tpid 33024 vid {5} {6} {7}\n'.format(onuno, port, index+1, *lan_service[index]['qinq']))
+    
+        return cmdlines
+
+    @staticmethod
+    def onu_ngn_voice_service(onu, pots, phonenum, **kwargs):
         """
-        函数功能： 通过线卡Telnet到MDU，并获取MDU的编译时间
+        函数功能: 配置ONU端口语音业务
+        函数参数:
+        @onu: (slotno, ponno, onuno)
+        参考命令行:
+        Admin(config-if-pon-)# onu ngn-voice-service <onuno> pots <portno> phonenum <num>
+        引用函数:
+        """   
+        slotno, ponno, onuno = onu
+        cmdlines = []
+        # cmdlines.append('interface pon 1/{0}/{1}\n'.format(slotno, ponno))
+
+        onu_ngn_voice_cmd = 'onu ngn-voice-service {0} pots {1} phonenum {2}'.format(onuno, pots, phonenum) 
+        for key in kwargs.keys():
+            onu_ngn_voice_cmd.join(' {0} {1}'.format(key, kwargs[key]))
+        onu_ngn_voice_cmd += '\n'
+
+        cmdlines.append(onu_ngn_voice_cmd)
+        print("ngn:", cmdlines)
+        return cmdlines
+    
+    @staticmethod
+    def del_ngn_voice_service(*onu_pots):
         """
-        cmdline = []
-        cmdline.append("config\n")
-        cmdline.append('t l 0 \n')
-        cmdline.append('telnet slot 1/%s' % slotno)
-        cmdline.append('cd service \n')
-        cmdline.append('telnetdata pon % onu % \n')
-        cmdline.append('')
+        函数功能: 删除ONU端口语音业务
+        函数参数:
+        @onu_pots: (slotno, ponno, onuno, pots)
+        参考命令行:
+        Admin(config-if-pon-)# no onu ngn-voice-service <onuno> pots <portno>
+        引用函数:
+        """                      
+        slotno, ponno, onuno, pots = onu_pots
+        cmdlines = []
+        cmdlines.append('interface pon 1/{0}/{1}\n'.format(slotno, ponno))
+        cmdlines.append('no onu ngn-voice-service {0} pots {1}\n'.format(onuno, pots))
+        return cmdlines
 
-    @classmethod
-    def create_config(cls):
+    @staticmethod
+    def get_onu_version(*onu):
+        """
+        函数功能: 通过线卡Telnet到MDU，并获取MDU的编译时间
+        函数参数:
+        @onu: (slotno, ponno, onuno)
+        参考命令行:
+        引用函数:
+        """
+        slotno, ponno, onuno = onu
+
+        cmdlines = []
+        cmdlines.append("config\n")
+        cmdlines.append('t l 512\n')
+        cmdlines.append('telnet slot 1/%s' % slotno)
+        cmdlines.append('cd service\n')
+        cmdlines.append('telnetdata pon %d onu %d \n' % (ponno, onuno))
+        cmdlines.append('')
+        # TODO
+
+    @staticmethod
+    def get_MDU_ngn_ip(slot, pon, onu, ip):
+        cmdlines = []
+        cmdlines.append('config\n')
+        cmdlines.append('telnet slot 1/%d \n' % slot)
+        cmdlines.append('')
+
+    @staticmethod
+    def add_ngn_uplink():
         '''
-        onu port vlan 1 eth 1 service count 3
-        onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
-        onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301
-        onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+        ngn-uplink-user service <name> {[vid] <vid>}*1 {[potsqinqstate] [enable|disable] svlanid <0-4085>}*1 {[service-cos] <value>}*1 {[customer-cos] <value>}*1 {[ip-mode] [static|pppoe|dhcp|pppoev6|dhcpv6]}*1 {[public-ip] [ipv4|ipv6] <ipaddress/prefix>}*1 {[public-gate] [ipv4|ipv6] <ipaddress>}*1 {[pppoeuser] <name> }*1 {[password] <pwd>}*1 {[dhcp-option60] [enable|disable]}*1 {[dhcp-value] <value>}*1 {[domainname] <name>}*1 {[protocol-port] <0-65535>}*1 {[user-index] <value>}*1
 
-        onu port vlan 1 eth 1 service 2 tag priority 3 tpid 33024 vid 45 
-        onu port vlan 1 eth 1 service 2 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
-
-        onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
-        onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+        ngn-uplink-user serv H248 vid 251 serv 0 cus 0 ip-m static public-ip ipv4 10.52.152.207/26 public-gate ipv4 10.52.152.193 pro 2944 user-in 1007
+        ngn-uplink-user-port phone 2015220701 usern aaln/0 user-in 1007 
+        ngn-uplink-user-port phone 2015220702 usern aaln/1 user-in 1007 
+        ngn-uplink-user-port phone 2015220703 usern aaln/2 user-in 1007
+        ngn-uplink-user-port phone 2015220704 usern aaln/3 user-in 1007
+        ngn-uplink-user-port phone 2015220705 usern aaln/4 user-in 1007
+        ngn-uplink-user-port phone 2015220706 usern aaln/5 user-in 1007
+        ngn-uplink-user-port phone 2015220707 usern aaln/6 user-in 1007
+        ngn-uplink-user-port phone 2015220708 usern aaln/7 user-in 1007
         '''
-        ONUID = [1, 2, 3, 6, 7, 10, 15, 20, 30, 58, 59, 60, 61, 62]
-        PORTNO = [8, 24, 24, 16, 16, 16, 24, 16, 16, 24, 16, 16, 24, 24]
-
-        ser_count = 3
-        svlan = 2701
-        send_cmd = []
-        for index in range(14):
-            onuid = ONUID[index]
-            portno = PORTNO[index]
-            ser_count = 3
-            for p in range(portno):
-
-                cmd0 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, 0)
-                send_cmd.append(cmd0)
-                cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, ser_count)
-                send_cmd.append(cmd1)
-                cmd2 = 'onu port vlan %d eth %d service %d transparent priority 1 tpid 33024 vid %d\n' % (
-                    onuid, p + 1, 1, 41)
-                send_cmd.append(cmd2)
-                cmd3 = 'onu port vlan %d eth %d service %d translate enable priority 1 tpid 33024 vid %d\n' % (
-                    onuid, p + 1, 1, 301 + (onuid - 1) * 24 + p)
-                send_cmd.append(cmd3)
-                cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (
-                    onuid, p + 1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
-                send_cmd.append(cmd4)
-                cmd5 = 'onu port vlan %d eth %d service %d transparent priority 1 tpid 33024 vid %d\n' % (
-                    onuid, p + 1, 2, 45)
-                send_cmd.append(cmd5)
-                cmd6 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (
-                    onuid, p+1, 2, svlan, 'FTTB_QINQ', 'SVLAN2')
-                send_cmd.append(cmd6)
-                cmd7 = 'onu port vlan %d eth %d service %d transparent priority 7 tpid 33024 vid %d\n' % (
-                    onuid, p + 1, 3, 46)
-                send_cmd.append(cmd7)
-                cmd8 = 'onu port vlan %d eth %d service %d qinq enable priority 7 tpid 33024 vid %d %s %s\n' % (
-                    onuid, p+1, 3, svlan, 'FTTB_QINQ', 'SVLAN2')
-                send_cmd.append(cmd8)
-
-            with open(r'E:/config.txt', 'w') as f:
-                f.write(''.join(send_cmd))
-        return send_cmd
-
-    @classmethod
-    def create_config1(cls):
-        '''
-        onu port vlan 1 eth 1 service count 3
-        onu port vlan 1 eth 1 service 1 tag priority 1 tpid 33024 vid 41 
-        onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301
-        onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
-
-        onu port vlan 1 eth 1 service 2 tag priority 3 tpid 33024 vid 45 
-        onu port vlan 1 eth 1 service 2 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
-
-        onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
-        onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
-        '''
-        ONUID = [1, 2, 3, 6, 7, 10, 15, 20, 30, 58, 59, 60, 61, 62]
-        PORTNO = [8, 24, 24, 16, 16, 16, 24, 16, 16, 24, 16, 16, 24, 24]
-
-        ser_count = 3
-        # trans_ser_vlan = 41
-        svlan = 2701
-        for index in range(14):
-            onuid = ONUID[index]
-            portno = PORTNO[index]
-            ser_count = 3
-            for p in range(portno):
-                send_cmd = []
-                cmd0 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, 0)
-                send_cmd.append(cmd0)
-                cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, ser_count)
-                send_cmd.append(cmd1)
-                cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (
-                    onuid, p+1, 1, 41)
-                send_cmd.append(cmd2)
-                cmd3 = 'onu port vlan %d eth %d service %d translate enable priority 1 tpid 33024 vid %d\n' % (
-                    onuid, p+1, 1, 301 + (onuid - 1) * 24 + p)
-                send_cmd.append(cmd3)
-                cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (
-                    onuid, p+1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
-                send_cmd.append(cmd4)
-                cmd5 = 'onu port vlan %d eth %d service %d transparent priority 1 tpid 33024 vid %d\n' % (
-                    onuid, p+1, 2, 45)
-                send_cmd.append(cmd5)
-                cmd6 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (
-                    onuid, p+1, 2, svlan, 'FTTB_QINQ', 'SVLAN2')
-                send_cmd.append(cmd6)
-                cmd7 = 'onu port vlan %d eth %d service %d transparent priority 7 tpid 33024 vid %d\n' % (
-                    onuid, p + 1, 3, 46)
-                send_cmd.append(cmd7)
-                cmd8 = 'onu port vlan %d eth %d service %d qinq enable priority 7 tpid 33024 vid %d %s %s\n' % (
-                    onuid, p+1, 3, svlan, 'FTTB_QINQ', 'SVLAN2')
-                send_cmd.append(cmd8)
-
-                with open(r'E:/config1.txt', 'w') as f:
-                    f.write(''.join(send_cmd))
-                return send_cmd
-
-    @classmethod
-    def get_MDU_ngn_ip(cls, slot, pon, onu, ip):
-        cmdline = []
-        cmdline.append('config\n')
-        cmdline.append('telnet slot 1/%d \n' % slot)
-        cmdline.append('')
-
-    @classmethod
-    def model1_config(cls):
-        '''
-        onu port vlan 1 eth 1 service count 1
-        onu port vlan 1 eth 1 service 1 tag priority 1 tpid 33024 vid 301 
-        onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
-        '''
-        onu_count = 18
-        ONUID_NEW = range(1,onu_count+1)
-        PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,8]
-
-        with open(r'E:/config_model1.txt','w') as f:
-            # onu1
-            # onuid = 1
-            # portno = 8
-            ser_count = 1
-            # trans_ser_vlan = 41
-            svlan = 2701
-            send_cmd = []
-            for index in range(onu_count):
-                onuid = ONUID_NEW[index]
-                portno = PORTNO[index]
-                for p in range(portno):
-                    
-                    cmd0 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, 0)
-                    send_cmd.append(cmd0)
-                    cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, ser_count)
-                    send_cmd.append(cmd1)
-                    cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (onuid, p+1, 1, 301+(onuid-1)*24 + p)
-                    send_cmd.append(cmd2)
-                    cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (onuid, p+1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
-                    send_cmd.append(cmd4)
-                    send_cmd.append(cmd2)
-            f.write(''.join(send_cmd))
+        pass

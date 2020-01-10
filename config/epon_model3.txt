@@ -1,0 +1,1113 @@
+onu port vlan 1 eth 1 service count 1
+onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301
+onu port vlan 1 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 2 service count 1
+onu port vlan 1 eth 2 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 2 service 1 translate enable priority 1 tpid 33024 vid 302
+onu port vlan 1 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 3 service count 1
+onu port vlan 1 eth 3 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 3 service 1 translate enable priority 1 tpid 33024 vid 303
+onu port vlan 1 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 4 service count 1
+onu port vlan 1 eth 4 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 4 service 1 translate enable priority 1 tpid 33024 vid 304
+onu port vlan 1 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 5 service count 1
+onu port vlan 1 eth 5 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 5 service 1 translate enable priority 1 tpid 33024 vid 305
+onu port vlan 1 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 6 service count 1
+onu port vlan 1 eth 6 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 6 service 1 translate enable priority 1 tpid 33024 vid 306
+onu port vlan 1 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 7 service count 1
+onu port vlan 1 eth 7 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 7 service 1 translate enable priority 1 tpid 33024 vid 307
+onu port vlan 1 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 8 service count 1
+onu port vlan 1 eth 8 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 8 service 1 translate enable priority 1 tpid 33024 vid 308
+onu port vlan 1 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 9 service count 1
+onu port vlan 1 eth 9 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 9 service 1 translate enable priority 1 tpid 33024 vid 309
+onu port vlan 1 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 10 service count 1
+onu port vlan 1 eth 10 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 10 service 1 translate enable priority 1 tpid 33024 vid 310
+onu port vlan 1 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 11 service count 1
+onu port vlan 1 eth 11 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 11 service 1 translate enable priority 1 tpid 33024 vid 311
+onu port vlan 1 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 12 service count 1
+onu port vlan 1 eth 12 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 12 service 1 translate enable priority 1 tpid 33024 vid 312
+onu port vlan 1 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 13 service count 1
+onu port vlan 1 eth 13 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 13 service 1 translate enable priority 1 tpid 33024 vid 313
+onu port vlan 1 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 14 service count 1
+onu port vlan 1 eth 14 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 14 service 1 translate enable priority 1 tpid 33024 vid 314
+onu port vlan 1 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 15 service count 1
+onu port vlan 1 eth 15 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 15 service 1 translate enable priority 1 tpid 33024 vid 315
+onu port vlan 1 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 1 eth 16 service count 1
+onu port vlan 1 eth 16 service 1 transparent priority 1 tpid 33024 vid 2001
+onu port vlan 1 eth 16 service 1 translate enable priority 1 tpid 33024 vid 316
+onu port vlan 1 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 1 service count 1
+onu port vlan 2 eth 1 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 1 service 1 translate enable priority 1 tpid 33024 vid 325
+onu port vlan 2 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 2 service count 1
+onu port vlan 2 eth 2 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 2 service 1 translate enable priority 1 tpid 33024 vid 326
+onu port vlan 2 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 3 service count 1
+onu port vlan 2 eth 3 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 3 service 1 translate enable priority 1 tpid 33024 vid 327
+onu port vlan 2 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 4 service count 1
+onu port vlan 2 eth 4 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 4 service 1 translate enable priority 1 tpid 33024 vid 328
+onu port vlan 2 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 5 service count 1
+onu port vlan 2 eth 5 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 5 service 1 translate enable priority 1 tpid 33024 vid 329
+onu port vlan 2 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 6 service count 1
+onu port vlan 2 eth 6 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 6 service 1 translate enable priority 1 tpid 33024 vid 330
+onu port vlan 2 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 7 service count 1
+onu port vlan 2 eth 7 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 7 service 1 translate enable priority 1 tpid 33024 vid 331
+onu port vlan 2 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 8 service count 1
+onu port vlan 2 eth 8 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 8 service 1 translate enable priority 1 tpid 33024 vid 332
+onu port vlan 2 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 9 service count 1
+onu port vlan 2 eth 9 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 9 service 1 translate enable priority 1 tpid 33024 vid 333
+onu port vlan 2 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 10 service count 1
+onu port vlan 2 eth 10 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 10 service 1 translate enable priority 1 tpid 33024 vid 334
+onu port vlan 2 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 11 service count 1
+onu port vlan 2 eth 11 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 11 service 1 translate enable priority 1 tpid 33024 vid 335
+onu port vlan 2 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 12 service count 1
+onu port vlan 2 eth 12 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 12 service 1 translate enable priority 1 tpid 33024 vid 336
+onu port vlan 2 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 13 service count 1
+onu port vlan 2 eth 13 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 13 service 1 translate enable priority 1 tpid 33024 vid 337
+onu port vlan 2 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 14 service count 1
+onu port vlan 2 eth 14 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 14 service 1 translate enable priority 1 tpid 33024 vid 338
+onu port vlan 2 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 15 service count 1
+onu port vlan 2 eth 15 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 15 service 1 translate enable priority 1 tpid 33024 vid 339
+onu port vlan 2 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 2 eth 16 service count 1
+onu port vlan 2 eth 16 service 1 transparent priority 1 tpid 33024 vid 2002
+onu port vlan 2 eth 16 service 1 translate enable priority 1 tpid 33024 vid 340
+onu port vlan 2 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 1 service count 1
+onu port vlan 3 eth 1 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 1 service 1 translate enable priority 1 tpid 33024 vid 349
+onu port vlan 3 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 2 service count 1
+onu port vlan 3 eth 2 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 2 service 1 translate enable priority 1 tpid 33024 vid 350
+onu port vlan 3 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 3 service count 1
+onu port vlan 3 eth 3 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 3 service 1 translate enable priority 1 tpid 33024 vid 351
+onu port vlan 3 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 4 service count 1
+onu port vlan 3 eth 4 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 4 service 1 translate enable priority 1 tpid 33024 vid 352
+onu port vlan 3 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 5 service count 1
+onu port vlan 3 eth 5 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 5 service 1 translate enable priority 1 tpid 33024 vid 353
+onu port vlan 3 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 6 service count 1
+onu port vlan 3 eth 6 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 6 service 1 translate enable priority 1 tpid 33024 vid 354
+onu port vlan 3 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 7 service count 1
+onu port vlan 3 eth 7 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 7 service 1 translate enable priority 1 tpid 33024 vid 355
+onu port vlan 3 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 3 eth 8 service count 1
+onu port vlan 3 eth 8 service 1 transparent priority 1 tpid 33024 vid 2003
+onu port vlan 3 eth 8 service 1 translate enable priority 1 tpid 33024 vid 356
+onu port vlan 3 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 1 service count 1
+onu port vlan 4 eth 1 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 1 service 1 translate enable priority 1 tpid 33024 vid 373
+onu port vlan 4 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 2 service count 1
+onu port vlan 4 eth 2 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 2 service 1 translate enable priority 1 tpid 33024 vid 374
+onu port vlan 4 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 3 service count 1
+onu port vlan 4 eth 3 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 3 service 1 translate enable priority 1 tpid 33024 vid 375
+onu port vlan 4 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 4 service count 1
+onu port vlan 4 eth 4 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 4 service 1 translate enable priority 1 tpid 33024 vid 376
+onu port vlan 4 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 5 service count 1
+onu port vlan 4 eth 5 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 5 service 1 translate enable priority 1 tpid 33024 vid 377
+onu port vlan 4 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 6 service count 1
+onu port vlan 4 eth 6 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 6 service 1 translate enable priority 1 tpid 33024 vid 378
+onu port vlan 4 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 7 service count 1
+onu port vlan 4 eth 7 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 7 service 1 translate enable priority 1 tpid 33024 vid 379
+onu port vlan 4 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 8 service count 1
+onu port vlan 4 eth 8 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 8 service 1 translate enable priority 1 tpid 33024 vid 380
+onu port vlan 4 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 9 service count 1
+onu port vlan 4 eth 9 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 9 service 1 translate enable priority 1 tpid 33024 vid 381
+onu port vlan 4 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 10 service count 1
+onu port vlan 4 eth 10 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 10 service 1 translate enable priority 1 tpid 33024 vid 382
+onu port vlan 4 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 11 service count 1
+onu port vlan 4 eth 11 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 11 service 1 translate enable priority 1 tpid 33024 vid 383
+onu port vlan 4 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 12 service count 1
+onu port vlan 4 eth 12 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 12 service 1 translate enable priority 1 tpid 33024 vid 384
+onu port vlan 4 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 13 service count 1
+onu port vlan 4 eth 13 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 13 service 1 translate enable priority 1 tpid 33024 vid 385
+onu port vlan 4 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 14 service count 1
+onu port vlan 4 eth 14 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 14 service 1 translate enable priority 1 tpid 33024 vid 386
+onu port vlan 4 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 15 service count 1
+onu port vlan 4 eth 15 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 15 service 1 translate enable priority 1 tpid 33024 vid 387
+onu port vlan 4 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 16 service count 1
+onu port vlan 4 eth 16 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 16 service 1 translate enable priority 1 tpid 33024 vid 388
+onu port vlan 4 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 17 service count 1
+onu port vlan 4 eth 17 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 17 service 1 translate enable priority 1 tpid 33024 vid 389
+onu port vlan 4 eth 17 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 18 service count 1
+onu port vlan 4 eth 18 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 18 service 1 translate enable priority 1 tpid 33024 vid 390
+onu port vlan 4 eth 18 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 19 service count 1
+onu port vlan 4 eth 19 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 19 service 1 translate enable priority 1 tpid 33024 vid 391
+onu port vlan 4 eth 19 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 20 service count 1
+onu port vlan 4 eth 20 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 20 service 1 translate enable priority 1 tpid 33024 vid 392
+onu port vlan 4 eth 20 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 21 service count 1
+onu port vlan 4 eth 21 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 21 service 1 translate enable priority 1 tpid 33024 vid 393
+onu port vlan 4 eth 21 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 22 service count 1
+onu port vlan 4 eth 22 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 22 service 1 translate enable priority 1 tpid 33024 vid 394
+onu port vlan 4 eth 22 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 23 service count 1
+onu port vlan 4 eth 23 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 23 service 1 translate enable priority 1 tpid 33024 vid 395
+onu port vlan 4 eth 23 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 4 eth 24 service count 1
+onu port vlan 4 eth 24 service 1 transparent priority 1 tpid 33024 vid 2004
+onu port vlan 4 eth 24 service 1 translate enable priority 1 tpid 33024 vid 396
+onu port vlan 4 eth 24 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 1 service count 1
+onu port vlan 5 eth 1 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 1 service 1 translate enable priority 1 tpid 33024 vid 397
+onu port vlan 5 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 2 service count 1
+onu port vlan 5 eth 2 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 2 service 1 translate enable priority 1 tpid 33024 vid 398
+onu port vlan 5 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 3 service count 1
+onu port vlan 5 eth 3 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 3 service 1 translate enable priority 1 tpid 33024 vid 399
+onu port vlan 5 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 4 service count 1
+onu port vlan 5 eth 4 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 4 service 1 translate enable priority 1 tpid 33024 vid 400
+onu port vlan 5 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 5 service count 1
+onu port vlan 5 eth 5 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 5 service 1 translate enable priority 1 tpid 33024 vid 401
+onu port vlan 5 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 6 service count 1
+onu port vlan 5 eth 6 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 6 service 1 translate enable priority 1 tpid 33024 vid 402
+onu port vlan 5 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 7 service count 1
+onu port vlan 5 eth 7 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 7 service 1 translate enable priority 1 tpid 33024 vid 403
+onu port vlan 5 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 8 service count 1
+onu port vlan 5 eth 8 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 8 service 1 translate enable priority 1 tpid 33024 vid 404
+onu port vlan 5 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 9 service count 1
+onu port vlan 5 eth 9 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 9 service 1 translate enable priority 1 tpid 33024 vid 405
+onu port vlan 5 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 10 service count 1
+onu port vlan 5 eth 10 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 10 service 1 translate enable priority 1 tpid 33024 vid 406
+onu port vlan 5 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 11 service count 1
+onu port vlan 5 eth 11 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 11 service 1 translate enable priority 1 tpid 33024 vid 407
+onu port vlan 5 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 12 service count 1
+onu port vlan 5 eth 12 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 12 service 1 translate enable priority 1 tpid 33024 vid 408
+onu port vlan 5 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 13 service count 1
+onu port vlan 5 eth 13 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 13 service 1 translate enable priority 1 tpid 33024 vid 409
+onu port vlan 5 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 14 service count 1
+onu port vlan 5 eth 14 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 14 service 1 translate enable priority 1 tpid 33024 vid 410
+onu port vlan 5 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 15 service count 1
+onu port vlan 5 eth 15 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 15 service 1 translate enable priority 1 tpid 33024 vid 411
+onu port vlan 5 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 16 service count 1
+onu port vlan 5 eth 16 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 16 service 1 translate enable priority 1 tpid 33024 vid 412
+onu port vlan 5 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 17 service count 1
+onu port vlan 5 eth 17 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 17 service 1 translate enable priority 1 tpid 33024 vid 413
+onu port vlan 5 eth 17 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 18 service count 1
+onu port vlan 5 eth 18 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 18 service 1 translate enable priority 1 tpid 33024 vid 414
+onu port vlan 5 eth 18 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 19 service count 1
+onu port vlan 5 eth 19 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 19 service 1 translate enable priority 1 tpid 33024 vid 415
+onu port vlan 5 eth 19 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 20 service count 1
+onu port vlan 5 eth 20 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 20 service 1 translate enable priority 1 tpid 33024 vid 416
+onu port vlan 5 eth 20 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 21 service count 1
+onu port vlan 5 eth 21 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 21 service 1 translate enable priority 1 tpid 33024 vid 417
+onu port vlan 5 eth 21 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 22 service count 1
+onu port vlan 5 eth 22 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 22 service 1 translate enable priority 1 tpid 33024 vid 418
+onu port vlan 5 eth 22 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 23 service count 1
+onu port vlan 5 eth 23 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 23 service 1 translate enable priority 1 tpid 33024 vid 419
+onu port vlan 5 eth 23 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 5 eth 24 service count 1
+onu port vlan 5 eth 24 service 1 transparent priority 1 tpid 33024 vid 2005
+onu port vlan 5 eth 24 service 1 translate enable priority 1 tpid 33024 vid 420
+onu port vlan 5 eth 24 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 1 service count 1
+onu port vlan 6 eth 1 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 1 service 1 translate enable priority 1 tpid 33024 vid 421
+onu port vlan 6 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 2 service count 1
+onu port vlan 6 eth 2 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 2 service 1 translate enable priority 1 tpid 33024 vid 422
+onu port vlan 6 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 3 service count 1
+onu port vlan 6 eth 3 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 3 service 1 translate enable priority 1 tpid 33024 vid 423
+onu port vlan 6 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 4 service count 1
+onu port vlan 6 eth 4 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 4 service 1 translate enable priority 1 tpid 33024 vid 424
+onu port vlan 6 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 5 service count 1
+onu port vlan 6 eth 5 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 5 service 1 translate enable priority 1 tpid 33024 vid 425
+onu port vlan 6 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 6 service count 1
+onu port vlan 6 eth 6 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 6 service 1 translate enable priority 1 tpid 33024 vid 426
+onu port vlan 6 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 7 service count 1
+onu port vlan 6 eth 7 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 7 service 1 translate enable priority 1 tpid 33024 vid 427
+onu port vlan 6 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 8 service count 1
+onu port vlan 6 eth 8 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 8 service 1 translate enable priority 1 tpid 33024 vid 428
+onu port vlan 6 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 9 service count 1
+onu port vlan 6 eth 9 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 9 service 1 translate enable priority 1 tpid 33024 vid 429
+onu port vlan 6 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 10 service count 1
+onu port vlan 6 eth 10 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 10 service 1 translate enable priority 1 tpid 33024 vid 430
+onu port vlan 6 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 11 service count 1
+onu port vlan 6 eth 11 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 11 service 1 translate enable priority 1 tpid 33024 vid 431
+onu port vlan 6 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 12 service count 1
+onu port vlan 6 eth 12 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 12 service 1 translate enable priority 1 tpid 33024 vid 432
+onu port vlan 6 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 13 service count 1
+onu port vlan 6 eth 13 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 13 service 1 translate enable priority 1 tpid 33024 vid 433
+onu port vlan 6 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 14 service count 1
+onu port vlan 6 eth 14 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 14 service 1 translate enable priority 1 tpid 33024 vid 434
+onu port vlan 6 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 15 service count 1
+onu port vlan 6 eth 15 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 15 service 1 translate enable priority 1 tpid 33024 vid 435
+onu port vlan 6 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 6 eth 16 service count 1
+onu port vlan 6 eth 16 service 1 transparent priority 1 tpid 33024 vid 2006
+onu port vlan 6 eth 16 service 1 translate enable priority 1 tpid 33024 vid 436
+onu port vlan 6 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 1 service count 1
+onu port vlan 7 eth 1 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 1 service 1 translate enable priority 1 tpid 33024 vid 445
+onu port vlan 7 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 2 service count 1
+onu port vlan 7 eth 2 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 2 service 1 translate enable priority 1 tpid 33024 vid 446
+onu port vlan 7 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 3 service count 1
+onu port vlan 7 eth 3 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 3 service 1 translate enable priority 1 tpid 33024 vid 447
+onu port vlan 7 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 4 service count 1
+onu port vlan 7 eth 4 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 4 service 1 translate enable priority 1 tpid 33024 vid 448
+onu port vlan 7 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 5 service count 1
+onu port vlan 7 eth 5 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 5 service 1 translate enable priority 1 tpid 33024 vid 449
+onu port vlan 7 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 6 service count 1
+onu port vlan 7 eth 6 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 6 service 1 translate enable priority 1 tpid 33024 vid 450
+onu port vlan 7 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 7 service count 1
+onu port vlan 7 eth 7 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 7 service 1 translate enable priority 1 tpid 33024 vid 451
+onu port vlan 7 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 8 service count 1
+onu port vlan 7 eth 8 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 8 service 1 translate enable priority 1 tpid 33024 vid 452
+onu port vlan 7 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 9 service count 1
+onu port vlan 7 eth 9 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 9 service 1 translate enable priority 1 tpid 33024 vid 453
+onu port vlan 7 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 10 service count 1
+onu port vlan 7 eth 10 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 10 service 1 translate enable priority 1 tpid 33024 vid 454
+onu port vlan 7 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 11 service count 1
+onu port vlan 7 eth 11 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 11 service 1 translate enable priority 1 tpid 33024 vid 455
+onu port vlan 7 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 12 service count 1
+onu port vlan 7 eth 12 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 12 service 1 translate enable priority 1 tpid 33024 vid 456
+onu port vlan 7 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 13 service count 1
+onu port vlan 7 eth 13 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 13 service 1 translate enable priority 1 tpid 33024 vid 457
+onu port vlan 7 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 14 service count 1
+onu port vlan 7 eth 14 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 14 service 1 translate enable priority 1 tpid 33024 vid 458
+onu port vlan 7 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 15 service count 1
+onu port vlan 7 eth 15 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 15 service 1 translate enable priority 1 tpid 33024 vid 459
+onu port vlan 7 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 16 service count 1
+onu port vlan 7 eth 16 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 16 service 1 translate enable priority 1 tpid 33024 vid 460
+onu port vlan 7 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 17 service count 1
+onu port vlan 7 eth 17 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 17 service 1 translate enable priority 1 tpid 33024 vid 461
+onu port vlan 7 eth 17 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 18 service count 1
+onu port vlan 7 eth 18 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 18 service 1 translate enable priority 1 tpid 33024 vid 462
+onu port vlan 7 eth 18 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 19 service count 1
+onu port vlan 7 eth 19 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 19 service 1 translate enable priority 1 tpid 33024 vid 463
+onu port vlan 7 eth 19 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 20 service count 1
+onu port vlan 7 eth 20 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 20 service 1 translate enable priority 1 tpid 33024 vid 464
+onu port vlan 7 eth 20 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 21 service count 1
+onu port vlan 7 eth 21 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 21 service 1 translate enable priority 1 tpid 33024 vid 465
+onu port vlan 7 eth 21 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 22 service count 1
+onu port vlan 7 eth 22 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 22 service 1 translate enable priority 1 tpid 33024 vid 466
+onu port vlan 7 eth 22 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 23 service count 1
+onu port vlan 7 eth 23 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 23 service 1 translate enable priority 1 tpid 33024 vid 467
+onu port vlan 7 eth 23 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 7 eth 24 service count 1
+onu port vlan 7 eth 24 service 1 transparent priority 1 tpid 33024 vid 2007
+onu port vlan 7 eth 24 service 1 translate enable priority 1 tpid 33024 vid 468
+onu port vlan 7 eth 24 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 1 service count 1
+onu port vlan 8 eth 1 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 1 service 1 translate enable priority 1 tpid 33024 vid 469
+onu port vlan 8 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 2 service count 1
+onu port vlan 8 eth 2 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 2 service 1 translate enable priority 1 tpid 33024 vid 470
+onu port vlan 8 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 3 service count 1
+onu port vlan 8 eth 3 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 3 service 1 translate enable priority 1 tpid 33024 vid 471
+onu port vlan 8 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 4 service count 1
+onu port vlan 8 eth 4 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 4 service 1 translate enable priority 1 tpid 33024 vid 472
+onu port vlan 8 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 5 service count 1
+onu port vlan 8 eth 5 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 5 service 1 translate enable priority 1 tpid 33024 vid 473
+onu port vlan 8 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 6 service count 1
+onu port vlan 8 eth 6 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 6 service 1 translate enable priority 1 tpid 33024 vid 474
+onu port vlan 8 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 7 service count 1
+onu port vlan 8 eth 7 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 7 service 1 translate enable priority 1 tpid 33024 vid 475
+onu port vlan 8 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 8 service count 1
+onu port vlan 8 eth 8 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 8 service 1 translate enable priority 1 tpid 33024 vid 476
+onu port vlan 8 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 9 service count 1
+onu port vlan 8 eth 9 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 9 service 1 translate enable priority 1 tpid 33024 vid 477
+onu port vlan 8 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 10 service count 1
+onu port vlan 8 eth 10 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 10 service 1 translate enable priority 1 tpid 33024 vid 478
+onu port vlan 8 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 11 service count 1
+onu port vlan 8 eth 11 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 11 service 1 translate enable priority 1 tpid 33024 vid 479
+onu port vlan 8 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 12 service count 1
+onu port vlan 8 eth 12 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 12 service 1 translate enable priority 1 tpid 33024 vid 480
+onu port vlan 8 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 13 service count 1
+onu port vlan 8 eth 13 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 13 service 1 translate enable priority 1 tpid 33024 vid 481
+onu port vlan 8 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 14 service count 1
+onu port vlan 8 eth 14 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 14 service 1 translate enable priority 1 tpid 33024 vid 482
+onu port vlan 8 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 15 service count 1
+onu port vlan 8 eth 15 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 15 service 1 translate enable priority 1 tpid 33024 vid 483
+onu port vlan 8 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 16 service count 1
+onu port vlan 8 eth 16 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 16 service 1 translate enable priority 1 tpid 33024 vid 484
+onu port vlan 8 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 17 service count 1
+onu port vlan 8 eth 17 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 17 service 1 translate enable priority 1 tpid 33024 vid 485
+onu port vlan 8 eth 17 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 18 service count 1
+onu port vlan 8 eth 18 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 18 service 1 translate enable priority 1 tpid 33024 vid 486
+onu port vlan 8 eth 18 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 19 service count 1
+onu port vlan 8 eth 19 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 19 service 1 translate enable priority 1 tpid 33024 vid 487
+onu port vlan 8 eth 19 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 20 service count 1
+onu port vlan 8 eth 20 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 20 service 1 translate enable priority 1 tpid 33024 vid 488
+onu port vlan 8 eth 20 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 21 service count 1
+onu port vlan 8 eth 21 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 21 service 1 translate enable priority 1 tpid 33024 vid 489
+onu port vlan 8 eth 21 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 22 service count 1
+onu port vlan 8 eth 22 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 22 service 1 translate enable priority 1 tpid 33024 vid 490
+onu port vlan 8 eth 22 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 23 service count 1
+onu port vlan 8 eth 23 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 23 service 1 translate enable priority 1 tpid 33024 vid 491
+onu port vlan 8 eth 23 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 8 eth 24 service count 1
+onu port vlan 8 eth 24 service 1 transparent priority 1 tpid 33024 vid 2008
+onu port vlan 8 eth 24 service 1 translate enable priority 1 tpid 33024 vid 492
+onu port vlan 8 eth 24 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 1 service count 1
+onu port vlan 9 eth 1 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 1 service 1 translate enable priority 1 tpid 33024 vid 493
+onu port vlan 9 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 2 service count 1
+onu port vlan 9 eth 2 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 2 service 1 translate enable priority 1 tpid 33024 vid 494
+onu port vlan 9 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 3 service count 1
+onu port vlan 9 eth 3 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 3 service 1 translate enable priority 1 tpid 33024 vid 495
+onu port vlan 9 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 4 service count 1
+onu port vlan 9 eth 4 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 4 service 1 translate enable priority 1 tpid 33024 vid 496
+onu port vlan 9 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 5 service count 1
+onu port vlan 9 eth 5 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 5 service 1 translate enable priority 1 tpid 33024 vid 497
+onu port vlan 9 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 6 service count 1
+onu port vlan 9 eth 6 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 6 service 1 translate enable priority 1 tpid 33024 vid 498
+onu port vlan 9 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 7 service count 1
+onu port vlan 9 eth 7 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 7 service 1 translate enable priority 1 tpid 33024 vid 499
+onu port vlan 9 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 8 service count 1
+onu port vlan 9 eth 8 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 8 service 1 translate enable priority 1 tpid 33024 vid 500
+onu port vlan 9 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 9 service count 1
+onu port vlan 9 eth 9 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 9 service 1 translate enable priority 1 tpid 33024 vid 501
+onu port vlan 9 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 10 service count 1
+onu port vlan 9 eth 10 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 10 service 1 translate enable priority 1 tpid 33024 vid 502
+onu port vlan 9 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 11 service count 1
+onu port vlan 9 eth 11 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 11 service 1 translate enable priority 1 tpid 33024 vid 503
+onu port vlan 9 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 12 service count 1
+onu port vlan 9 eth 12 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 12 service 1 translate enable priority 1 tpid 33024 vid 504
+onu port vlan 9 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 13 service count 1
+onu port vlan 9 eth 13 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 13 service 1 translate enable priority 1 tpid 33024 vid 505
+onu port vlan 9 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 14 service count 1
+onu port vlan 9 eth 14 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 14 service 1 translate enable priority 1 tpid 33024 vid 506
+onu port vlan 9 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 15 service count 1
+onu port vlan 9 eth 15 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 15 service 1 translate enable priority 1 tpid 33024 vid 507
+onu port vlan 9 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 9 eth 16 service count 1
+onu port vlan 9 eth 16 service 1 transparent priority 1 tpid 33024 vid 2009
+onu port vlan 9 eth 16 service 1 translate enable priority 1 tpid 33024 vid 508
+onu port vlan 9 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 1 service count 1
+onu port vlan 10 eth 1 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 1 service 1 translate enable priority 1 tpid 33024 vid 517
+onu port vlan 10 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 2 service count 1
+onu port vlan 10 eth 2 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 2 service 1 translate enable priority 1 tpid 33024 vid 518
+onu port vlan 10 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 3 service count 1
+onu port vlan 10 eth 3 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 3 service 1 translate enable priority 1 tpid 33024 vid 519
+onu port vlan 10 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 4 service count 1
+onu port vlan 10 eth 4 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 4 service 1 translate enable priority 1 tpid 33024 vid 520
+onu port vlan 10 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 5 service count 1
+onu port vlan 10 eth 5 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 5 service 1 translate enable priority 1 tpid 33024 vid 521
+onu port vlan 10 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 6 service count 1
+onu port vlan 10 eth 6 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 6 service 1 translate enable priority 1 tpid 33024 vid 522
+onu port vlan 10 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 7 service count 1
+onu port vlan 10 eth 7 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 7 service 1 translate enable priority 1 tpid 33024 vid 523
+onu port vlan 10 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 8 service count 1
+onu port vlan 10 eth 8 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 8 service 1 translate enable priority 1 tpid 33024 vid 524
+onu port vlan 10 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 9 service count 1
+onu port vlan 10 eth 9 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 9 service 1 translate enable priority 1 tpid 33024 vid 525
+onu port vlan 10 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 10 service count 1
+onu port vlan 10 eth 10 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 10 service 1 translate enable priority 1 tpid 33024 vid 526
+onu port vlan 10 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 11 service count 1
+onu port vlan 10 eth 11 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 11 service 1 translate enable priority 1 tpid 33024 vid 527
+onu port vlan 10 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 12 service count 1
+onu port vlan 10 eth 12 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 12 service 1 translate enable priority 1 tpid 33024 vid 528
+onu port vlan 10 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 13 service count 1
+onu port vlan 10 eth 13 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 13 service 1 translate enable priority 1 tpid 33024 vid 529
+onu port vlan 10 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 14 service count 1
+onu port vlan 10 eth 14 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 14 service 1 translate enable priority 1 tpid 33024 vid 530
+onu port vlan 10 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 15 service count 1
+onu port vlan 10 eth 15 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 15 service 1 translate enable priority 1 tpid 33024 vid 531
+onu port vlan 10 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 10 eth 16 service count 1
+onu port vlan 10 eth 16 service 1 transparent priority 1 tpid 33024 vid 2010
+onu port vlan 10 eth 16 service 1 translate enable priority 1 tpid 33024 vid 532
+onu port vlan 10 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 1 service count 1
+onu port vlan 11 eth 1 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 1 service 1 translate enable priority 1 tpid 33024 vid 541
+onu port vlan 11 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 2 service count 1
+onu port vlan 11 eth 2 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 2 service 1 translate enable priority 1 tpid 33024 vid 542
+onu port vlan 11 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 3 service count 1
+onu port vlan 11 eth 3 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 3 service 1 translate enable priority 1 tpid 33024 vid 543
+onu port vlan 11 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 4 service count 1
+onu port vlan 11 eth 4 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 4 service 1 translate enable priority 1 tpid 33024 vid 544
+onu port vlan 11 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 5 service count 1
+onu port vlan 11 eth 5 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 5 service 1 translate enable priority 1 tpid 33024 vid 545
+onu port vlan 11 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 6 service count 1
+onu port vlan 11 eth 6 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 6 service 1 translate enable priority 1 tpid 33024 vid 546
+onu port vlan 11 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 7 service count 1
+onu port vlan 11 eth 7 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 7 service 1 translate enable priority 1 tpid 33024 vid 547
+onu port vlan 11 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 8 service count 1
+onu port vlan 11 eth 8 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 8 service 1 translate enable priority 1 tpid 33024 vid 548
+onu port vlan 11 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 9 service count 1
+onu port vlan 11 eth 9 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 9 service 1 translate enable priority 1 tpid 33024 vid 549
+onu port vlan 11 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 10 service count 1
+onu port vlan 11 eth 10 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 10 service 1 translate enable priority 1 tpid 33024 vid 550
+onu port vlan 11 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 11 service count 1
+onu port vlan 11 eth 11 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 11 service 1 translate enable priority 1 tpid 33024 vid 551
+onu port vlan 11 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 12 service count 1
+onu port vlan 11 eth 12 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 12 service 1 translate enable priority 1 tpid 33024 vid 552
+onu port vlan 11 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 13 service count 1
+onu port vlan 11 eth 13 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 13 service 1 translate enable priority 1 tpid 33024 vid 553
+onu port vlan 11 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 14 service count 1
+onu port vlan 11 eth 14 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 14 service 1 translate enable priority 1 tpid 33024 vid 554
+onu port vlan 11 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 15 service count 1
+onu port vlan 11 eth 15 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 15 service 1 translate enable priority 1 tpid 33024 vid 555
+onu port vlan 11 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 11 eth 16 service count 1
+onu port vlan 11 eth 16 service 1 transparent priority 1 tpid 33024 vid 2011
+onu port vlan 11 eth 16 service 1 translate enable priority 1 tpid 33024 vid 556
+onu port vlan 11 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 1 service count 1
+onu port vlan 12 eth 1 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 1 service 1 translate enable priority 1 tpid 33024 vid 565
+onu port vlan 12 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 2 service count 1
+onu port vlan 12 eth 2 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 2 service 1 translate enable priority 1 tpid 33024 vid 566
+onu port vlan 12 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 3 service count 1
+onu port vlan 12 eth 3 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 3 service 1 translate enable priority 1 tpid 33024 vid 567
+onu port vlan 12 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 4 service count 1
+onu port vlan 12 eth 4 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 4 service 1 translate enable priority 1 tpid 33024 vid 568
+onu port vlan 12 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 5 service count 1
+onu port vlan 12 eth 5 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 5 service 1 translate enable priority 1 tpid 33024 vid 569
+onu port vlan 12 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 6 service count 1
+onu port vlan 12 eth 6 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 6 service 1 translate enable priority 1 tpid 33024 vid 570
+onu port vlan 12 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 7 service count 1
+onu port vlan 12 eth 7 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 7 service 1 translate enable priority 1 tpid 33024 vid 571
+onu port vlan 12 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 8 service count 1
+onu port vlan 12 eth 8 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 8 service 1 translate enable priority 1 tpid 33024 vid 572
+onu port vlan 12 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 9 service count 1
+onu port vlan 12 eth 9 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 9 service 1 translate enable priority 1 tpid 33024 vid 573
+onu port vlan 12 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 10 service count 1
+onu port vlan 12 eth 10 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 10 service 1 translate enable priority 1 tpid 33024 vid 574
+onu port vlan 12 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 11 service count 1
+onu port vlan 12 eth 11 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 11 service 1 translate enable priority 1 tpid 33024 vid 575
+onu port vlan 12 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 12 service count 1
+onu port vlan 12 eth 12 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 12 service 1 translate enable priority 1 tpid 33024 vid 576
+onu port vlan 12 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 13 service count 1
+onu port vlan 12 eth 13 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 13 service 1 translate enable priority 1 tpid 33024 vid 577
+onu port vlan 12 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 14 service count 1
+onu port vlan 12 eth 14 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 14 service 1 translate enable priority 1 tpid 33024 vid 578
+onu port vlan 12 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 15 service count 1
+onu port vlan 12 eth 15 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 15 service 1 translate enable priority 1 tpid 33024 vid 579
+onu port vlan 12 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 12 eth 16 service count 1
+onu port vlan 12 eth 16 service 1 transparent priority 1 tpid 33024 vid 2012
+onu port vlan 12 eth 16 service 1 translate enable priority 1 tpid 33024 vid 580
+onu port vlan 12 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 1 service count 1
+onu port vlan 13 eth 1 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 1 service 1 translate enable priority 1 tpid 33024 vid 589
+onu port vlan 13 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 2 service count 1
+onu port vlan 13 eth 2 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 2 service 1 translate enable priority 1 tpid 33024 vid 590
+onu port vlan 13 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 3 service count 1
+onu port vlan 13 eth 3 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 3 service 1 translate enable priority 1 tpid 33024 vid 591
+onu port vlan 13 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 4 service count 1
+onu port vlan 13 eth 4 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 4 service 1 translate enable priority 1 tpid 33024 vid 592
+onu port vlan 13 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 5 service count 1
+onu port vlan 13 eth 5 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 5 service 1 translate enable priority 1 tpid 33024 vid 593
+onu port vlan 13 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 6 service count 1
+onu port vlan 13 eth 6 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 6 service 1 translate enable priority 1 tpid 33024 vid 594
+onu port vlan 13 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 7 service count 1
+onu port vlan 13 eth 7 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 7 service 1 translate enable priority 1 tpid 33024 vid 595
+onu port vlan 13 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 8 service count 1
+onu port vlan 13 eth 8 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 8 service 1 translate enable priority 1 tpid 33024 vid 596
+onu port vlan 13 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 9 service count 1
+onu port vlan 13 eth 9 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 9 service 1 translate enable priority 1 tpid 33024 vid 597
+onu port vlan 13 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 10 service count 1
+onu port vlan 13 eth 10 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 10 service 1 translate enable priority 1 tpid 33024 vid 598
+onu port vlan 13 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 11 service count 1
+onu port vlan 13 eth 11 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 11 service 1 translate enable priority 1 tpid 33024 vid 599
+onu port vlan 13 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 12 service count 1
+onu port vlan 13 eth 12 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 12 service 1 translate enable priority 1 tpid 33024 vid 600
+onu port vlan 13 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 13 service count 1
+onu port vlan 13 eth 13 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 13 service 1 translate enable priority 1 tpid 33024 vid 601
+onu port vlan 13 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 14 service count 1
+onu port vlan 13 eth 14 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 14 service 1 translate enable priority 1 tpid 33024 vid 602
+onu port vlan 13 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 15 service count 1
+onu port vlan 13 eth 15 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 15 service 1 translate enable priority 1 tpid 33024 vid 603
+onu port vlan 13 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 16 service count 1
+onu port vlan 13 eth 16 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 16 service 1 translate enable priority 1 tpid 33024 vid 604
+onu port vlan 13 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 17 service count 1
+onu port vlan 13 eth 17 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 17 service 1 translate enable priority 1 tpid 33024 vid 605
+onu port vlan 13 eth 17 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 18 service count 1
+onu port vlan 13 eth 18 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 18 service 1 translate enable priority 1 tpid 33024 vid 606
+onu port vlan 13 eth 18 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 19 service count 1
+onu port vlan 13 eth 19 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 19 service 1 translate enable priority 1 tpid 33024 vid 607
+onu port vlan 13 eth 19 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 20 service count 1
+onu port vlan 13 eth 20 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 20 service 1 translate enable priority 1 tpid 33024 vid 608
+onu port vlan 13 eth 20 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 21 service count 1
+onu port vlan 13 eth 21 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 21 service 1 translate enable priority 1 tpid 33024 vid 609
+onu port vlan 13 eth 21 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 22 service count 1
+onu port vlan 13 eth 22 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 22 service 1 translate enable priority 1 tpid 33024 vid 610
+onu port vlan 13 eth 22 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 23 service count 1
+onu port vlan 13 eth 23 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 23 service 1 translate enable priority 1 tpid 33024 vid 611
+onu port vlan 13 eth 23 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 13 eth 24 service count 1
+onu port vlan 13 eth 24 service 1 transparent priority 1 tpid 33024 vid 2013
+onu port vlan 13 eth 24 service 1 translate enable priority 1 tpid 33024 vid 612
+onu port vlan 13 eth 24 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 1 service count 1
+onu port vlan 14 eth 1 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 1 service 1 translate enable priority 1 tpid 33024 vid 613
+onu port vlan 14 eth 1 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 2 service count 1
+onu port vlan 14 eth 2 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 2 service 1 translate enable priority 1 tpid 33024 vid 614
+onu port vlan 14 eth 2 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 3 service count 1
+onu port vlan 14 eth 3 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 3 service 1 translate enable priority 1 tpid 33024 vid 615
+onu port vlan 14 eth 3 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 4 service count 1
+onu port vlan 14 eth 4 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 4 service 1 translate enable priority 1 tpid 33024 vid 616
+onu port vlan 14 eth 4 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 5 service count 1
+onu port vlan 14 eth 5 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 5 service 1 translate enable priority 1 tpid 33024 vid 617
+onu port vlan 14 eth 5 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 6 service count 1
+onu port vlan 14 eth 6 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 6 service 1 translate enable priority 1 tpid 33024 vid 618
+onu port vlan 14 eth 6 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 7 service count 1
+onu port vlan 14 eth 7 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 7 service 1 translate enable priority 1 tpid 33024 vid 619
+onu port vlan 14 eth 7 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 8 service count 1
+onu port vlan 14 eth 8 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 8 service 1 translate enable priority 1 tpid 33024 vid 620
+onu port vlan 14 eth 8 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 9 service count 1
+onu port vlan 14 eth 9 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 9 service 1 translate enable priority 1 tpid 33024 vid 621
+onu port vlan 14 eth 9 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 10 service count 1
+onu port vlan 14 eth 10 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 10 service 1 translate enable priority 1 tpid 33024 vid 622
+onu port vlan 14 eth 10 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 11 service count 1
+onu port vlan 14 eth 11 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 11 service 1 translate enable priority 1 tpid 33024 vid 623
+onu port vlan 14 eth 11 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 12 service count 1
+onu port vlan 14 eth 12 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 12 service 1 translate enable priority 1 tpid 33024 vid 624
+onu port vlan 14 eth 12 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 13 service count 1
+onu port vlan 14 eth 13 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 13 service 1 translate enable priority 1 tpid 33024 vid 625
+onu port vlan 14 eth 13 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 14 service count 1
+onu port vlan 14 eth 14 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 14 service 1 translate enable priority 1 tpid 33024 vid 626
+onu port vlan 14 eth 14 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 15 service count 1
+onu port vlan 14 eth 15 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 15 service 1 translate enable priority 1 tpid 33024 vid 627
+onu port vlan 14 eth 15 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 16 service count 1
+onu port vlan 14 eth 16 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 16 service 1 translate enable priority 1 tpid 33024 vid 628
+onu port vlan 14 eth 16 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 17 service count 1
+onu port vlan 14 eth 17 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 17 service 1 translate enable priority 1 tpid 33024 vid 629
+onu port vlan 14 eth 17 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 18 service count 1
+onu port vlan 14 eth 18 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 18 service 1 translate enable priority 1 tpid 33024 vid 630
+onu port vlan 14 eth 18 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 19 service count 1
+onu port vlan 14 eth 19 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 19 service 1 translate enable priority 1 tpid 33024 vid 631
+onu port vlan 14 eth 19 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 20 service count 1
+onu port vlan 14 eth 20 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 20 service 1 translate enable priority 1 tpid 33024 vid 632
+onu port vlan 14 eth 20 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 21 service count 1
+onu port vlan 14 eth 21 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 21 service 1 translate enable priority 1 tpid 33024 vid 633
+onu port vlan 14 eth 21 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 22 service count 1
+onu port vlan 14 eth 22 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 22 service 1 translate enable priority 1 tpid 33024 vid 634
+onu port vlan 14 eth 22 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 23 service count 1
+onu port vlan 14 eth 23 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 23 service 1 translate enable priority 1 tpid 33024 vid 635
+onu port vlan 14 eth 23 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+onu port vlan 14 eth 24 service count 1
+onu port vlan 14 eth 24 service 1 transparent priority 1 tpid 33024 vid 2014
+onu port vlan 14 eth 24 service 1 translate enable priority 1 tpid 33024 vid 636
+onu port vlan 14 eth 24 service 1 qinq enable priority 3 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+quit
+onu port vlan 15 eth 1 service count 1
+onu port vlan 15 eth 1 service 1 tag priority 1 tpid 33024 vid 637
+onu port vlan 15 eth 2 service count 1
+onu port vlan 15 eth 2 service 1 tag priority 1 tpid 33024 vid 638
+onu port vlan 15 eth 3 service count 1
+onu port vlan 15 eth 3 service 1 tag priority 1 tpid 33024 vid 639
+onu port vlan 15 eth 4 service count 1
+onu port vlan 15 eth 4 service 1 tag priority 1 tpid 33024 vid 640
+onu port vlan 16 eth 1 service count 1
+onu port vlan 16 eth 1 service 1 tag priority 1 tpid 33024 vid 661
+onu port vlan 16 eth 2 service count 1
+onu port vlan 16 eth 2 service 1 tag priority 1 tpid 33024 vid 662
+onu port vlan 16 eth 3 service count 1
+onu port vlan 16 eth 3 service 1 tag priority 1 tpid 33024 vid 663
+onu port vlan 16 eth 4 service count 1
+onu port vlan 16 eth 4 service 1 tag priority 1 tpid 33024 vid 664
+onu port vlan 17 eth 1 service count 1
+onu port vlan 17 eth 1 service 1 tag priority 1 tpid 33024 vid 685
+onu port vlan 17 eth 2 service count 1
+onu port vlan 17 eth 2 service 1 tag priority 1 tpid 33024 vid 686
+onu port vlan 17 eth 3 service count 1
+onu port vlan 17 eth 3 service 1 tag priority 1 tpid 33024 vid 687
+onu port vlan 17 eth 4 service count 1
+onu port vlan 17 eth 4 service 1 tag priority 1 tpid 33024 vid 688
+onu port vlan 18 eth 1 service count 1
+onu port vlan 18 eth 1 service 1 tag priority 1 tpid 33024 vid 709
+onu port vlan 18 eth 2 service count 1
+onu port vlan 18 eth 2 service 1 tag priority 1 tpid 33024 vid 710
+onu port vlan 18 eth 3 service count 1
+onu port vlan 18 eth 3 service 1 tag priority 1 tpid 33024 vid 711
+onu port vlan 18 eth 4 service count 1
+onu port vlan 18 eth 4 service 1 tag priority 1 tpid 33024 vid 712
+onu port vlan 19 eth 1 service count 1
+onu port vlan 19 eth 1 service 1 tag priority 1 tpid 33024 vid 733
+onu port vlan 19 eth 2 service count 1
+onu port vlan 19 eth 2 service 1 tag priority 1 tpid 33024 vid 734
+onu port vlan 19 eth 3 service count 1
+onu port vlan 19 eth 3 service 1 tag priority 1 tpid 33024 vid 735
+onu port vlan 19 eth 4 service count 1
+onu port vlan 19 eth 4 service 1 tag priority 1 tpid 33024 vid 736
+onu port vlan 20 eth 1 service count 1
+onu port vlan 20 eth 1 service 1 tag priority 1 tpid 33024 vid 757
+onu port vlan 20 eth 2 service count 1
+onu port vlan 20 eth 2 service 1 tag priority 1 tpid 33024 vid 758
+onu port vlan 20 eth 3 service count 1
+onu port vlan 20 eth 3 service 1 tag priority 1 tpid 33024 vid 759
+onu port vlan 20 eth 4 service count 1
+onu port vlan 20 eth 4 service 1 tag priority 1 tpid 33024 vid 760
+onu port vlan 20 eth 5 service count 1
+onu port vlan 20 eth 5 service 1 tag priority 1 tpid 33024 vid 761
+onu port vlan 20 eth 6 service count 1
+onu port vlan 20 eth 6 service 1 tag priority 1 tpid 33024 vid 762
+onu port vlan 20 eth 7 service count 1
+onu port vlan 20 eth 7 service 1 tag priority 1 tpid 33024 vid 763
+onu port vlan 20 eth 8 service count 1
+onu port vlan 20 eth 8 service 1 tag priority 1 tpid 33024 vid 764

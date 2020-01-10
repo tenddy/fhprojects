@@ -4,18 +4,20 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime : 2019-12-26 16:34:12
-@LastEditors  : Teddy.tu
+@LastEditTime : 2019-12-29 22:18:20
+@LastEditors  :  Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
-
+import sys
+import time
+import re
 from lib import log
 from lib.dut_connect import connect_olt_telnet
 from lib.fhlib import OLT_V5
-import sys
-import time
-from src.FHAT import ServiceConfig
+from lib.FHAT import ServiceConfig
+from lib.FHAT import send_cmd_file
+import EPON_FTTB
 
 
 def testcase():
@@ -65,12 +67,30 @@ def service_config_ONUs(tn, slots):
                 # service_config(tn, slotno, ponno, onuno, 1, vid, 4000)
 
 
-if __name__ == "__main__":
-    host = "35.35.35.109"
-    tn = connect_olt_telnet(host, 23, b'admin', b'admin')
-    print("test")
-    test_obj = ServiceConfig(tn, log.Logger())
-    send_cmdline = ["config\n", "show discovery 1/3/16\n"]
+def func1(method, onutype, *onu):
+    print("method: ", method, "\nonutype: ", onutype, "\nonu: ", onu)
 
-    ret = test_obj.send_cmd(send_cmdline)
-    print(ret)
+def config_cmds(host, file, slotno=3, ponno=16):
+    tn = connect_olt_telnet(host, 23, b'admin', b'admin')
+    dut_host = ServiceConfig(tn, log.Logger(r'E:/DDTU Workplace/fhprojects/log/fttb.log'))
+    # dut_host.send_cmd(['config\n'])
+    f = open(file, 'r')
+    for line in f:
+        # if "#" in line:
+        #     input("press any key to continue.")
+        line = re.sub(r'phy-id [0-9]* [0-9]*', 'phy-id {0} {1}'.format(slotno, ponno), line)
+        line = re.sub(r'slot [0-9]* pon [0-9]*', 'slot {0} pon {1}'.format(slotno, ponno), line)
+        line = re.sub(r'1/[0-9]*/[0-9]*', '1/{0}/{1}'.format(slotno, ponno), line)
+        # print(line)
+        dut_host.send_cmd(line)
+    # dut_host.send_cmd(['quit\nquit\n'])
+    tn.close()
+
+if __name__ == "__main__":
+    # EPON_FTTB.epon_service_config() 
+    if len(sys.argv) <= 1:
+        print("Error: 缺少文件路径")
+        exit(-1)
+
+    host = "35.35.35.109"
+    config_cmds(host, sys.argv[1], 1, 1)
