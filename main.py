@@ -4,24 +4,26 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime : 2020-01-01 22:13:31
+@LastEditTime : 2020-01-10 22:10:45
 @LastEditors  :  Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 import sys
 import time
+import re
 from lib import log
 from lib.dut_connect import dut_connect_telnet
 from lib.fhlib import OLT_V5
-# from lib import fhat
+from lib.FHAT import ServiceConfig
+from lib.FHAT import send_cmd_file
 import EPON_FTTB
 
 
 def testcase():
     print("test...")
     host = "10.182.32.15"
-    tn = dut_connect_telnet.login_olt_telnet(host)
+    tn = dut_connect_telnet(host)
     tn.close()
 
 
@@ -49,7 +51,7 @@ def service_config_test(tn, slotno, ponno, onuno, ethno, uni_vid):
     cmds = [ser_cmd1, ser_cmd2, ser_cmd3, ser_cmd4]
     for cmd in cmds:
         byte_cmd = bytes(cmd, encoding='utf8')
-        ret = dut_connect_telnet.send_cmd(tn, byte_cmd)
+        ret = tn.send_cmd(tn, byte_cmd)
         # dut_connct_telnet.log.info(ret)
 
 
@@ -69,34 +71,28 @@ def func1(method, onutype, *onu):
     print("method: ", method, "\nonutype: ", onutype, "\nonu: ", onu)
 
 
-if __name__ == "__main__":
-    host = "127.0.0.1"
-    tn = dut_connect_telnet(host, port=2001, promot=b']')
-    print("test")
-    tn.write(b"disp current\n")
-    ret = tn.read_until(b']')
-    print(ret.decode('utf-8'))
+def config_cmds(host, file, slotno=3, ponno=16):
+    tn = dut_connect_telnet(host, 23, b'admin', b'admin')
+    dut_host = ServiceConfig(tn, log.Logger(r'E:/DDTU Workplace/fhprojects/log/fttb.log'))
+    # dut_host.send_cmd(['config\n'])
+    f = open(file, 'r')
+    for line in f:
+        # if "#" in line:
+        #     input("press any key to continue.")
+        line = re.sub(r'phy-id [0-9]* [0-9]*', 'phy-id {0} {1}'.format(slotno, ponno), line)
+        line = re.sub(r'slot [0-9]* pon [0-9]*', 'slot {0} pon {1}'.format(slotno, ponno), line)
+        line = re.sub(r'1/[0-9]*/[0-9]*', '1/{0}/{1}'.format(slotno, ponno), line)
+        # print(line)
+        dut_host.send_cmd(line)
+    # dut_host.send_cmd(['quit\nquit\n'])
     tn.close()
-    # test_obj = ServiceConfig(tn, log.Logger())
-    # send_cmdline = ["config\n", "show discovery 1/3/16\n"]
 
-    # ret = test_obj.send_cmd(send_cmdline)
-    # print(ret)
-    # func1("add", "other2", *(9, 9, 1))
-    # func1("add", "other2", {'a': 1}, {'b': 2})
-    # cmd = OLT_V5.authorize_onu("phy-id", "FHTT01010001", "5006-10", 1, 1, 1)
-    # print(cmd)
-    cmd = OLT_V5.onu_lan_service(
-        (1, 1, 1, 1),
-        2,
-        {'cvlan': ('tag', 1, 2001),
-         'translate': ('enable', 3, 301),
-         'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')},
-        {'cvlan': ('transparent', 1, 302),
-         'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')})
-    # print(cmd)
-    cmd1 = OLT_V5.onu_lan_service((2, 1, 1, 1), 0)
-    # print(cmd1)
-    cmd = EPON_FTTB.service_model1_cmd(1, 1, (1, 24), (2, 8))
-    # for item in cmd:
-    #     print(item)
+
+if __name__ == "__main__":
+    # EPON_FTTB.epon_service_config()
+    if len(sys.argv) <= 1:
+        print("Error: 缺少文件路径")
+        exit(-1)
+
+    host = "35.35.35.109"
+    config_cmds(host, sys.argv[1], 1, 1)

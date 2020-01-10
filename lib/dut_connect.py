@@ -1,6 +1,7 @@
 import logging
 import telnetlib
 import time
+from functools import wraps
 
 fh_promot = [b'ogin:', b'assword:', b'ser>', b'# ']
 
@@ -28,7 +29,7 @@ PASSWORD = b'GEPON'
 ENABLE = b'enable'
 
 # 重连次数
-CONNECT_TIMES = 5
+CONNECT_TIMES = 3
 
 
 def dut_connect_telnet(host, **kwargs):
@@ -60,46 +61,49 @@ def dut_connect_telnet(host, **kwargs):
         i, m, data = tn.expect(promot, 5)
         print("status:%s" % i)
         if i == -1:
-            tn.write(b' \r\n')
+            tn.write(b' \n')
             count += 1
             continue
 
         if i == 0:                                 # Login:
             logger.info("Login: %s" % username)
             tn.write(username + b"\n")
-            i, m, data = tn.expect(promot, 5)
+            i = tn.expect(promot, 5)[0]
 
         if i == 1:                                  # Password:
             logger.info("Password: %s" % password)
             tn.write(password + b"\n")
-            i, m, data = tn.expect(promot, 5)
+            i = tn.expect(promot, 5)[0]
 
         if i == 2:
             logger.info("User> %s" % enable)        # User>
             tn.write(b"enable\n")
-            i, m, data = tn.expect(promot, 5)
+            i = tn.expect(promot, 5)[0]
 
-        if i == 3:                                  # Admin#
-            logger.info("Login OLT(%s) success!\n" % host)
-            return tn
-
-        if len(promot)>4 and i>=4:
-            logger.info("Login success!\n")
+        if i == 3 or (len(promot)>4 and i>=4):                                  # Admin#
+            logger.info("Login Device(%s) success!\n" % host)
             return tn
 
 
-def dut_connect_tl1(host, port=3337, username='admin', password='admin'):
-    # tn = telnetlib.Telnet(host, port=port, timeout=5)
-    # login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;" % (username, password)
-    # tn.write(bytes(login_str, encoding='utf-8'))
-    # ret = tn.read_until(";")
-    # print(ret)
+class Send_CMD(object):
+    def __init__(self, tn):
+        self.tn = tn
 
+    def __call__(self, func):
+        @wraps(func)
+        def wrapped_function(*args, **kwargs):
+            ret = func(*args, **kwargs)
+            self.tn.write(ret)
+            return ret
+        return wrapped_function
+
+
+def dut_connect_tl1(host, port=3337, username='admin', password='admin',timeout=5):
     try:
         tn = telnetlib.Telnet(host, port=port)
         login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;\n" % (username, password)
 
-        ret = tn.write(bytes(login_str, encoding='utf8'))
+        tn.write(bytes(login_str, encoding='utf8'))
         line_b = tn.read_until(b';', 5)
         line_s = str(line_b, encoding='utf8')
         logger.info(line_s)
@@ -113,7 +117,7 @@ def dut_disconnect_tl1(tn_obj):
     try:
         # tn = telnetlib.Telnet(host, port=port)
         logout_str = "LOGOUT:::CTAG::;\n"
-        ret = tn_obj.write(bytes(logout_str, encoding='utf8'))
+        tn_obj.write(bytes(logout_str, encoding='utf8'))
         line_b = tn_obj.read_until(b';', 5)
         line_s = str(line_b, encoding='utf8')
         logger.info(line_s)
@@ -124,9 +128,22 @@ def dut_disconnect_tl1(tn_obj):
         return None
 
 
+def send_cmdlines_tl1(tn_obj, cmds, promot=b';', timeout=5, delay=0):
+    try:
+        for cmd in cmds:
+            tn_obj.write(bytes(cmd, encoding='utf8'), timeout=timeout)
+            line_ret = str(tn_obj.read_until(promot, timeout), encoding='utf8')
+            logger.info(line_ret)
+            time.sleep(delay)
+        return True
+    except Exception as err:
+        print(err)
+        return None
+
+    
 def auth_onu_cmd(meth='ADD'):
     olt_ip = '35.35.35.109'
-    tn_obj = dut_connect_telnet(olt_ip, 23, 'admin', 'admin')
+    tn_obj = dut_connect_telnet(olt_ip, 23, 'admin', 'admin123')
     onulist = r'./config/HGU list.txt'
     with open(onulist, 'r') as f:
         onuinfo = f.readlines()
@@ -134,8 +151,8 @@ def auth_onu_cmd(meth='ADD'):
         onu = item.split()
         slotno = onu[0]
         ponno = onu[1]
-        onuno = onu[2]
-        onutype = onu[3]
+        # onuno = onu[2]
+        onutype = 'OTHER_ONU2'
         onu_sn = onu[8]
         if meth == "ADD":
             slotno = '3'
@@ -148,7 +165,8 @@ def auth_onu_cmd(meth='ADD'):
         else:
             print("meth need ADD or DEL!")
         print(tl1_cmd)
-        cmd_ret = tn_obj.write(bytes(tl1_cmd, encoding="utf8"))
+        # cmd_ret = tn_obj.write(bytes(tl1_cmd, encoding="utf8"))
+        # print(cmd_ret)
         ret = tn_obj.read_until(b';', 5)
         print(str(ret, encoding="utf8"))
         time.sleep(0.5)
@@ -159,17 +177,20 @@ def auth_onu_tl1(meth='ADD'):
     unm_ip = '10.182.1.161'
     olt_ip = '35.35.35.109'
     tn_obj = dut_connect_tl1(unm_ip, 3337, 'admin', 'admin123')
-    onulist = r'./config/HGU list.txt'
+    # onulist = r'./config/HGU list.txt'
+    onulist = r'./config/EPON HGU 32.txt'
+
     with open(onulist, 'r') as f:
         onuinfo = f.readlines()
     for item in onuinfo:
         onu = item.split()
         # slotno = onu[0]
         # ponno = onu[1]
-        slotno = '11'
-        ponno = '4'
+        slotno = '13'
+        ponno = '14'
         onuno = onu[2]
-        onutype = onu[3]
+        # onutype = onu[3]
+        onutype = '10GEPONHGU'       
         onu_sn = onu[8]
         if meth == "ADD":
             tl1_cmd = 'ADD-ONU::OLTID=%s,PONID=NA-NA-%s-%s:CTAG::AUTHTYPE=LOID,ONUTYPE=%s,ONUID=%s;\n' % (
@@ -180,8 +201,8 @@ def auth_onu_tl1(meth='ADD'):
         else:
             print("meth need ADD or DEL!")
         print(tl1_cmd)
-        cmd_ret = tn_obj.write(bytes(tl1_cmd, encoding="utf8"))
-        ret = tn_obj.read_until(b';', 5)
+        tn_obj.write(bytes(tl1_cmd, encoding="utf8"))
+        ret = tn_obj.read_until(b';')
         print(str(ret, encoding="utf8"))
         time.sleep(0.5)
     dut_disconnect_tl1(tn_obj)
@@ -218,7 +239,7 @@ def config_service_tl1(method='add', onufile=r'./config/HGU list.txt', n_slotno=
 
             onuno = onu[2]
             onu_sn = onu[8]
-            internet_uv = 500 + int(onuno)
+            internet_uv = int(uv[0]) + int(onuno)-1
             # create
             qinq_tl1_cmd1 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%d,UV=%s,SCOS=1,CCOS=1;\n" \
                 % (olt_ip, slotno, ponno, onu_sn, svlan, internet_uv, cvlan[0])
@@ -247,7 +268,7 @@ def config_service_tl1(method='add', onufile=r'./config/HGU list.txt', n_slotno=
             else:
                 qinq_cmd = del_qinq_cmd
             print("cmd:", qinq_cmd)
-            cmd_ret = tn_obj.write(bytes(qinq_cmd, encoding="utf8"))
+            tn_obj.write(bytes(qinq_cmd, encoding="utf8"))
             ret = tn_obj.read_until(b';', 5)
             print(str(ret, encoding="utf8"))
             time.sleep(0.5)
@@ -257,7 +278,8 @@ def config_service_tl1(method='add', onufile=r'./config/HGU list.txt', n_slotno=
 if __name__ == "__main__":
     ip = '10.182.1.161'
     onulist = r'./config/EPON HGU 32.txt'
+    dut_onu = r'./config/HGU list.txt'
     # auth_onu_tl1('DEL')
     # auth_onu_tl1('ADD')
-    # config_service_tl1(r'./config/HGU list.txt', '13', '4')
-    config_service_tl1('add', onulist, '11', '8')
+    config_service_tl1('add', onulist, '13', '14')
+    # config_service_tl1('add', onulist, '11', '8')

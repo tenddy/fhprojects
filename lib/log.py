@@ -11,8 +11,13 @@
 # @License     : (c)Copyright 2019-2020 Teddy_tu
 #####################################################################
 '''
+from functools import wraps
 import logging
+import os
 
+INFO = 1
+WARNING = 2
+ERROR = 3
 
 class Logger():
     def __init__(self, logfile=None, level=logging.DEBUG):
@@ -30,7 +35,7 @@ class Logger():
         self.log__.addHandler(log)
 
     def __del__(self):
-        del self.log__
+        pass
 
     def log_info(self, msg):
         self.log__.info(msg)

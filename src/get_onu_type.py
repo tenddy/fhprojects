@@ -394,7 +394,7 @@ if __name__ == "__main__":
     # create_config2()
     # autho_onu_config(version='V5')
     # model1_config('V4', r'E:/config_model1_AN5516.txt')
-    # model1_config('V5', r'E:/config_model1_AN6000.txt')
+    model1_config('V5', r'E:/config_model1_AN6000.txt')
     # switch_config()
     # alarm_threshold_profile()
     # config_onu_bandwidth()
