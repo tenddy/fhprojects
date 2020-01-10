@@ -141,7 +141,6 @@ def model2_config(version="V5", file=r'E:/config_model2.txt'):
         f.write(''.join(send_cmd))
 
 
-
 def create_config1():
     '''
     onu port vlan 1 eth 1 service count 3

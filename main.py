@@ -4,7 +4,7 @@
 @Description: 
 @Author:  Teddy.tu
 @Date: 2019-07-07 21:53:46
-@LastEditTime : 2019-12-29 22:18:20
+@LastEditTime : 2020-01-01 22:13:31
 @LastEditors  :  Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
@@ -12,16 +12,16 @@
 import sys
 import time
 from lib import log
-from lib.dut_connect import connect_olt_telnet
+from lib.dut_connect import dut_connect_telnet
 from lib.fhlib import OLT_V5
-from src.FHAT import ServiceConfig
+# from lib import fhat
 import EPON_FTTB
 
 
 def testcase():
     print("test...")
     host = "10.182.32.15"
-    tn = connect_olt_telnet.login_olt_telnet(host)
+    tn = dut_connect_telnet.login_olt_telnet(host)
     tn.close()
 
 
@@ -36,7 +36,7 @@ def service_config(tn, slotno, ponno, onuno, ethno, uni_vid, multi_vid=4000):
     cmds = [ser_cmd1, ser_cmd2, ser_cmd3, ser_cmd4, ser_cmd5, ser_cmd6]
     for cmd in cmds:
         byte_cmd = bytes(cmd, encoding='utf8')
-        ret = connect_olt_telnet.send_cmd(tn, byte_cmd)
+        ret = dut_connect_telnet.send_cmd(tn, byte_cmd)
         # dut_connct_telnet.log.info(ret)
 
 
@@ -49,7 +49,7 @@ def service_config_test(tn, slotno, ponno, onuno, ethno, uni_vid):
     cmds = [ser_cmd1, ser_cmd2, ser_cmd3, ser_cmd4]
     for cmd in cmds:
         byte_cmd = bytes(cmd, encoding='utf8')
-        ret = connect_olt_telnet.send_cmd(tn, byte_cmd)
+        ret = dut_connect_telnet.send_cmd(tn, byte_cmd)
         # dut_connct_telnet.log.info(ret)
 
 
@@ -70,9 +70,13 @@ def func1(method, onutype, *onu):
 
 
 if __name__ == "__main__":
-    # host = "35.35.35.109"
-    # tn = connect_olt_telnet(host, 23, b'admin', b'admin')
-    # print("test")
+    host = "127.0.0.1"
+    tn = dut_connect_telnet(host, port=2001, promot=b']')
+    print("test")
+    tn.write(b"disp current\n")
+    ret = tn.read_until(b']')
+    print(ret.decode('utf-8'))
+    tn.close()
     # test_obj = ServiceConfig(tn, log.Logger())
     # send_cmdline = ["config\n", "show discovery 1/3/16\n"]
 
@@ -92,7 +96,7 @@ if __name__ == "__main__":
          'qinq': ('enable', 3, 2701, 'FTTB_QINQ', 'SVLAN')})
     # print(cmd)
     cmd1 = OLT_V5.onu_lan_service((2, 1, 1, 1), 0)
-    print(cmd1)
+    # print(cmd1)
     cmd = EPON_FTTB.service_model1_cmd(1, 1, (1, 24), (2, 8))
-    for item in cmd:
-        print(item)
+    # for item in cmd:
+    #     print(item)

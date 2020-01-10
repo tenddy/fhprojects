@@ -1,3 +1,14 @@
+#!/usr/bin/python3
+# coding=UTF-8
+'''
+@Description: 广西场景业务配置
+@Author:  Teddy.tu
+@Date: 2019-12-28 19:23:00
+@LastEditTime : 2019-12-30 22:20:52
+@LastEditors  :  Teddy.tu
+@Email:  teddy_tu@126.com
+@License:  (c)Copyright 2019-2020 Teddy_tu
+'''
 
 import re
 

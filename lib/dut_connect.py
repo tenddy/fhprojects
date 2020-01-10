@@ -2,23 +2,19 @@ import logging
 import telnetlib
 import time
 
-promot = [b'Login:', b'Password:', b'User>', b'# ']
+fh_promot = [b'ogin:', b'assword:', b'ser>', b'# ']
 
-# console
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+# console
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
 console.setFormatter(fomatter)
 
-# logger.addHandler(console)
-
 # File log
-# log = logging.getLogger(__name__)
-# log.setLevel(logging.DEBUG)
-
 file_log = logging.FileHandler('log.txt')
 file_log.setLevel(logging.DEBUG)
 fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
@@ -35,18 +31,34 @@ ENABLE = b'enable'
 CONNECT_TIMES = 5
 
 
-def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enable=ENABLE):
+def dut_connect_telnet(host, **kwargs):
     """
     OLT telnet login
     """
+    port, promot, username, password, enable = 23, fh_promot, b'GEPON', b'GEPON', b'enable'
+
+    if 'port' in kwargs.keys():
+        port = kwargs['port']
+    if 'promot' in kwargs.keys():
+        promot.append(kwargs['promot'])
+    if 'username' in kwargs.keys():
+        username = kwargs['username']
+    if 'password' in kwargs.keys():
+        password = kwargs['password']
+    if 'enable' in kwargs.keys():
+        enable = kwargs['enable']
+         
     tn = telnetlib.Telnet(host, port=port)
     count = 1
     logger.info("login...")
     while True:
-        # logger.warning("try connect %s of %d times" % (host, count))
+        if count > CONNECT_TIMES:
+            logger.error("login Devices(%s) Failed!\n" % host)
+            return None
+
         print("try connect %s of %d times" % (host, count)) 
         i, m, data = tn.expect(promot, 5)
-        # print("status:%s" % i)
+        print("status:%s" % i)
         if i == -1:
             tn.write(b' \r\n')
             count += 1
@@ -69,17 +81,11 @@ def connect_olt_telnet(host, port=23, username=USERNAME, password=PASSWORD, enab
 
         if i == 3:                                  # Admin#
             logger.info("Login OLT(%s) success!\n" % host)
-            # print("handlers", logger.handlers)
-            # hd = logger.handlers
-            # for h in hd:
-            #     h.flush()
-            #     h.close()
-            #     print("close", h)
             return tn
 
-        if count > CONNECT_TIMES:
-            logger.error("login Devices(%s) Failed!\n" % host)
-            return None
+        if len(promot)>4 and i>=4:
+            logger.info("Login success!\n")
+            return tn
 
 
 def dut_connect_tl1(host, port=3337, username='admin', password='admin'):
@@ -120,7 +126,7 @@ def dut_disconnect_tl1(tn_obj):
 
 def auth_onu_cmd(meth='ADD'):
     olt_ip = '35.35.35.109'
-    tn_obj = connect_olt_telnet(olt_ip, 23, 'admin', 'admin')
+    tn_obj = dut_connect_telnet(olt_ip, 23, 'admin', 'admin')
     onulist = r'./config/HGU list.txt'
     with open(onulist, 'r') as f:
         onuinfo = f.readlines()

@@ -31,8 +31,6 @@ set ep sl 14 p 2 o 1-9,11-13,17-19 p 13 serv 1 qinq en 3 33024 qing ftthdata 254
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
-
-
 import re
 
 
@@ -103,7 +101,7 @@ class GetONUConfig():
                 if r"-" in index_sp:
                     onu_l = index_sp.split("-")
                     onuid_list.extend(list(range(int(onu_l[0]), int(onu_l[1])+1)))
-                else:  
+                else:
                     onuid_list.append(int(index_sp))
             print("onuid_list:", onuid_list)
             if int(onuno) in onuid_list:
