@@ -69,12 +69,12 @@ def verify_string_match(dst_str, cmp_str):
 
 
 def tc_reboot_system(host):
-    tn_obj = dut_connect.connect_olt_telnet(host)
+    tn_obj = dut_connect.dut_connect_telnet(host)
     log = Logger()
 
     if tn_obj is None:
         time.sleep(60)
-        tn_obj = dut_connect.connect_olt_telnet(host)
+        tn_obj = dut_connect.dut_connect_telnet(host)
     else:
         dut = ServiceConfig(tn_obj, log)
         dut.send_cmd(OLT_V4.reboot_system())
@@ -121,20 +121,16 @@ def send_cmd_file(host, file):
     with open(file) as f:
         lines = f.readlines()
         log = Logger()
-        tn_obj = dut_connect.connect_olt_telnet(host)
+        tn_obj = dut_connect.dut_connect_telnet(host)
         dut_host = ServiceConfig(tn_obj, log)
-        # dut_host.send_cmd(["config\n", "t l 0\n"])
-        # print(len(lines), lines)
-        # for line in lines:
         dut_host.send_cmd(lines)
-        # dut_host.send_cmd(["quit\n", "quit\n"])
 
 
 if __name__ == "__main__":
     host = '35.35.35.109'
 
     config = True
-    tn = dut_connect.connect_olt_telnet(host, 23, username='admin', password='admin')
+    tn = dut_connect.dut_connect_telnet(host, 23, username='admin', password='admin')
     tn.close()
     # if config:
     #     olt_config = r'./config/new_config.txt'

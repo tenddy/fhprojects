@@ -32,23 +32,14 @@ ENABLE = b'enable'
 CONNECT_TIMES = 3
 
 
-def dut_connect_telnet(host, **kwargs):
+def dut_connect_telnet(host, port=23, username='GEPON', password='GEPON', enable='enable', promot=None):
     """
     OLT telnet login
-    """
-    port, promot, username, password, enable = 23, fh_promot, b'GEPON', b'GEPON', b'enable'
+    """ 
+    dut_promot = fh_promot   
+    if promot is not None:
+        dut_promot.append(bytes(promot, encoding='utf8'))
 
-    if 'port' in kwargs.keys():
-        port = kwargs['port']
-    if 'promot' in kwargs.keys():
-        promot.append(kwargs['promot'])
-    if 'username' in kwargs.keys():
-        username = kwargs['username']
-    if 'password' in kwargs.keys():
-        password = kwargs['password']
-    if 'enable' in kwargs.keys():
-        enable = kwargs['enable']
-         
     tn = telnetlib.Telnet(host, port=port)
     count = 1
     logger.info("login...")
@@ -58,8 +49,8 @@ def dut_connect_telnet(host, **kwargs):
             return None
 
         print("try connect %s of %d times" % (host, count)) 
-        i, m, data = tn.expect(promot, 5)
-        print("status:%s" % i)
+        i, m, data = tn.expect(dut_promot, 5)
+        # print("status:%s" % i)
         if i == -1:
             tn.write(b' \n')
             count += 1
@@ -67,25 +58,25 @@ def dut_connect_telnet(host, **kwargs):
 
         if i == 0:                                 # Login:
             logger.info("Login: %s" % username)
-            tn.write(username + b"\n")
-            i = tn.expect(promot, 5)[0]
+            tn.write(bytes("%s\n" % username, encoding='utf8'))
+            i = tn.expect(dut_promot, 5)[0]
 
         if i == 1:                                  # Password:
             logger.info("Password: %s" % password)
-            tn.write(password + b"\n")
-            i = tn.expect(promot, 5)[0]
+            tn.write(bytes("%s\n" % password, encoding='utf8'))
+            i = tn.expect(dut_promot, 5)[0]
 
         if i == 2:
             logger.info("User> %s" % enable)        # User>
-            tn.write(b"enable\n")
-            i = tn.expect(promot, 5)[0]
+            tn.write(bytes("%s\n" % enable, encoding='utf8'))
+            i = tn.expect(dut_promot, 5)[0]
 
-        if i == 3 or (len(promot)>4 and i>=4):                                  # Admin#
+        if i == 3 or (len(dut_promot)>4 and i>=4):                      # Admin# or promot
             logger.info("Login Device(%s) success!\n" % host)
             return tn
 
 
-class Send_CMD(object):
+class Send_CMD():
     def __init__(self, tn):
         self.tn = tn
 

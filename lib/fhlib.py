@@ -14,9 +14,9 @@ class TL1_CMD():
     def __init__(self):
        self.version__ = ""
        pass
-    
+
     @staticmethod
-    def add_onu(oltid, slotno, ponno, onuidtype, onuid, onutype, bandtype=None,**kwargs):
+    def add_onu(oltid, slotno, ponno, onuidtype, onuid, onutype, bandtype=None, **kwargs):
         """
         函数功能：TL1授权ONU
         函数参数:
@@ -24,26 +24,166 @@ class TL1_CMD():
         @slotno(string/int):槽位号
         @ponno(string/int):PON口号
         @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
-        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU 
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
         @cvlan(string/int): cvlan, 1-4095
         @**kwargs: 其他可选字段
         参考命令行：
         ADD-ONU::OLTID=olt-name,PONID=ponport_location:CTAG::[AUTHTYPE=auth-type],ONUID=onu-index[,PWD=onu password][,ONUNO=onu-no][,NAME=name][,DESC=onudescription],ONUTYPE=onu type[,BANDTYPE = BandWidthType];
         引用函数：
         使用示例:
-        
         """
         cmdlines = []
-        add_onu_cmds = 'ADD-ONU::OLTID={0},PONID=NA-NA-{1}-{2}:CTAG::AUTHTYPE={3},ONUID={4}'.format(oltid,slotno,ponno,onuidtype,onuid)
+        add_onu_cmds = 'ADD-ONU::OLTID={0},PONID=NA-NA-{1}-{2}:CTAG::AUTHTYPE={3},ONUID={4}'.format(
+            oltid, slotno, ponno, onuidtype, onuid)
         for key in kwargs.keys():
             add_onu_cmds += ',{0}={1}'.format(key, kwargs[key])
-        
+
         if bandtype is not None:
             add_onu_cmds += ',BANDTYPE=%s' % bandtype
-        
+
         add_onu_cmds += ';\n'
-        return add_onu_cmds
+        cmdlines.append(add_onu_cmds)
+        return cmdlines
+
+    @staticmethod
+    def del_onu(oltid, slotno, ponno, onuidtype, onuid):
+        """
+        函数功能：TL1去授权ONU
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
+        参考命令行：
+        DEL-ONU::OLTID=olt-name,PONID=ponport_location:CTAG::ONUIDTYPE=onuid-type,ONUID=onu-index;
+        引用函数：
+        使用示例:
+        """
+        cmdlines = []
+        del_onu_cmds = 'DEL-ONU::OLTID={0},PONID=NA-NA-{1}-{2}:CTAG::ONUIDTYPE={3},ONUID={4};\n'.format(oltid, slotno, ponno, onuidtype, onuid)
+        cmdlines.append(del_onu_cmds)
+        return cmdlines
     
+    @staticmethod
+    def cfg_lanport_vlan(oltid, slotno, ponno, onuidtype, onuid, onuport, cvlan, **kwargs):
+        """
+        函数功能：TL1配置ONU端口VLAN
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
+        @onuport(string/int): ONU 端口号
+        @cvlan(string/int): cvlan, 1-4095
+        @**kwargs: 其他可选字段,SVLAN, UV, SCOS, CCOS
+        参考命令行：
+        CFG-LANPORTVLAN::ONUIP=onu-name|OLTID=olt-name[,PONID=ponport_location,ONUIDTYPE=onuid-type,ONUID=onu-index],ONUPORT=onu-port:CTAG::[SVLAN=outer vlan],CVLAN=Inner vlan[,UV=user-vlan][,SCOS=outer qos][,CCOS=inner qos];
+        引用函数：
+        使用示例:
+        """
+        cmdlines = []
+        lanportvlan_cmds = 'CFG-LANPORTVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::'.format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        if 'SVLAN' in kwargs.keys():
+            lanportvlan_cmds += "SVLAN={0},CVLAN={1}".format(kwargs['SVLAN'], cvlan)
+        else:
+            lanportvlan_cmds += "CVLAN={0}".format(cvlan)
+        
+        if 'UV' in kwargs.keys():
+            lanportvlan_cmds += ',UV={0}'.format(kwargs['UV'])
+        if 'SCOS' in kwargs.keys():
+            lanportvlan_cmds += ',SCOS={0}'.format(kwargs['SCOS'])
+        if 'CCOS' in kwargs.keys():
+            lanportvlan_cmds += ',SCOS={0}'.format(kwargs['CCOS'])
+        lanportvlan_cmds += ';\n'
+
+        cmdlines.append(lanportvlan_cmds)
+        return cmdlines
+
+    @staticmethod
+    def del_lanport_vlan(oltid, slotno, ponno, onuidtype, onuid, onuport, cvlan=None):
+        """
+        函数功能：TL1删除ONU端口VLAN
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
+        @onuport(string/int): ONU 端口号
+        参考命令行：
+        DEL-LANPORTVLAN::OLTID=oltname,PONID=ponport_location,ONUIDTYPE=onuidtype,ONUID=onu-index,ONUPORT=onu-port:CTAG::[,UV=user-vlan];
+        引用函数：
+        使用示例:
+        """
+        cmdlines = []
+        lanportvlan_cmds = 'CFG-LANPORTVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::'.format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        if cvlan is not None:
+            lanportvlan_cmds += ',UV={0}'.format(cvlan)
+        lanportvlan_cmds += ";\n"
+
+        cmdlines.append(lanportvlan_cmds)
+        return cmdlines
+
+    @staticmethod
+    def add_laniptvport(oltid, slotno, ponno, onuidtype, onuid, onuport, **kwargs):
+        """
+        函数功能：TL1配置ONU端口组播VLAN
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
+        @onuport(string/int): ONU 端口号
+        @**kwargs: 其他可选字段,SVLAN, UV, SCOS, CCOS
+        参考命令行：
+        ADD-LANIPTVPORT::ONUIP=onu-name|OLTID=olt-name,PONID=ponport_location,ONUIDTYPE=onuid-type,ONUID=onu-index,ONUPORT=onu-port:CTAG::[UV=user vlan][,MVLAN=mvlan] [,UCOS=ucos] [,MCOS=mcos][,SVCMODPROFILE=svc mod profile][,GEMPORT=0];
+
+        引用函数：
+        使用示例:
+        """      
+        cmdlines = []
+        add_iptv_cmds = "ADD-LANIPTVPORT::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::".format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        for key in kwargs.keys():
+            if key=='UV':
+                add_iptv_cmds += "{0}={1}".format(key, kwargs[key])
+            else:
+                add_iptv_cmds += ",{0}={1}".format(key, kwargs[key])
+        add_iptv_cmds += ';\n'
+        cmdlines.append(add_iptv_cmds)
+        return cmdlines
+    
+    @staticmethod
+    def del_laniptvport(oltid, slotno, ponno, onuidtype, onuid, onuport, **kwargs):
+        """
+        函数功能：TL1删除ONU端口组播VLAN
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
+        @cvlan(string/int): cvlan, 1-4095
+        @**kwargs: 其他可选字段,SVLAN, UV, SCOS, CCOS
+        参考命令行：
+        DEL-LANIPTVPORT::ONUIP=onu-name|OLTID=olt-name[,PONID=ponport_location,ONUIDTYPE=onuid-type,ONUID=onu-index],ONUPORT=onu-port:CTAG::[UV=uservlan][,MVLAN=mvlan];
+
+        引用函数：
+        使用示例:
+        """   
+        cmdlines = []
+        del_iptv_cmds = "DEL-LANIPTVPORT::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::".format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        for key in kwargs.keys():
+            if key=='UV':
+                del_iptv_cmds += "{0}={1}".format(key, kwargs[key])
+            else:
+                del_iptv_cmds += ",{0}={1}".format(key, kwargs[key])
+        del_iptv_cmds += ';\n'
+        cmdlines.append(del_iptv_cmds)
+        return cmdlines          
+                
     @staticmethod
     def add_ponvlan(oltid, slotno, ponno, onuidtype, onuid, cvlan,**kwargs):
         """
@@ -73,7 +213,7 @@ class TL1_CMD():
         add_ponvlan_cmd += ';\n'
 
         cmdlines.append(add_ponvlan_cmd)
-        return add_ponvlan_cmd
+        return cmdlines
     
     @staticmethod
     def del_ponvlan(oltid, slotno, ponno, onuidtype, onuid, cvlan):
@@ -96,8 +236,71 @@ class TL1_CMD():
         del_ponvlan_cmd = "DEL-PONVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4}:CTAG::UV={5};\n".format(oltid,slotno,ponno,onuidtype,onuid,cvlan)
         
         cmdlines.append(del_ponvlan_cmd)
-        return del_ponvlan_cmd
+        return cmdlines
 
+    @staticmethod
+    def add_BWprofile(oltid, profilename, *args):
+        """
+        函数功能：TL1创建ONU带宽模板
+        函数参数:
+        @oltid(string):olt ip
+        @profilename(string): 带宽模板名称
+        @*args: 其他可选字段, (UPMGBW,UMABW,DMGBW,DMABW,UFBW) --> (上行最小保证带宽, 上行最大允许带宽, 下行最小保证带宽, 下行最大允许带宽, 上行固定带宽)
+        
+        参考命令行：
+        ADD-BWPROFILE::ONUIP=onu-name|OLTID=olt-name:CTAG::PROFILENAME=profile name[,UPMGBW=UpMINGuaranteedBandwidth,UMABW=uplinkmaximumallowedbandwidth,DMGBW=DownMINGuaranteedBandwidth,DMABW=DownMAXAllowedBandwidth,UFBW=UpstreamFixedBandwidth];
+        
+        引用函数：
+        """
+        BW = ('UPMGBW','UMABW','DMGBW','DMABW','UFBW')
+        cmdlines = []
+        add_BWprofile_cmd = "ADD-BWPROFILE::OLTID={0}:CTAG::PROFILENAME={1}".format(oltid, profilename)
+        for index in range(len(args)):
+            add_BWprofile_cmd += ",{0}={1}".format(BW[index],args[index])
+        add_BWprofile_cmd += ";\n"
+        cmdlines.append(add_BWprofile_cmd)
+        return cmdlines
+    
+    @staticmethod
+    def del_BWprofile(oltid, profilename):
+        """
+        函数功能：TL1删除ONU带宽模板
+        函数参数:
+        @oltid(string):olt ip
+        @profilename(string): 带宽模板名称
+
+        参考命令行：
+        DEL-BWPROFILE::ONUIP=onu-name|OLTID=olt-name:CTAG::PROFILENAME=profilename;
+
+        引用函数：
+        """
+        cmdlines = []
+        add_BWprofile_cmd = "DEL-BWPROFILE::OLTID={0}:CTAG::PROFILENAME={1};\n".format(oltid, profilename)
+        cmdlines.append(add_BWprofile_cmd)
+        return cmdlines
+
+    @staticmethod
+    def cfg_onuBW(oltid, slotno, ponno, onuidtype, onuid, up_bandwidth, dw_bandwidth):
+        """
+        函数功能：TL1 配置ONU上下行带宽
+        函数参数:
+        @oltid(string):olt ip
+        @slotno(string/int):槽位号
+        @ponno(string/int):PON口号
+        @onuidtype(string):ONU标识类型（ONU_NAME、MAC、LOID、ONU_NUMBER）
+        @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU 
+        @up_bandwidth(string): 上行带宽模板
+        @dw_bandwidth(string): 下行带宽模板
+
+        参考命令行：
+        CFG-ONUBW::OLTID=olt-name,PONID=NA-NA-slot-pon,ONUIDTYPE=onuid-type,ONUID=onu-index:CTAG::UPBW=onu-up-bandwidth,DOWNBW=onu-down-bandwidth;
+
+        引用函数：
+        """
+        cmdlines = []
+        cfg_onuBW_cmd = "CFG-ONUBW::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4}:CTAG::UPBW={5},DOWNBW={6};\n".format(oltid, slotno, ponno, onuidtype, onuid, up_bandwidth, dw_bandwidth)
+        cmdlines.append(cfg_onuBW_cmd)
+        return cmdlines
 
 
 class OLT_V4():
