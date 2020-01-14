@@ -12,6 +12,7 @@
 import time
 import argparse
 from lib import dut_connect
+# import dut_connect
 from lib.log import Logger
 from lib.fhlib import OLT_V5
 from lib.fhlib import OLT_V4
@@ -37,14 +38,15 @@ class ServiceConfig():
         try:
             cmd_ret = "Admin# "  # 返回参数
             for item in cmdline:
+                if len(item) == 0:
+                    continue
+                print(item)
                 self.tn__.write(bytes(item, encoding='utf8'))
                 ret = self.tn__.read_until(promot, timeout).decode('utf-8')
                 print(ret)
+                self.log__.log_info(ret)
                 cmd_ret = cmd_ret + ret
-                if len(item) == 0:
-                    continue
                 time.sleep(delay)
-            self.log__.log_info(cmd_ret)
             return cmd_ret
         except Exception as err:
             print("send cmd Error!!!")
@@ -86,7 +88,7 @@ def auth_onu_auto():
     log = Logger()
     # host = "35.35.35.109"
     host = '192.168.0.168'
-    tn_obj = dut_connect.connect_olt_telnet(host, 8003)
+    tn_obj = dut_connect.dut_connect_telnet(host, 8003)
     # a = tn_obj.read_until(b"#")
     # print(str(a, encoding='utf8'))
     dut_host = ServiceConfig(tn_obj, log)
