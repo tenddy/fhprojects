@@ -11,6 +11,8 @@
 
 import time
 import argparse
+import numpy as np 
+import pandas as pd 
 from lib import dut_connect
 # import dut_connect
 from lib.log import Logger
@@ -52,6 +54,17 @@ class ServiceConfig():
             print("send cmd Error!!!")
             self.log__.log_error("Error:" + err)
             return None
+
+class ReadFile():
+    pass
+
+def get_data_excel(filename, sheets=0):
+    """
+    函数功能:通过excel文件获取ONU信息，返回格式为DataFrame
+        Excel文件格式为：
+    """
+    data = pd.read_excel(filename, sheet_name=sheets)
+    return data
 
 
 def verify_string_match(dst_str, cmp_str):

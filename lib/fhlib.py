@@ -481,7 +481,7 @@ class OLT_V5():
         """
         函数功能: 删除ONU端口语音业务
         函数参数:
-        @onu_pots: (slotno, ponno, onuno, pots)
+        @onu_pots: ( slotno, ponno, onuno, pots)
         参考命令行:
         Admin(config-if-pon-)# no onu ngn-voice-service <onuno> pots <portno>
         引用函数:

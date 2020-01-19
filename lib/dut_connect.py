@@ -16,7 +16,7 @@ fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
 console.setFormatter(fomatter)
 
 # File log
-file_log = logging.FileHandler('log.txt')
+file_log = logging.FileHandler('./log/dut_log.txt')
 file_log.setLevel(logging.DEBUG)
 fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
 file_log.setFormatter(fomatter)
@@ -93,7 +93,7 @@ def dut_connect_tl1(host, port=3337, username='admin', password='admin',timeout=
     try:
         tn = telnetlib.Telnet(host, port=port)
         login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;\n" % (username, password)
-
+        print(login_str)
         tn.write(bytes(login_str, encoding='utf8'))
         line_b = tn.read_until(b';', 5)
         line_s = str(line_b, encoding='utf8')
@@ -108,6 +108,7 @@ def dut_disconnect_tl1(tn_obj):
     try:
         # tn = telnetlib.Telnet(host, port=port)
         logout_str = "LOGOUT:::CTAG::;\n"
+        print(logout_str)
         tn_obj.write(bytes(logout_str, encoding='utf8'))
         line_b = tn_obj.read_until(b';', 5)
         line_s = str(line_b, encoding='utf8')
