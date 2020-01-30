@@ -35,6 +35,7 @@ class TL1_CMD():
         cmdlines = []
         add_onu_cmds = 'ADD-ONU::OLTID={0},PONID=NA-NA-{1}-{2}:CTAG::AUTHTYPE={3},ONUID={4}'.format(
             oltid, slotno, ponno, onuidtype, onuid)
+        kwargs['ONUTYPE'] = onutype
         for key in kwargs.keys():
             add_onu_cmds += ',{0}={1}'.format(key, kwargs[key])
 
@@ -77,25 +78,29 @@ class TL1_CMD():
         @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
         @onuport(string/int): ONU 端口号
         @cvlan(string/int): cvlan, 1-4095
-        @**kwargs: 其他可选字段,SVLAN, UV, SCOS, CCOS
+        @**kwargs: 其他可选字段,SVLAN, TVLAN, SCOS, CCOS
         参考命令行：
         CFG-LANPORTVLAN::ONUIP=onu-name|OLTID=olt-name[,PONID=ponport_location,ONUIDTYPE=onuid-type,ONUID=onu-index],ONUPORT=onu-port:CTAG::[SVLAN=outer vlan],CVLAN=Inner vlan[,UV=user-vlan][,SCOS=outer qos][,CCOS=inner qos];
         引用函数：
         使用示例:
         """
         cmdlines = []
-        lanportvlan_cmds = 'CFG-LANPORTVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::'.format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        lanportvlan_cmds = 'CFG-LANPORTVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT=NA-NA-NA-{5}:CTAG::'.format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        
+        # SVLAN
         if 'SVLAN' in kwargs.keys():
-            lanportvlan_cmds += "SVLAN={0},CVLAN={1}".format(kwargs['SVLAN'], cvlan)
+            lanportvlan_cmds += "SVLAN={0},".format(kwargs['SVLAN'])
+
+        #CVLAN, UV
+        if 'TVLAN' in kwargs.keys():
+            lanportvlan_cmds += "CVLAN={0},UV={1}".format(kwargs['TVLAN'], cvlan)
         else:
             lanportvlan_cmds += "CVLAN={0}".format(cvlan)
-        
-        if 'UV' in kwargs.keys():
-            lanportvlan_cmds += ',UV={0}'.format(kwargs['UV'])
+
         if 'SCOS' in kwargs.keys():
             lanportvlan_cmds += ',SCOS={0}'.format(kwargs['SCOS'])
         if 'CCOS' in kwargs.keys():
-            lanportvlan_cmds += ',SCOS={0}'.format(kwargs['CCOS'])
+            lanportvlan_cmds += ',CCOS={0}'.format(kwargs['CCOS'])
         lanportvlan_cmds += ';\n'
 
         cmdlines.append(lanportvlan_cmds)
@@ -113,21 +118,21 @@ class TL1_CMD():
         @onuid(string):ONU标识，可以取值：ONU_NAME、MAC、LOID、ONU_NUMBER 4选一，用来唯一标识PON口的ONU
         @onuport(string/int): ONU 端口号
         参考命令行：
-        DEL-LANPORTVLAN::OLTID=oltname,PONID=ponport_location,ONUIDTYPE=onuidtype,ONUID=onu-index,ONUPORT=onu-port:CTAG::[,UV=user-vlan];
+        DEL-LANPORTVLAN::OLTID=oltname,PONID=ponport_location,ONUIDTYPE=onuidtype,ONUID=onu-index,ONUPORT=onu-port:CTAG::[UV=user-vlan];
         引用函数：
         使用示例:
         """
         cmdlines = []
-        lanportvlan_cmds = 'CFG-LANPORTVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::'.format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        lanportvlan_cmds = 'DEL-LANPORTVLAN::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT=NA-NA-NA-{5}:CTAG::'.format(oltid, slotno, ponno, onuidtype, onuid, onuport)
         if cvlan is not None:
-            lanportvlan_cmds += ',UV={0}'.format(cvlan)
+            lanportvlan_cmds += 'UV={0}'.format(cvlan)
         lanportvlan_cmds += ";\n"
 
         cmdlines.append(lanportvlan_cmds)
         return cmdlines
 
     @staticmethod
-    def add_laniptvport(oltid, slotno, ponno, onuidtype, onuid, onuport, **kwargs):
+    def add_laniptvport(oltid, slotno, ponno, onuidtype, onuid, onuport, mvlan, **kwargs):
         """
         函数功能：TL1配置ONU端口组播VLAN
         函数参数:
@@ -145,13 +150,19 @@ class TL1_CMD():
         使用示例:
         """      
         cmdlines = []
-        add_iptv_cmds = "ADD-LANIPTVPORT::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::".format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        add_iptv_cmds = "ADD-LANIPTVPORT::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT=NA-NA-NA-{5}:CTAG::".format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        
+        if 'UV' in kwargs.keys():
+            add_iptv_cmds += "UV={0},MVLAN={1}".format(kwargs['UV'], mvlan)
+        else:
+            add_iptv_cmds += "MVLAN={0}".format(mvlan)
+        
         for key in kwargs.keys():
-            if key=='UV':
-                add_iptv_cmds += "{0}={1}".format(key, kwargs[key])
-            else:
-                add_iptv_cmds += ",{0}={1}".format(key, kwargs[key])
-        add_iptv_cmds += ';\n'
+            if key == 'UV':
+                continue
+            add_iptv_cmds += ",{0}={1}".format(key, kwargs[key])
+
+        add_iptv_cmds += ";\n"
         cmdlines.append(add_iptv_cmds)
         return cmdlines
     
@@ -174,7 +185,7 @@ class TL1_CMD():
         使用示例:
         """   
         cmdlines = []
-        del_iptv_cmds = "DEL-LANIPTVPORT::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT={5}:CTAG::".format(oltid, slotno, ponno, onuidtype, onuid, onuport)
+        del_iptv_cmds = "DEL-LANIPTVPORT::OLTID={0},PONID=NA-NA-{1}-{2},ONUIDTYPE={3},ONUID={4},ONUPORT=NA-NA-NA-{5}:CTAG::".format(oltid, slotno, ponno, onuidtype, onuid, onuport)
         for key in kwargs.keys():
             if key=='UV':
                 del_iptv_cmds += "{0}={1}".format(key, kwargs[key])
@@ -435,7 +446,7 @@ class OLT_V5():
             # translate
             if 'translate' in lan_service[index]:
                 cmdlines.append('onu port vlan {0} eth {1} service {2} translate {3} priority {4} tpid 33024 vid {5}\n'.format(onuno, port, index+1, *lan_service[index]['translate']))
-            
+          
             # qinq
             if 'qinq' in lan_service[index]:
                 cmdlines.append('onu port vlan {0} eth {1} service {2} qinq {3} priority {4} tpid 33024 vid {5} {6} {7}\n'.format(onuno, port, index+1, *lan_service[index]['qinq']))
@@ -452,11 +463,11 @@ class OLT_V5():
         Admin(config-if-pon-)# onu ngn-voice-service <onuno> pots <portno> phonenum <num>
         引用函数:
         """   
-        slotno, ponno, onuno = onu
+        # slotno, ponno, onuno = onu
         cmdlines = []
-        # cmdlines.append('interface pon 1/{0}/{1}\n'.format(slotno, ponno))
+        # cmdlines.append('interface pon 1/{0}/{1}\n'.format(onu[0], onu[1]))
 
-        onu_ngn_voice_cmd = 'onu ngn-voice-service {0} pots {1} phonenum {2}'.format(onuno, pots, phonenum) 
+        onu_ngn_voice_cmd = 'onu ngn-voice-service {0} pots {1} phonenum {2}'.format(onu[2], pots, phonenum) 
         for key in kwargs.keys():
             onu_ngn_voice_cmd.join(' {0} {1}'.format(key, kwargs[key]))
         onu_ngn_voice_cmd += '\n'
@@ -470,7 +481,7 @@ class OLT_V5():
         """
         函数功能: 删除ONU端口语音业务
         函数参数:
-        @onu_pots: (slotno, ponno, onuno, pots)
+        @onu_pots: ( slotno, ponno, onuno, pots)
         参考命令行:
         Admin(config-if-pon-)# no onu ngn-voice-service <onuno> pots <portno>
         引用函数:

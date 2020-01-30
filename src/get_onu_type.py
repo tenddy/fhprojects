@@ -1,27 +1,16 @@
-#!/usr/bin/python3
-# coding=UTF-8
-'''
-@Description: 广西场景业务配置
-@Author:  Teddy.tu
-@Date: 2019-12-28 19:23:00
-@LastEditTime : 2019-12-30 22:20:52
-@LastEditors  :  Teddy.tu
-@Email:  teddy_tu@126.com
-@License:  (c)Copyright 2019-2020 Teddy_tu
-'''
 
 import re
 
 def autho_onu_config(version="V4"):
     send_cmd = []
-    with open(r'E:/epon_onu_list.txt', 'r') as f:
+    with open(r'./config/MDU&SFU list.txt', 'r') as f:
         onulist = f.readlines()
     if version == "V4":
         # set white phy addr 123456789012 pas null ac add sl 3 p 5 o 30 ty 5006-07B
         for item in onulist:
             onu = item.split()
             # print(onu)
-            auth_str = 'set white phy addr %s pas null ac add sl %s p %s o %s ty %s\n' % (onu[2], '7', '4', str(int(onu[0])), onu[5][2:])
+            auth_str = 'set white phy addr %s pas null ac add sl %s p %s o %s ty %s\n' % (onu[7], '7', '4', onu[2], onu[3])
             send_cmd.append(auth_str)
             print(auth_str)
         # print(send_cmd)
@@ -80,12 +69,13 @@ def model1_config(version="V5", file=r'E:/config_model1.txt'):
     onu_count = 21
     ONUID_NEW = range(1,onu_count+1)
     PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8]
+    ONU_step = 60
     with open(file,'w') as f:
         ser_count = 1
         svlan = 2701
         send_cmd = []
         for index in range(onu_count):
-            onuid = ONUID_NEW[index] + 60
+            onuid = ONUID_NEW[index] + ONU_step
             portno = PORTNO[index]
             for p in range(portno):
                 if version == "V5":
@@ -94,7 +84,7 @@ def model1_config(version="V5", file=r'E:/config_model1.txt'):
                     send_cmd.append(cmd0)
                     cmd1 = 'onu port vlan %d eth %d service count %d\n' % (onuno, p+1, ser_count)
                     send_cmd.append(cmd1)
-                    cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (onuno, p+1, 1, 301+(onuid-61)*24 + p)
+                    cmd2 = 'onu port vlan %d eth %d service %d tag priority 1 tpid 33024 vid %d\n' % (onuno, p+1, 1, 301+(onuid-1-ONU_step)*24 + p)
                     send_cmd.append(cmd2)
                     cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (onuno, p+1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
                     if index < 14:
@@ -152,8 +142,7 @@ def model2_config(version="V5", file=r'E:/config_model2.txt'):
         f.write(''.join(send_cmd))
 
 
-
-def create_config1():
+def model3_config():
     '''
     onu port vlan 1 eth 1 service count 3
     onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 41 
@@ -166,22 +155,24 @@ def create_config1():
     onu port vlan 1 eth 1 service 3 tag priority 7 tpid 33024 vid 46 
     onu port vlan 1 eth 1 service 3 qinq enable priority 7 tpid 33024 vid 2701 voip SVLAN2
     '''
+    
     onu_count = 21
     PORTNO =  [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8]
-    with open(r'E:/config_model4.txt','w') as f:
+    with open(r'E:/config_model3.txt','w') as f:
         # onu1
         # onuid = 1
         # portno = 8
         ser_count = 3
         # trans_ser_vlan = 41
         svlan = 2701
-        for index in range(onu_count):
-            onuid = index+1
+        onu_step = 60
+        for index in range(14):
+            onuid = index+1+onu_step
             portno = PORTNO[index]
             ser_count = 3
             for p in range(portno):
-                if p != 1:
-                    continue
+                # if p != 1:
+                #     continue
                 send_cmd = []
                 cmd0 = 'onu port vlan %d eth %d service count %d\n' % (onuid, p+1, 0)
                 send_cmd.append(cmd0)
@@ -189,7 +180,7 @@ def create_config1():
                 send_cmd.append(cmd1)
                 cmd2 = 'onu port vlan %d eth %d service %d transparent priority 1 tpid 33024 vid %d\n' % (onuid, p+1, 1, 2001+index)
                 send_cmd.append(cmd2)
-                cmd3 = 'onu port vlan %d eth %d service %d translate enable priority 1 tpid 33024 vid %d\n' % (onuid, p+1, 1, 301+(onuid-1)*24 + p)
+                cmd3 = 'onu port vlan %d eth %d service %d translate enable priority 1 tpid 33024 vid %d\n' % (onuid, p+1, 1, 301+(onuid-1-onu_step)*24 + p)
                 send_cmd.append(cmd3)
                 cmd4 = 'onu port vlan %d eth %d service %d qinq enable priority 1 tpid 33024 vid %d %s %s\n' % (onuid, p+1, 1, svlan, 'FTTB_QINQ', 'SVLAN2')
                 send_cmd.append(cmd4)
@@ -370,15 +361,15 @@ def config_onu_bandwidth():
 
 
 def onu_auth_8K():
-    slot_list = [1,2,4,8,11,13,15,18]
+    slot_list = [1]
     # slot_list = [3, 16]
-    file = r'e:/8K.txt'
+    file = r'e:/8K-1.txt'
     with open(file, 'w') as f:
         for s in slot_list:
-            for p in range(1, 17):
-                for onu in range(1, 65):
+            for p in range(1, 2):
+                for onu in range(1, 129):
                     sn = 'FHTT%02d%02d%04d' % (s, p, onu)
-                    onutype = "OTHER2"
+                    onutype = "5006-10B"
                     auth_str = 'whitelist add logic-id %s type %s slot %d pon %d onuid %d \n' % (sn, onutype, s, p, onu)
                     f.write(auth_str)
                 
@@ -389,13 +380,15 @@ if __name__ == "__main__":
     # f = open(r"E:/d.txt", "w")
     # f.write("ddd\n")
     # f.close()
-    model1_config()
-    # create_config1()
+    # model3_config()
     # create_config2()
-    # autho_onu_config(version='V5')
+    # autho_onu_config(version='V4')
     # model1_config('V4', r'E:/config_model1_AN5516.txt')
-    model1_config('V5', r'E:/config_model1_AN6000.txt')
+    # model1_config('V5', r'E:/config_model1_AN6000.txt')
     # switch_config()
     # alarm_threshold_profile()
     # config_onu_bandwidth()
     # onu_auth_8K()
+    with open(r'./onulist.txt', 'w') as f:
+        for i in range(1,129):
+            f.write("%d,"%i)

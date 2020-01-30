@@ -11,15 +11,17 @@
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 
-from lib.fhlib import OLT_V5
-from lib.fhlib import TL1_CMD
-from lib.dut_connect import dut_connect_telnet
-from lib import dut_connect
-from lib.fhat import ServiceConfig
-from lib.log import Logger
-import sys
-import pandas as pd
 import math
+import sys
+
+import pandas as pd
+
+from lib import dut_connect
+from lib.dut_connect import dut_connect_telnet
+from lib.fhat import ServiceConfig
+from lib.fhlib import OLT_V5, TL1_CMD
+from lib.log import Logger
+
 
 def get_onu_info(filename):
     """
@@ -387,98 +389,210 @@ def issue_test(model=1, slotno=3, ponno=16, onuno_begin=0):
     return config_cmds
 
 
+def get_cmd(**kwargs):
+    """"""
+    onufile = r'./config/epon.xls'
+    if 'FILE' in kwargs.keys():
+        onufile = kwargs['FILE']
+    onu = get_onu_info(onufile)
+
+    slotno = 17
+    ponno = 4
+    cvlan, ccos, cstep = 301, 1, 1
+    cvlan_trans = 2001
+    tvlan, tcos, tstep = 301, 1, 24
+    svlan, scos = 2701, 3
+    # onuidtype = 'MAC'
+    qinqprf = "FTTB_QINQ"
+    # qinqprf = "qinq_ippon"
+    svlan_service = "SVLAN2"
+
+    lanportno = kwargs['PORTNO'] if 'PORTNO' in kwargs.keys() else 2 #配置业务端口号
+
+    cmdlines = []
+    
+    cmdlines.append("config\ninterface pon 1/{0}/{1}\n".format(slotno, ponno))
+    # lanport_index = range(5)
+    for index in range(len(onu)):
+        if 'ONU_LANPORT' in kwargs.keys():   # 配置端口业务配置
+            for portno in range(onu.loc[index]['PORTNUM']):
+                if kwargs['ONU_LANPORT'] == 0: # del
+                    cmdlines += OLT_V5.onu_lan_service((slotno,ponno,onu.loc[index]['ONU'], portno+1), 0)
+                if kwargs['ONU_LANPORT'] == 1:   # transparent
+                    cmdlines += OLT_V5.onu_lan_service((slotno,ponno,onu.loc[index]['ONU'], portno+1), ccos, 
+                    {'cvlan': ('transparent', tcos, cvlan_trans+index*cstep)}) 
+                if kwargs['ONU_LANPORT'] == 2: # Tag
+                    cmdlines += OLT_V5.onu_lan_service((slotno,ponno,onu.loc[index]['ONU'], portno+1), 1, 
+                    {'cvlan': ('tag', ccos, cvlan+portno+index*tstep)})
+                if kwargs['ONU_LANPORT'] == 3: # tag+ONU qinq模板
+                    cmdlines += OLT_V5.onu_lan_service((slotno,ponno,onu.loc[index]['ONU'], portno+1), 1, 
+                    {'cvlan': ('tag', ccos, cvlan+portno+index*tstep), 
+                    'qinq':('enable', scos, svlan, qinqprf, svlan_service)})
+                if kwargs['ONU_LANPORT'] == 4: # transparent+ONU qinq模板
+                    cmdlines += OLT_V5.onu_lan_service((slotno,ponno,onu.loc[index]['ONU'], portno+1), 1, 
+                    {'cvlan': ('transparent', tcos, cvlan_trans+index*cstep),
+                     'qinq':('enable', scos, svlan, "qinq_ippon", svlan_service)})
+    
+    cmdlines.append("quit\nquit\n")
+    return cmdlines
+
+
 def tl1_cmd(**kwargs):
     """
     @kwargs:
         OLTIP: OLT ip 地址;
         FILE: ONU 列表;
+        slotno: 槽位号
+        ponno: PON口号
         ONU: True--> 授权ONU, False--> 去授权ONU
-        PORTNO: 端口业务;
+        ONU_LANPORT: 配置端口业务; 0-->删除端口业务, 1-->TAG, 2-->TAG+ONU qinq域, 3-->透传+翻译 + ONU qinq域
+        PORTNO: ONU端口号;
         QINQ: True 添加qinq域， False 删除qinq域;
-        ADDBW: 创建带宽模板;
+        ADDBW: 带宽模板名，创建新的带宽模板;
+        CFGBW: 绑定带宽模板; 与参数ADDBW结合使用
     """
-    oltip = '10.182.5.109'
-    if "OLTIP" in kwargs.keys():
-        oltip = kwargs['OLTIP']
-
-    onufile = r'./config/epon.xls'
-    if 'FILE' in kwargs.keys():
-        onufile = kwargs['FILE']
+    oltip = kwargs['OLTIP'] if "OLTIP" in kwargs.keys() else '10.182.5.109'
+    onufile = kwargs['FILE'] if 'FILE' in kwargs.keys() else r'./config/epon.xls'
     onu = get_onu_info(onufile)
-    # print(onu.head())
     
-    slotno = 4
-    ponno = 8
-    cvlan, ccos, cstep = 301, 1, 24
-    tvlan, tcos, tstep = 301, 1, 24
-    svlan, scos = 2701, 3
-    onuidtype = 'MAC'
+    slotno = kwargs['SLOTNO'] if 'SLOTNO' in kwargs.keys() else 4
+    ponno = kwargs['PONNO'] if 'PONNO' in kwargs.keys() else 7
+    cvlan, ccos, cstep = 301, 1, 24     # CVLAN
+    tvlan, tcos, tstep = 301, 1, 24     # TVALN
+    svlan, scos = 2701, 3       # SVLAN
+    mvlan = kwargs['mvlan'] if 'mvlan' in kwargs.keys() else 33 # 组播VLAN
+    onuidtype = 'MAC'   # ONU认证方式
+
     lanportno = 2 #配置业务端口号
     if 'PORTNO' in kwargs.keys():
         portno = kwargs['PORTNO']
    
-    cmdlines = []
-    print("ADD BW PROFILE...")
-    
-    default_bw = (64,1000000,64,1000000,64)
-    bandwidth = (256,1000,64,5000,512)
-    if "ADDBW" in kwargs.keys():
-        bw_prfname = kwargs['ADDBW']
-        cmdlines += TL1_CMD.add_BWprofile(oltip, bw_prfname, *bandwidth) 
+    cmdlines = []   # 保存TL1 命令行
 
-    for index in range(len(onu)):
-        print("ONU add or Delete.!")
-        if "ONU" in kwargs.keys():
-            pass
-        
-        print("config ONU(%d) lan port services." % (index+1))
-        if "ONU_LANPORT" in kwargs.keys():
-            for portno in range(onu.loc[index]['PORTNUM']):
-                if kwargs['ONU_LANPORT']:
+    if "ONU" in kwargs.keys():
+        print("授权/去授权ONU") 
+        for index in range(len(onu)):   # 遍历ONU
+            if onu.loc[index]['ONUTYPE'] == "OTHER2":
+                onutype = "OTHER_ONU2"
+            else:
+                onutype = onu.loc[index]['ONUTYPE']
+
+            if kwargs['ONU']:
+               
+                cmdlines += TL1_CMD.add_onu(oltip, slotno, ponno, onu.loc[index]['ONUIDTYPE'], onu.loc[index]['SN'], onutype)
+            else:
+                cmdlines += TL1_CMD.del_onu(oltip, slotno, ponno, onu.loc[index]['ONUIDTYPE'], onu.loc[index]['SN'])
+
+    if "ONU_LANPORT" in kwargs.keys():   # 配置端口业务
+        print("配置ONU端口业务，模型%d" % kwargs['ONU_LANPORT'])
+        for index in range(len(onu)):   # 遍历ONU
+            for portno in range(onu.loc[index]['PORTNUM']): #遍历ONU LAN口
+                if kwargs['ONU_LANPORT'] == 0: # 删除端口业务
+                    cmdlines += TL1_CMD.del_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep)
+
+                if kwargs['ONU_LANPORT'] == 1: # model1（TAG）
+                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, CCOS=ccos)
+
+                if kwargs['ONU_LANPORT'] == 2: # model2 （TAG+ONU qinq域）
+                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, SVLAN=svlan, SCOS=scos, CCOS=ccos)
+                
+                if kwargs['ONU_LANPORT'] == 3: # model3 （透传+翻译 + ONU qinq域）
                     cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, SVLAN=svlan, UV=cvlan+portno+index*tstep, SCOS=scos, CCOS=ccos)
-                 
-        if 'QINQ' in kwargs.keys(): 
-            if onu.loc[index]['ONUTYPE'] == 'AN5006-20':
-                print("ONU Type is %s." % onu.loc[index]['ONUTYPE'])
-                continue
-            # 根据端口数量和需要配置端口号，选择需要配置的端口
-            port = min(onu.loc[index]['PORTNUM'], lanportno) 
-            if kwargs['QINQ']:  # True, 添加QinQ
-                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], tvlan+port-1+index*tstep, SVLAN=svlan, UV=cvlan+port-1+index*cstep, SCOS=scos, CCOS=ccos)
-            else:   # False, 删除QinQ
-                cmdlines += TL1_CMD.del_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], cvlan+port-1+index*cstep)
-        
+    
+    if "ONU_IPTVPORT" in kwargs.keys():
+        print("配置ONU端口组播业务")
+        for index in range(len(onu)):   # 遍历ONU
+            for portno in range(onu.loc[index]['PORTNUM']): #遍历ONU LAN口
+                if kwargs['ONU_IPTVPORT']:
+                    cmdlines += TL1_CMD.add_laniptvport(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, mvlan, MCOS=5)
+                else:
+                    cmdlines += TL1_CMD.del_laniptvport(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1)
+  
+    if 'QINQ' in kwargs.keys():
+        print("="*20)
+        print("配置QinQ")
+        for index in range(len(onu)):   # 遍历ONU
+            if onu.loc[index]['ONUTYPE'] == 'AN5006-20': # AN5006-20 业务模型
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 3001, SVLAN=2701, UV=3001, SCOS=scos, CCOS=ccos)
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 3002, SVLAN=2701, UV=3002, SCOS=scos, CCOS=ccos)
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 33, UV=50)
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 251, UV=251)
+            
+            elif onu.loc[index]['ONUTYPE'] == 'OTHER2': # EPON HGU 
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 41, SVLAN=2401, UV=41, SCOS=scos, CCOS=ccos)
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 45, SVLAN=2401, UV=45, SCOS=scos, CCOS=ccos)
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 33, UV=33)
+                cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], 250, UV=250)
+            
+            else:  # FTTB&SFU业务模型
+                # 根据端口数量和需要配置端口号，选择需要配置的端口
+                port = min(onu.loc[index]['PORTNUM'], lanportno) 
+                if kwargs['QINQ']:  # True, 添加QinQ
+                    cmdlines += TL1_CMD.add_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], tvlan+port-1+index*tstep, SVLAN=svlan, UV=cvlan+port-1+index*cstep, SCOS=scos, CCOS=ccos)
+                else:   # False, 删除QinQ
+                    cmdlines += TL1_CMD.del_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], cvlan+port-1+index*cstep)
+                    cmdlines += TL1_CMD.del_ponvlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], mvlan)
+    
+    # 配置ONU带宽
+    if "ADDBW" in kwargs.keys():
+        print("="*20)
+        print("配置ONU带宽")
+        bandwidth = kwargs['bandwidth'] if 'bandwidth' in kwargs.keys() else (64,1000000,64,1000000,64)
+        # bandwidth = (256,1000,256,5000,512)
+        # 创建带宽模板
+        cmdlines += TL1_CMD.add_BWprofile(oltip, kwargs['ADDBW'], *bandwidth) 
+        # cmdlines += TL1_CMD.add_BWprofile(oltip, kwargs['ADDBW'], *default_bw)  
         if 'CFGBW' in kwargs.keys() and kwargs['CFGBW']:
-            cmdlines += TL1_CMD.cfg_onuBW(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], bw_prfname, bw_prfname)
+            for index in range(len(onu)):   # 遍历ONU
+                cmdlines += TL1_CMD.cfg_onuBW(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], kwargs['ADDBW'], kwargs['ADDBW'])        # ONU绑定带宽模板
         
     return cmdlines
 
 
-
 if __name__ == "__main__":
-    # telnet OLT
-    # tn_obj = connect_olt_telnet('10.182.5.109', 23, 'admin', 'admin')
-    # log_obj = Logger(r'./log/issues.log')
-    # send_cmd_obj = ServiceConfig(tn_obj, log_obj)
+    # telnet OLT   
+    oltip = '10.182.5.109'     
+    tn_obj = dut_connect.dut_connect_telnet('10.182.5.109', 23, 'admin', 'admin')
+    log_obj = Logger(r'./log/issues.log')
+    cmd_send_obj = ServiceConfig(tn_obj, log_obj)
     
     # TL1 
     unm_ip = '10.182.1.161'
     unm_user, unm_pwd = 'admin', 'admin123'
-    # unm_tn = dut_connect.dut_connect_tl1(unm_ip, username=unm_user, password=unm_pwd)
-    # send_tl1_cmd = ServiceConfig(unm_tn, Logger(r'./log/tl1_log.log'))
+    unm_tn = dut_connect.dut_connect_tl1(unm_ip, username=unm_user, password=unm_pwd)
+    tl1_cmd_obj = ServiceConfig(unm_tn, Logger(r'./log/tl1_log.log'))
     
-    slotno = 4
-    ponno = 8
+    slotno = 17
+    ponno = 4
     onuno_step = 0
-    if len(sys.argv) <= 1:
-        model = 0
-    else:
-        model = int(sys.argv[1])
     
-    cmds = issue_test(model, slotno, ponno, onuno_step)
-    # print(cmds)
-    # send_cmd_obj.send_cmd(cmds,delay=0.5)
-    tl1_cmds = tl1_cmd(OLTIP='10.182.5.109', ONU_LANPORT=False, QINQ=True, ADDBW='EPON', CFGBW=True)
-    for item in tl1_cmds:
-        print(item, end='')
-    # dut_connect.dut_disconnect_tl1(unm_tn)
+    # cmds = issue_test(model, slotno, ponno, onuno_step)
+    cmds = []
+    cmds += get_cmd(ONU_LANPORT=0)
+    # cmds += get_cmd(ONU_LANPORT=1)
+    # cmd_send_obj.send_cmd(cmds,delay=0.1)
+
+    #### TL1 #####
+
+    tl1_sendline_cmds = []
+    # tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', SLOTNO=7, PONNO=5, ONU=False) 
+    # tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', SLOTNO=slotno, PONNO=ponno, ONU=True)
+
+    # tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', ONU_LANPORT=0)
+    # tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', SLOTNO=slotno, PONNO=ponno, ONU_LANPORT=1)
+    # tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', SLOTNO=slotno, PONNO=ponno, ONU_IPTVPORT=True)
+
+    # tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', SLOTNO=slotno, PONNO=ponno, QINQ=True)
+    bwprf1 = "EPON_1000M"
+    bwprf2 = "EPON_1M_5M"
+    bwprf3 = "EPON_1M_1M"
+    bandwidth1 = (256,1000000,256,1000000,512)
+    bandwidth2 = (256,1000,256,5000,512)
+    bandwidth3 = (256,1000,256,1000,512)
+    tl1_sendline_cmds += tl1_cmd(OLTIP='10.182.5.109', SLOTNO=slotno, PONNO=ponno, ADDBW=bwprf1, bandwidth=bandwidth1, CFGBW=True)
+
+    # for item in tl1_sendline_cmds:
+    #     print(item, end='')
+    tl1_cmd_obj.send_cmd(tl1_sendline_cmds, promot=b';', delay=0.1)
+    
+    dut_connect.dut_disconnect_tl1(unm_tn)
