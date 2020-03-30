@@ -55,7 +55,7 @@ def switch_config():
     with open("e:/sw.txt", 'w') as f:
         for p in range(1, port+1):
             # str = "interface gigaethernet 1/0/%d \n port link-type access\nport default vlan %d\n" % (p+1, 101+p)
-            str1 = 'interface gigaethernet 1/0/%d \n port default vlan 1\n port link-type hybrid\n port hybrid vlan %d tagged\n port hybrid vlan %d untagged \nport hybrid pvid %d\n' % (p, 1500+p, 500+p, 500+p)
+            str1 = 'interface gigaethernet 1/0/%d \n port default vlan 1\n port link-type hybrid\n no port hybrid vlan 1\n port hybrid vlan %d tagged\n port hybrid vlan %d untagged \nport hybrid pvid %d\n' % (p, 1400+p, 400+p, 400+p)
             print(str1)
             # f.write("interface gigaethernet 1/0/%d \n port link-type access\nport default vlan %d" % (p+1, 101+p))
             f.write(str1)
@@ -66,10 +66,11 @@ def model1_config(version="V5", file=r'E:/config_model1.txt'):
     onu port vlan 1 eth 1 service 1 tag priority 1 tpid 33024 vid 301 
     onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
     '''
-    onu_count = 21
+    onu_count = 24
     ONUID_NEW = range(1,onu_count+1)
-    PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8]
-    ONU_step = 60
+    PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8,1,2,24]
+
+    ONU_step = 0
     with open(file,'w') as f:
         ser_count = 1
         svlan = 2701
@@ -110,9 +111,9 @@ def model2_config(version="V5", file=r'E:/config_model2.txt'):
     onu port vlan 1 eth 1 service 1 tag priority 1 tpid 33024 vid 301 
     onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
     '''
-    onu_count = 21
+    onu_count = 24
     ONUID_NEW = range(1,onu_count+1)
-    PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8]
+    PORTNO = [16,16,8,24,24,16,24,24,16,16,16,16,24,24,4,4,4,4,4,8,8,1,2,24]
     with open(file,'w') as f:
         ser_count = 1
         svlan = 2701
@@ -131,8 +132,8 @@ def model2_config(version="V5", file=r'E:/config_model2.txt'):
                     send_cmd.append(cmd2)
                 if version == "V4":
                     slotno = 7
-                    ponno = 8
-                    onuno = onuid + 10
+                    ponno = 7
+                    onuno = onuid 
                     cmd0 = 'set epon slot {0} pon {1} onu {2} port {3} serv num {4}\napply onu {0} {1} {2} vlan\n'.format(slotno, ponno, onuno, p+1, 0)
                     send_cmd.append(cmd0)
                     cmd1 = 'set epon slot {0} pon {1} onu {2} port {3} serv num {4}\n'.format(slotno, ponno, onuno, p+1, 1)
@@ -385,10 +386,11 @@ if __name__ == "__main__":
     # autho_onu_config(version='V4')
     # model1_config('V4', r'E:/config_model1_AN5516.txt')
     # model1_config('V5', r'E:/config_model1_AN6000.txt')
+    model2_config('V4', r'E:/config_model2_AN5516.txt')
     # switch_config()
     # alarm_threshold_profile()
     # config_onu_bandwidth()
     # onu_auth_8K()
-    with open(r'./onulist.txt', 'w') as f:
-        for i in range(1,129):
-            f.write("%d,"%i)
+    # with open(r'./onulist.txt', 'w') as f:
+    #     for i in range(1,129):
+    #         f.write("%d,"%i)

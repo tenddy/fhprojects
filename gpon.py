@@ -19,7 +19,7 @@ def gpon_service_config_cmd(**kwargs):
     函数功能：通过命令行配置业务(GPON)
     函数参数：@kwargs:
             FILE: ONU信息文件
-            ONU_LANPORT: 
+            ONU_LANPORT: 端口业务模型
     """
     onufile = r'./config/gpon.xlsx'
     if 'FILE' in kwargs.keys():
@@ -79,9 +79,9 @@ def gpon_service_config_tl1(**kwargs):
     
     slotno = kwargs['SLOTNO'] if 'SLOTNO' in kwargs.keys() else 12
     ponno = kwargs['PONNO'] if 'PONNO' in kwargs.keys() else 4
-    cvlan, ccos, cstep = 401, 1, 24     # CVLAN
-    tvlan, tcos, tstep = 401, 1, 24     # TVALN
-    svlan, scos = 2741, 3       # SVLAN
+    cvlan, ccos, cstep = 1501, 1, 24     # CVLAN
+    tvlan, tcos, tstep = 1501, 1, 24     # TVALN
+    svlan, scos = 2740, 3       # SVLAN
     mvlan = kwargs['mvlan'] if 'mvlan' in kwargs.keys() else 33 # 组播VLAN
     onuidtype = 'MAC'   # ONU认证方式
 
@@ -107,16 +107,16 @@ def gpon_service_config_tl1(**kwargs):
         for index in range(len(onu)):   # 遍历ONU
             for portno in range(onu.loc[index]['PORTNUM']):     # 遍历ONU LAN口
                 if kwargs['ONU_LANPORT'] == 0:  # 删除端口业务
-                    cmdlines += TL1_CMD.del_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep)
+                    cmdlines += TL1_CMD.del_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*cstep)
 
                 if kwargs['ONU_LANPORT'] == 1: # model1（TAG）
-                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, CCOS=ccos)
+                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*cstep, CCOS=ccos)
 
                 if kwargs['ONU_LANPORT'] == 2: # model2 （TAG+ONU qinq域）
-                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, SVLAN=svlan, SCOS=scos, CCOS=ccos)
+                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*cstep, SVLAN=svlan, SCOS=scos, CCOS=ccos)
                 
                 if kwargs['ONU_LANPORT'] == 3: # model3 （透传+翻译 + ONU qinq域）
-                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, SVLAN=svlan, UV=cvlan+portno+index*tstep, SCOS=scos, CCOS=ccos)
+                    cmdlines += TL1_CMD.cfg_lanport_vlan(oltip, slotno, ponno, onuidtype, onu.loc[index]['SN'], portno+1, cvlan+portno+index*tstep, SVLAN=svlan, UV=cvlan+portno+index*cstep, SCOS=scos, CCOS=ccos)
     
     if "ONU_IPTVPORT" in kwargs.keys():
         print("配置ONU端口组播业务")
@@ -174,7 +174,7 @@ def get_linecmds():
 
 def get_linecmds_tl1():
     cmds = []
-    cmds += gpon_service_config_tl1(ONU=False)
+    # cmds += gpon_service_config_tl1(ONU=True)
     cmds += gpon_service_config_tl1(ONU_LANPORT=1)
     return cmds
 

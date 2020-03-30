@@ -324,6 +324,31 @@ class OLT_V4():
         cmdlines = cmdlines.join("reboot\ny\n")
        # self.cmdlines__ = cmdlines__.join(cmdlines)
         return cmdlines
+    
+    @staticmethod
+    def authorize_onu(auth_type, onu_sn, onutype, *onu):
+        """
+        函数功能：授权ONU
+        函数参数:
+        @auth_type(string):phy-id,logic-id
+        @onu_sn(string):onu physics address or logic sn 
+        @onutye: Type of onu, eg. 5006-10, OTHER2
+        @*onu: (slotno, ponno, onuno)
+        参考命令行：
+        set whitelist <phy-id/logic-id/password> address <sn> password null  action add slot 7 pon 7 onu 1 type 5006-07A
+
+
+        引用函数：
+        """
+        cmdlines = []
+        cmdlines.append('cd onu\n')
+        try:
+            cmdlines.append("whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(auth_type, onu_sn,onutype, *onu))
+        except Exception as err:
+            print("Error:", err)
+
+        return cmdlines
+
 
 
 class OLT_V5():
@@ -344,21 +369,24 @@ class OLT_V5():
         cmdlines.append(['config\n', 'interface meth 1/1\n', "show ip address\n"])
         return cmdlines
 
+        # set whitelist phy_addr address ff password null  action add slot 7 pon 7 onu 1 type 5006-07A
+
     @staticmethod
     def authorize_onu(auth_type, onu_sn, onutype, *onu):
         """
         函数功能：授权ONU
         函数参数:
-        @auth_type(string):phy-id,log-id
+        @auth_type(string):phy-id,logic-id
         @onu_sn(string):onu physics address or logic sn 
         @onutye: Type of onu, eg. 5006-10, OTHER2
         @*onu: (slotno, ponno, onuno)
         参考命令行：
-        whitelist add <phy-id/log-id> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
+        whitelist add <phy-id/logic-id/password> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
 
         引用函数：
         """
         cmdlines = []
+        # cmdlines.append('config\n')
         try:
             cmdlines.append("whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(auth_type, onu_sn,onutype, *onu))
         except Exception as err:
@@ -452,6 +480,8 @@ class OLT_V5():
                 cmdlines.append('onu port vlan {0} eth {1} service {2} qinq {3} priority {4} tpid 33024 vid {5} {6} {7}\n'.format(onuno, port, index+1, *lan_service[index]['qinq']))
     
         return cmdlines
+
+    
 
     @staticmethod
     def onu_ngn_voice_service(onu, pots, phonenum, **kwargs):
