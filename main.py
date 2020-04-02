@@ -50,10 +50,8 @@ if __name__ == "__main__":
     print("TL1")
     for index in gpon.get_linecmds_tl1():
         print(index, end='')
-    # tl1_cmd_obj.send_cmd(gpon.get_linecmds_tl1())
+    tl1_cmd_obj.send_cmd(gpon.get_linecmds_tl1(), promot=b';')
     
-    
-
     # disconnet TL1
     dut_connect.dut_disconnect_tl1(unm_tn)
 
