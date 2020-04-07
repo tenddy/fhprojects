@@ -75,6 +75,11 @@ def dut_connect_telnet(host, port=23, username='GEPON', password='GEPON', enable
             logger.info("Login Device(%s) success!\n" % host)
             return tn
 
+def dut_disconnect_telnet(tn):
+    try:
+        tn.close()
+    except Exception as err:
+        logger.error(err)
 
 class Send_CMD():
     def __init__(self, tn):
