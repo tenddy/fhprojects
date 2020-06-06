@@ -3,8 +3,8 @@ import telnetlib
 import time
 from functools import wraps
 
-fh_promot = [b'ogin:', b'assword:', b'ser>', b'# ']
-
+# Fiberhome OLT telnet 登录提示符,用户名及密码
+fh_olt_promot = {'Login': 'GEPON', 'Password': 'GEPON',  '>': 'enable'}
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -23,78 +23,69 @@ file_log.setFormatter(fomatter)
 
 # log.addHandler(file_log)
 logger.addHandler(console)
-# Fiberhome OLT 登录 用户名及密码
-USERNAME = b'GEPON'
-PASSWORD = b'GEPON'
-ENABLE = b'enable'
+
 
 # 重连次数
 CONNECT_TIMES = 3
 
 
-def dut_connect_telnet(host, port=23, username='GEPON', password='GEPON', enable='enable', promot=None):
+def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
     """
-    OLT telnet login
-    """ 
-    dut_promot = fh_promot   
-    if promot is not None:
-        dut_promot.append(bytes(promot, encoding='utf8'))
+    @函数功能:
+       通过telnet登录dut设备
+    @param host: dut设备的IP地址, 字符串类型
+    @param port: telnet登录端口号, 范围（0~65535)默认23
+    @param login_promot: telnet登录设备的提示字符及对应用户名和密码, 字典类型
+    @param promot: 设备登录成功提示符,正常输入命令提示符, bytes类型
+    """
+    promot_keys = []
+    promot_times = {}
+    for key in login_promot.keys():
+        promot_keys.append(bytes(key, encoding='utf8'))
 
-    tn = telnetlib.Telnet(host, port=port)
-    count = 1
-    logger.info("login...")
-    while True:
-        if count > CONNECT_TIMES:
-            logger.error("login Devices(%s) Failed!\n" % host)
-            return None
+    promot_keys.append(bytes(promot, encoding='utf8'))
 
-        print("try connect %s of %d times" % (host, count)) 
-        i, m, data = tn.expect(dut_promot, 5)
-        # print("status:%s" % i)
-        if i == -1:
-            tn.write(b' \n')
-            count += 1
-            continue
+    try:
+        logger.info("Connect Host(%s) by telnet." % host)
+        tn = telnetlib.Telnet(host, port=port)
+        i, m, data = tn.expect(promot_keys, 5)
+        m = str(m.group(), encoding='utf8')
 
-        if i == 0:                                 # Login:
-            logger.info("Login: %s" % username)
-            tn.write(bytes("%s\n" % username, encoding='utf8'))
-            i = tn.expect(dut_promot, 5)[0]
+        while i != -1:  # 没有登录成功，并且提示符正确
+            if m == promot:
+                logger.info("Connect Host(%s) success!\n" % host)   # 登录成功，返回tn
+                return tn
 
-        if i == 1:                                  # Password:
-            logger.info("Password: %s" % password)
-            tn.write(bytes("%s\n" % password, encoding='utf8'))
-            i = tn.expect(dut_promot, 5)[0]
+            if m in promot_times.keys():
+                promot_times[m] += 1
+                if promot_times[m] > 2:
+                    logger.info("Connect Host(%s) Failed!\n" % host)   # 登录失败，返回 None
+                    tn.close()
+                    return None
+            else:
+                promot_times[m] = 1
 
-        if i == 2:
-            logger.info("User> %s" % enable)        # User>
-            tn.write(bytes("%s\n" % enable, encoding='utf8'))
-            i = tn.expect(dut_promot, 5)[0]
+            # logger.info("%s:%s" % (m, login_promot[m]))
+            tn.write(bytes(login_promot[m] + '\n', encoding='utf8'))
+            i, m, data = tn.expect(promot_keys, 5)
+            m = str(m.group(), encoding='utf8')
 
-        if i == 3 or (len(dut_promot)>4 and i>=4):                      # Admin# or promot
-            logger.info("Login Device(%s) success!\n" % host)
-            return tn
+    except Exception as err:
+        logger.error(err)
+        tn = None
+
+    return tn
+
 
 def dut_disconnect_telnet(tn):
     try:
+        logger.info("Telnet disconnect!")
         tn.close()
     except Exception as err:
         logger.error(err)
 
-class Send_CMD():
-    def __init__(self, tn):
-        self.tn = tn
 
-    def __call__(self, func):
-        @wraps(func)
-        def wrapped_function(*args, **kwargs):
-            ret = func(*args, **kwargs)
-            self.tn.write(ret)
-            return ret
-        return wrapped_function
-
-
-def dut_connect_tl1(host, port=3337, username='admin', password='admin',timeout=5):
+def dut_connect_tl1(host, port=3337, username='admin', password='admin', timeout=5):
     try:
         tn = telnetlib.Telnet(host, port=port)
         login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;\n" % (username, password)
@@ -137,146 +128,12 @@ def send_cmdlines_tl1(tn_obj, cmds, promot=b';', timeout=5, delay=0):
         print(err)
         return None
 
-    
-def auth_onu_cmd(meth='ADD'):
-    olt_ip = '35.35.35.109'
-    tn_obj = dut_connect_telnet(olt_ip, 23, 'admin', 'admin123')
-    onulist = r'./config/HGU list.txt'
-    with open(onulist, 'r') as f:
-        onuinfo = f.readlines()
-    for item in onuinfo:
-        onu = item.split()
-        slotno = onu[0]
-        ponno = onu[1]
-        # onuno = onu[2]
-        onutype = 'OTHER_ONU2'
-        onu_sn = onu[8]
-        if meth == "ADD":
-            slotno = '3'
-            ponno = '8'
-            tl1_cmd = 'ADD-ONU::OLTID=%s,PONID=NA-NA-%s-%s:CTAG::AUTHTYPETYPE=LOID,ONUTYPE=%s,ONUID=%s;\n' % (
-                olt_ip, slotno, ponno, onutype, onu_sn)
-        elif meth == "DEL":
-            tl1_cmd = 'DEL-ONU::OLTID=%s,PONID=NA-NA-%s-%s:CTAG::ONUIDTYPE=LOID,ONUID=%s;\n' % (
-                olt_ip, slotno, ponno, onu_sn)
-        else:
-            print("meth need ADD or DEL!")
-        print(tl1_cmd)
-        # cmd_ret = tn_obj.write(bytes(tl1_cmd, encoding="utf8"))
-        # print(cmd_ret)
-        ret = tn_obj.read_until(b';', 5)
-        print(str(ret, encoding="utf8"))
-        time.sleep(0.5)
-    dut_disconnect_tl1(tn_obj)
-
-
-def auth_onu_tl1(meth='ADD'):
-    unm_ip = '10.182.1.161'
-    olt_ip = '35.35.35.109'
-    tn_obj = dut_connect_tl1(unm_ip, 3337, 'admin', 'admin123')
-    # onulist = r'./config/HGU list.txt'
-    onulist = r'./config/EPON HGU 32.txt'
-
-    with open(onulist, 'r') as f:
-        onuinfo = f.readlines()
-    for item in onuinfo:
-        onu = item.split()
-        # slotno = onu[0]
-        # ponno = onu[1]
-        slotno = '13'
-        ponno = '14'
-        onuno = onu[2]
-        # onutype = onu[3]
-        onutype = '10GEPONHGU'       
-        onu_sn = onu[8]
-        if meth == "ADD":
-            tl1_cmd = 'ADD-ONU::OLTID=%s,PONID=NA-NA-%s-%s:CTAG::AUTHTYPE=LOID,ONUTYPE=%s,ONUID=%s;\n' % (
-                olt_ip, slotno, ponno, onutype, onu_sn)
-        elif meth == "DEL":
-            tl1_cmd = 'DEL-ONU::OLTID=%s,PONID=NA-NA-%s-%s:CTAG::ONUIDTYPE=LOID,ONUID=%s;\n' % (
-                olt_ip, slotno, ponno, onu_sn)
-        else:
-            print("meth need ADD or DEL!")
-        print(tl1_cmd)
-        tn_obj.write(bytes(tl1_cmd, encoding="utf8"))
-        ret = tn_obj.read_until(b';')
-        print(str(ret, encoding="utf8"))
-        time.sleep(0.5)
-    dut_disconnect_tl1(tn_obj)
-
-
-def config_service_tl1(method='add', onufile=r'./config/HGU list.txt', n_slotno=None, n_ponno=None):
-    unm_ip = '10.182.1.161'
-    olt_ip = '35.35.35.109'
-    svlan = "2410"
-    cvlan = ["41", "45", "46"]
-    uv = ["1601", "45", "46"]
-    slotno = '13'
-
-    tn_obj = dut_connect_tl1(unm_ip, 3337, 'admin', 'admin123')
-
-    # 回读ONU信息
-    with open(onufile, 'r') as f:
-        onuinfo = f.readlines()
-        # print(onuinfo)
-        for item in onuinfo:
-            onu = item.split()
-            if len(onu) < 9:
-                continue
-            print(onu)
-            if n_slotno is None:
-                slotno = onu[0]
-            else:
-                slotno = n_slotno
-
-            if n_ponno is None:
-                ponno = onu[0]
-            else:
-                ponno = n_ponno
-
-            onuno = onu[2]
-            onu_sn = onu[8]
-            internet_uv = int(uv[0]) + int(onuno)-1
-            # create
-            qinq_tl1_cmd1 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%d,UV=%s,SCOS=1,CCOS=1;\n" \
-                % (olt_ip, slotno, ponno, onu_sn, svlan, internet_uv, cvlan[0])
-            qinq_tl1_cmd2 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%s,UV=%s,SCOS=5,CCOS=5;\n" \
-                % (olt_ip, slotno, ponno, onu_sn, svlan, uv[1], cvlan[1])
-            qinq_tl1_cmd3 = "ADD-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::SVLAN=%s,CVLAN=%s,UV=%s,SCOS=7,CCOS=7;\n" \
-                % (olt_ip, slotno, ponno, onu_sn, svlan, uv[2], cvlan[2])
-            add_qinq_cmd = qinq_tl1_cmd1 + qinq_tl1_cmd2 + qinq_tl1_cmd3
-
-            # delete
-            """
-            DEL-PONVLAN::OLTID=35.35.35.109,PONID=NA-NA-16-7,ONUIDTYPE=LOID,ONUID=fiberhomeHG221GS:CTAG::UV=46;
-            DEL-PONVLAN::OLTID=35.35.35.109,PONID=NA-NA-16-7,ONUIDTYPE=LOID,ONUID=fiberhomeHG221GS:CTAG::UV=41;
-            DEL-PONVLAN::OLTID=35.35.35.109,PONID=NA-NA-16-7,ONUIDTYPE=LOID,ONUID=fiberhomeHG221GS:CTAG::UV=45;
-            """
-            del_qinq_tl1_cmd1 = "DEL-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::UV=%s;\n" \
-                % (olt_ip, slotno, ponno, onu_sn,  cvlan[0])
-            del_qinq_tl1_cmd2 = "DEL-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::UV=%s;\n" \
-                % (olt_ip, slotno, ponno, onu_sn, cvlan[1])
-            del_qinq_tl1_cmd3 = "DEL-PONVLAN::OLTID=%s,PONID=NA-NA-%s-%s,ONUIDTYPE=LOID,ONUID=%s:CTAG::UV=%s;\n" \
-                % (olt_ip, slotno, ponno, onu_sn, cvlan[2])
-            del_qinq_cmd = del_qinq_tl1_cmd1 + del_qinq_tl1_cmd2 + del_qinq_tl1_cmd3
-
-            if method == "add":
-                qinq_cmd = add_qinq_cmd
-            else:
-                qinq_cmd = del_qinq_cmd
-            print("cmd:", qinq_cmd)
-            tn_obj.write(bytes(qinq_cmd, encoding="utf8"))
-            ret = tn_obj.read_until(b';', 5)
-            print(str(ret, encoding="utf8"))
-            time.sleep(0.5)
-    dut_disconnect_tl1(tn_obj)
-
 
 if __name__ == "__main__":
-    ip = '10.182.1.161'
-    onulist = r'./config/EPON HGU 32.txt'
-    dut_onu = r'./config/HGU list.txt'
-    # auth_onu_tl1('DEL')
-    # auth_onu_tl1('ADD')
-    config_service_tl1('add', onulist, '13', '14')
-    # config_service_tl1('add', onulist, '11', '8')
+    fh_login = {'Login': 'GEPON', 'Password': 'GEPON',  '>': 'enable'}
+    hw_login = {'>': 'system-view'}
+    hw_promot = "]"
+    hostip = '10.182.0.240'
+    dut_tn = dut_connect_telnet(hostip, 23, hw_login, hw_promot)
+    if dut_tn is not None:
+        dut_disconnect_telnet(dut_tn)

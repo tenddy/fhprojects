@@ -5,7 +5,7 @@
 广西EPON MDU 业务模型配置
 @Author:  Teddy.tu
 @Date: 2019-12-29 20:22:02
-@LastEditTime: 2020-04-06 07:58:00
+@LastEditTime: 2020-05-28 17:09:07
 @LastEditors: Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
@@ -17,7 +17,6 @@ import sys
 import pandas as pd
 
 from lib import dut_connect
-from lib.dut_connect import dut_connect_telnet
 from lib.fhat import ServiceConfig
 from lib.fhlib import OLT_V5, TL1_CMD
 from lib.log import Logger
