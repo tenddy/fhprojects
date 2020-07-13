@@ -8,6 +8,66 @@
 @License : (c)Copyright 2019-2020, Teddy.tu
 @Desc    : None
 '''
+from enum import Enum
+
+
+class VLAN_MODE(Enum):
+    """ONU 端口业务模式"""
+    UNTAG = 0
+    TAG = 1
+    TRANSLATE = 2
+    TRANSPARENT = 3
+    mode = ('untag', 'tag', 'translate', 'transparent')
+
+
+class SericeType(Enum):
+    """业务类型"""
+    UNICAST = 0
+    MULTICAST = 1
+    type = ('unicast', 'multicast')
+
+
+class ONUAuthType(Enum):
+    """授权ONU方式"""
+    PHYID = 0
+    PASSWORD = 1
+    LOID = 2
+    LOIDPSW = 3
+
+
+class PONAuthMode(Enum):
+    """PON口授权模式
+
+        @LOID             Authenticate onu by logical SN without password.
+
+        @LOID_AND_PSW     Authenticate onu by logical SN with password.
+
+        @NO_AUTH          Authorize onu directly, needn't authentication.
+
+        @PASSWORD         Authenticate onu by physical password.
+
+        @PHYID            Authenticate onu by physical ID.
+
+        @PHYID_AND_PSW    Authenticate onu by physical ID and physical password.
+
+        @PHYID_OR_LOID     Authenticate onu by physical ID or logical SN without password or physical password or registration ID.
+
+        @PHYID_OR_LOIDPSW  Authenticate onu by physical ID or logical SN with password or physical password or registration ID.
+
+        @PHYID_OR_PSW       Authenticate onu by physical ID or physical password.
+
+        @REGID             Authenticate onu by registration ID.
+    """
+    NO_AUTH = 0
+    PHYID = 1
+    LOID = 2
+    PASSWORD = 3
+    PHYID_AND_PSW = 4
+    LOID_ADN_PSW = 5
+    PHYID_OR_LOID = 6
+    PHYID_OR_PSW = 7
+    PHYID_OR_LOIDPSW = 8
+    REGID = 9
 
 
 class TL1_CMD():
@@ -332,50 +392,114 @@ class OLT_V4():
     def __init__(self):
         self.cmdlines__ = ""
 
-    @classmethod
-    def reboot_system(cls):
-        cmdlines = ""
-        cmdlines = cmdlines.join("reboot\ny\n")
-        # self.cmdlines__ = cmdlines__.join(cmdlines)
+    @staticmethod
+    def pon_auth_mode(slotno, ponno, authmode: PONAuthMode):
+        """
+        函数功能：
+            配置PON口授权模式
+        函数参数：
+            @param slotno: int
+            槽位号， AN5516范围1~8，11~18; AN6000-17范围：1~8，11~19
+            @param ponno: int
+            PON口号， 1~16
+            @param authmode：enum class (PONAuthMode)
+            PON口授权模式, 枚举值 或者 phy_id|phy_id+psw|password|loid+psw|phy_id/loid+psw|no_auth|loid|phy_id/loid|phy_id/psw|reg_id
+        参考命令行:
+            # set pon_auth slot <slotno> pon <ponno> mode [phy_id|phy_id+psw|password|loid+psw|phy_id/loid+psw|no_auth|loid|phy_id/loid|phy_id/psw|reg_id]
+            Admin\card
+        使用说明:
+            pon_auth_mode(1, 1, PONAuthMode.PHYID)
+        """
+        ponauthmode = ('no_auth', 'phy_id', 'loid', 'password', 'phy_id+psw', 'loid+psw',
+                       'phy_id/loid', 'phy_id/psw', 'phy_id/loid+psw', 'reg_id')
+        cmdlines = []
+        cmdlines.append('cd card\n')
+        cmdlines.append('set pon_auth slot {slotno} pon {ponno} mode {authmode}\n'.format(
+            slotno=slotno, ponno=ponno, authmode=ponauthmode[authmode.value]))
+        cmdlines.append('cd ..\n')
+
         return cmdlines
 
     @staticmethod
-    def authorize_onu(auth_type, onu_sn, onutype, *onu):
+    def authorize_onu(authtype: ONUAuthType, slotno, ponno, onuid, onutype, **onu_sn):
         """
-        函数功能：授权ONU
+        函数功能：
+            授权ONU;
+            授权ONU方式: phy-id, password, loid, loidpsw
+
         函数参数:
-        @auth_type(string):phy-id,logic-id
-        @onu_sn(string):onu physics address or logic sn
-        @onutye: Type of onu, eg. 5006-10, OTHER2
-        @*onu: (slotno, ponno, onuno)
+            @param auth_type: Enum class
+                OnuAuthType
+            @param slotno:int
+                槽位号, 范围1~19，根据不同的系统槽位号范围不相同
+            @param ponno:int
+                PON口号, 范围1~16
+            @param onuid:int
+                ONU ID， 范围1~128
+            @param onutype: string
+                ONU 类型， 例如OTHER2， HG260， 5506-04F1等
+            @**onu_sn: dict
+                onu 的SN信息， 根据授权方式不一样，分别需要配置phyid， password， loid， logicpsw
+
         参考命令行：
-        set whitelist <phy-id/logic-id/password> address <sn> password null  action add slot 7 pon 7 onu 1 type 5006-07A
+            Admin/onu# set whitelist <phy-id/logic-id/password> address <sn> password null  action add slot 7 pon 7 onu 1 type 5006-07A
+            set whitelist {[phy_addr] address <address> password [<pwd_str>|null]}*1 {[password] password <pwd_str>}*1 {[logic_sn] sn <sn_str> password [<pswd_str>|null]}*1 action [add|delete|lock|unlock] {slot <slotno> pon <ponno> onu <onuno> type <onutype>}*1
 
-
-        引用函数：
+        函数说明:
+            authorize_onu(ONUAuthType.PHYID, 1, 1, 1, 'HG260', phyid='FHTT01010001', loid='li1212', password='oso1')
         """
-        cmdlines = []
-        cmdlines.append('cd onu\n')
         try:
-            cmdlines.append(
-                "whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(
-                    auth_type, onu_sn, onutype, *onu))
-        except Exception as err:
-            print("Error:", err)
+            cmdlines = []
+            cmdlines.append('cd onu\n')
+            if ONUAuthType.PHYID == authtype:  # phy id
+                if 'password' not in onu_sn.keys():
+                    onu_sn['password'] = 'null'
+                cmdlines.append("set whitelist phy_addr address {phyid} password {password} action add slot {slotno} pon {ponno} onu {onuid} type {onutype}\n".format(
+                    phyid=onu_sn['phyid'], password=onu_sn['password'], slotno=slotno, ponno=ponno, onuid=onuid, onutype=onutype))
+
+            if ONUAuthType.PASSWORD == authtype:  # password
+                cmdlines.append("set whitelist  password password {password} action add slot {slotno} pon {ponno} onu {onuid} type {onutype}\n".format(
+                    password=onu_sn['password'], slotno=slotno, ponno=ponno, onuid=onuid, onutype=onutype))
+
+            if (ONUAuthType.LOID == authtype) or (ONUAuthType.LOIDPSW == authtype):  # loid without passowrd / loid with passowrd
+                if 'logicpsw' not in onu_sn.keys():
+                    onu_sn['logicpsw'] = 'null'
+                cmdlines.append("set whitelist logic_sn sn {loid} password {logicpsw} action add slot {slotno} pon {ponno} onu {onuid} type {onutype}\n".format(
+                    loid=onu_sn['loid'], logicpsw=onu_sn['logicpsw'], slotno=slotno, ponno=ponno, onuid=onuid, onutype=onutype))
+        except KeyError as err:
+            print("Authorize ONU Failed!!!")
+            print("KeyError: ", err)
+            print(
+                "Key of onu_sn need one of 'phyid', 'password', 'loid', 'logicpsw'.\n But keys of onu_sn:{0}".format(
+                    onu_sn.keys()))
 
         return cmdlines
 
+    @staticmethod
+    def unauth_onu(slotno, ponno, onuid, onutype, authmode, **onu_sn):
+        """
+        函数功能:
+            去授权ONU
+        函数参数:
+            @param
+        返回值: None
+        使用说明:
+        """
+        # TODO
+
 
 class OLT_V5():
-    def __init__(self, tn=None):
-        self.version__ = "V5R0"
-        self.tn__ = tn
+    def __init__(self, tn=None, version="V5"):
+        self.__version = version
+        # self.tn__ = tn
 
     @staticmethod
     def query_debugip():
         """
         函数功能：回读debug ip
+
         函数参数:
+
         参考命令行：
 
         引用函数：
@@ -389,7 +513,7 @@ class OLT_V5():
             filename, program_type='system', protocol='ftp', serverinfo=('10.182.5.213', '1', '1'),
             backup=False):
         '''
-        函数功能：系统版本升级
+        函数功能：升级系统版本
 
         函数参数：
             @filename: 升级文件文件
@@ -401,8 +525,10 @@ class OLT_V5():
         函数返回值：
 
         参考命令行：
-        Admin(config)# load program [system|config|script|ver-file|boot|patch|cpld|fpga] <filename> [tftp|ftp|sftp] <ipaddr> {<username> <password>}*1
-        Admin(config)# load program backup [system|patch|cpld|boot|fpga] <filename> [tftp|ftp|sftp]<ipaddr> {<username> <password>}*1 
+        # load program [system|config|script|ver-file|boot|patch|cpld|fpga] <filename> [tftp|ftp|sftp] <ipaddr> {<username> <password>}*1
+        Admin(config)
+        # load program backup [system|patch|cpld|boot|fpga] <filename> [tftp|ftp|sftp]<ipaddr> {<username> <password>}*1
+        Admin(config)
         '''
         cmdlines = ['config\n']
         if backup:
@@ -416,11 +542,13 @@ class OLT_V5():
     @staticmethod
     def show_debugversion(backup=False):
         """
-        函数功能：查看主控编译时间
+        函数功能： 查看主控编译时间
         函数参数：
+            @backup(boolean): False--主盘（默认值）； True--备盘
         函数返回值：
+            查看版本的命令行
         参考命令行：
-        Admin(config)# show card
+            Admin(diagnose)# show debugversion
         """
         if backup:
             cmdlines = ['config\n', 'telnet slot backup\n', 'diagnose\n', 'show debugversion\n']
@@ -441,11 +569,32 @@ class OLT_V5():
         return cmdlines
 
     @staticmethod
-    def authorize_onu(auth_type, onu_sn, onutype, *onu):
+    def pon_auth_mode(slotno, ponno, authmode: PONAuthMode):
+        """
+        函数功能:
+            配置PON口授权模式
+        函数参数:
+            @param slotno(int/string): 槽位号
+            @param ponno(int/string): PON口号
+            @param authmode(PONAuthMode): PON口授权模式
+        返回值: 命令行列表
+        使用说明:
+            Admin(config-if-pon-1/1)#  port authentication-mode [phyid|phy-id+psw|password|log-id|log-id+psw|no-auth|phy-id/psw|phy-id/log-id/psw|phy-id/log-id+psw/psw]
+        """
+        ponauthmode = ('no-auth', 'phyid', 'log-id', 'password', 'phy-id+psw', 'log-id+psw',
+                       'phy-id/log-id/psw', 'phy-id/psw', 'phy-id/log-id+psw/psw')
+        cmdlines = []
+        cmdlines.append('interface pon 1/{s}/{p}\n'.format(s=slotno, p=ponno))
+        cmdlines.append('port authentication-mode {mode}\n'.format(mode=ponauthmode[authmode.value]))
+        cmdlines.append('quit\n')
+        return cmdlines
+
+    @staticmethod
+    def authorize_onu(auth_type: ONUAuthType, onu_sn, onutype, *onu):
         """
         函数功能：授权ONU
         函数参数:
-        @auth_type(string):phy-id,logic-id
+        @auth_type(string):phy-id,logic-id,password
         @onu_sn(string):onu physics address or logic sn
         @onutye: Type of onu, eg. 5006-10, OTHER2
         @*onu: (slotno, ponno, onuno)
@@ -454,27 +603,29 @@ class OLT_V5():
 
         引用函数：
         """
+        auth_mode = ('phy-id', 'password', 'logic-id')
         cmdlines = []
-        # cmdlines.append('config\n')
         try:
             cmdlines.append(
                 "whitelist add {0} {1} type {2} slot {3} pon {4} onuid {5}\n".format(
-                    auth_type, onu_sn, onutype, *onu))
-        except Exception as err:
-            print("Error:", err)
+                    auth_mode[auth_type.value], onu_sn, onutype, *onu))
+        except SyntaxError as err:
+            print(err)
+        except IndexError as indexerr:
+            print(indexerr)
 
         return cmdlines
 
     @staticmethod
-    def unauth_onu(auth_type, slotno, ponno, onu_sn, **kwargs):
+    def unauth_onu(auth_type: ONUAuthType, slotno, ponno, onu_sn, **kwargs):
         """
         函数功能：去授权ONU
 
         函数参数:
-        @auth_type(string):phy-id,log-id
-        @slotno(string/int):槽位号
-        @ponno(string/int):PON 口号
-        @onu_sn(string):onu physics address or logic sn
+        @auth_type(enum):ONUAuthType
+        @slotno(str/int):槽位号
+        @ponno(str/int):PON 口号
+        @onu_sn(str):onu physics address or logic sn
         @**kwargs: checkcode
 
         参考命令行：
@@ -482,25 +633,26 @@ class OLT_V5():
 
         引用函数：
         """
-        checkcode = ""
-        if 'checkcode' in kwargs.values():
-            checkcode = kwargs['checkcode']
+
+        auth_mode = ('phy-id', 'password', 'logic-id')
+
+        checkcode = kwargs['checkcode'] if 'checkcode' in kwargs.values() else ""
 
         cmdlines = []
-        cmdlines.append("no whitelist {0} {1} {2} {3} {4}\n".format(auth_type, slotno, ponno, onu_sn, checkcode))
-
+        cmdlines.append("no whitelist {0} {1} {2} {3} {4}\n".format(
+            auth_mode[auth_type.value], slotno, ponno, onu_sn, checkcode))
         return cmdlines
 
     @staticmethod
-    def add_uplink_vlan(uplinkslot, uplinkport, vlan_mode, vlan_begin, vlan_end):
+    def add_uplink_vlan(uplinkslot, uplinkport, vlan_mode: VLAN_MODE, vlan_begin, vlan_end):
         """
         函数功能：
             配置上联端口VLAN
 
         函数参数:
-            @uplinkslot: 上联口槽位
+            @uplinkslot: 上联口槽位号或者主控槽位号
             @uplinkport: 上联口端口
-            @vlan_mode: vlan模式，tag, untag
+            @vlan_mode(enum): vlan模式，VLAN_MODE
             @vlan_begin: 起始VLAN (0~4095)
             @vlan_end: 终止VLAN (0~4095)
         参考命令行：
@@ -510,14 +662,39 @@ class OLT_V5():
         cmdlines = []
         # cmdlines.append("config\n")
         cmdlines.append("port vlan {0} to {1} {2} 1/{3} {4} \n".format(
-            vlan_begin, vlan_end, vlan_mode, uplinkslot, uplinkport))
+            vlan_begin, vlan_end, VLAN_MODE.mode.value[vlan_mode.value], uplinkslot, uplinkport))
 
         return cmdlines
 
     @staticmethod
+    def show_port_vlan(slot, port):
+        """
+        函数功能:
+            获取上联口VLAN
+        函数参数:
+            @param
+        返回值: None
+        使用说明:
+        Admin(config)# show port vlan <frameid/slotid/portid>
+        """
+        return ['show port vlan 1/{slotid}/{portid}\n'.format(slotid=slot, portid=port)]
+
+    @staticmethod
+    def del_uplink_vlan(uplinkslot: int, uplinkport, vlan_mode: VLAN_MODE, vlan_begin, vlan_end):
+        """
+        函数功能:
+            删除上联口VLAN
+        函数参数:
+            @param
+        返回值: None
+        使用说明:
+        """
+        # Todo
+
+    @staticmethod
     def onu_lan_service(onu_port, ser_count, *lan_service):
         """
-        函数功能: 
+        函数功能:
             配置ONU端口业务
 
         函数参数:
@@ -577,7 +754,7 @@ class OLT_V5():
 
         函数参数：
             @qinq_name: olt qinq域名称
-            @*vlanrule: ({'uprule':((filedid, value, condition),), 'dwrule': ((filedid, value, condition),), 
+            @*vlanrule: ({'uprule':((filedid, value, condition),), 'dwrule': ((filedid, value, condition),),
             'vlanrule': (l1oldvlan, l1oldvlan_cos, l1_action, l1_tpid, l1_newvlan, l1_newvlancos, l2oldvlan, l2oldvlan_cos, l2_action, l2_tpid, l2_newvlan, l2_newvlancos)},)
 
             @uprule 与dwrule 分别是上下行匹配规则；默认值为((2, '000000000000', 5),)
@@ -595,17 +772,20 @@ class OLT_V5():
 
         参考命令行：
         # oltqinq 上行匹配规则
-        Admin(config)# oltqinq-domain <name> service <1-8> classification upstream {field-id <1-27> value <value> condition <condition>}*4 {serv-id <1-8>}*1
+        # oltqinq-domain <name> service <1-8> classification upstream {field-id <1-27> value <value> condition <condition>}*4 {serv-id <1-8>}*1
+        Admin(config)
 
         # oltqinq 下行匹配规则
-        Admin(config)# oltqinq-domain <name> service <1-8> classification downstream {field-id <1-27> value <value> condition <condition>}*4
+        # oltqinq-domain <name> service <1-8> classification downstream {field-id <1-27> value <value> condition <condition>}*4
+        Admin(config)
 
         # 配置VLAN转换规则
-        Admin(config)# oltqinq-domain <name> service <1-8> {vlan <1-4> user-vlanid [<0-4095>|null] user-cos [<0-7>|null] [add|translation|transparent]
+        # oltqinq-domain <name> service <1-8> {vlan <1-4> user-vlanid [<0-4095>|null] user-cos [<0-7>|null] [add|translation|transparent]
+        Admin(config)
         tpid <tpid> cos [<cos>|user-cos|null] vlanid [<vlanid>|null]}*4
 
         示例：
-        config_oltqinq_vlanservice(qinq_test, {'uprule': ((7, 100, 4), (7, 200, 3)), 'dwrule':(
+        config_oltqinq_vlanservice('qinq_test', {'uprule': ((7, 100, 4), (7, 200, 3)), 'dwrule':(
             (2,'000000000000', 5),), 'vlanrule': (100, 'null', 'translation', 33024, 201, 1, 'null', 'null', 'add', 33024, 2701, 1)})
         """
         cmdlines = []
@@ -778,9 +958,7 @@ class OLT_V5():
     @staticmethod
     def get_MDU_ngn_ip(slot, pon, onu, ip):
         cmdlines = []
-        cmdlines.append('config\n')
         cmdlines.append('telnet slot 1/%d \n' % slot)
-        cmdlines.append('')
         # TODO
 
     @staticmethod
@@ -801,30 +979,41 @@ class OLT_V5():
         pass
 
 
-class OLT_V4_RUSSIA():
+class OLT_V4_RUSSIA(OLT_V4):
     """俄罗斯命令"""
 
     def __init__(self):
         pass
 
     @staticmethod
-    def cfg_onu_lan_service(onuinfo, cvlan, cos, service_type, mode):
+    def unauth_onu(onuinfo: tuple):
+        """
+        函数功能:
+            去授权ONU，俄罗斯MGTS 命令
+        函数参数:
+            @para onuinfo(tuple)：
+        返回值: None
+        使用说明:
+        OLT_FH_1\onu# no whitelist slot 18 pon 16 onu 1
+        """
+        cmdlines = ['cd /onu\n']
+        cmdlines.append("no whitelist slot {0} pon {1} onu {2}\n".format(*onuinfo))
+        return cmdlines
+
+    @staticmethod
+    def cfg_onu_lan_service(onu_port_info: tuple, cvlan: int, cos: int, service_type: SericeType, mode: VLAN_MODE):
         """
         函数功能:
             配置端口业务
 
         函数参数：
-            @para onuinfo: tuple
-                (slotno, ponno, onuno, portno)
-            @para cvlan: int
-                int
-            @para cos:int
-            @para service_type: string
-                mulicast, unicast
-            @para mode: string
-                tag, transparent
-        返回值：
-
+            @para onu_port_info(tuple): (槽位，PON口，ONU，端口) -- (slotno, ponno, onuno, portno)
+            @para cvlan(int): 业务VLAN
+            @para cos(int): 优先级
+            @para service_type(enum): 业务类型
+            @para mode(enum): VLAN模式
+        返回值：list
+            配置命令行
         参考命令行：
              onu-lan slot <slotno> pon <ponno> onu <onuno> port <portno> vlan <vlanlist> priority <priority_value> type [unicast|multicast] mode [tag|transparent] {[translate] svlan <vlan_id>} *
         使用示例：
@@ -832,22 +1021,20 @@ class OLT_V4_RUSSIA():
 
         cmdlines = ['cd /onu/lan\n']
         cmdlines.append('onu-lan slot {0} pon {1} onu {2} port {3} vlan {4} priority {5} type {6} mode {7}\n'.format(
-            *onuinfo, cvlan, cos, service_type, mode))
-        print("onuinfo", onuinfo)
-        cmdlines.append('apply onu {0} {1} {2} vlan\n'.format(*onuinfo[:3]))
+            *onu_port_info, cvlan, cos, SericeType.type.value[service_type.value], VLAN_MODE.mode.value[mode.value]))
+        cmdlines.append('apply onu {0} {1} {2} vlan\n'.format(*onu_port_info[:3]))
+        cmdlines.append('cd / \n')
         return cmdlines
 
     @staticmethod
-    def del_onu_lan_service(onuinfo, vlan):
+    def del_onu_lan_service(onu_port_info, vlan):
         """
         函数功能:
             删除端口业务
 
         函数参数：
-            @para onuinfo: tuple
-                (slotno, ponno, onuno, portno)
-            @para vlan: string
-                vlanlist | all
+            @para onu_port_info(tuple): (槽位，PON口，ONU，端口) -- (slotno, ponno, onuno, portno)
+            @para vlan(string): vlanlist | all
         返回值：
 
         参考命令行：
@@ -856,9 +1043,72 @@ class OLT_V4_RUSSIA():
         """
 
         cmdlines = ['cd /onu/lan\n']
-        cmdlines.append('no onu-lan slot {0} pon {1} onu {2} port {3} vlan {4}\n'.format(*onuinfo, vlan))
-        print("onuinfo", onuinfo)
-        cmdlines.append('apply onu {0} {1} {2} vlan\n'.format(*onuinfo[:3]))
+        cmdlines.append('no onu-lan slot {0} pon {1} onu {2} port {3} vlan {4}\n'.format(*onu_port_info, vlan))
+        cmdlines.append('apply onu {0} {1} {2} vlan\n'.format(*onu_port_info[:3]))
+        cmdlines.append('cd /\n')
+
+        return cmdlines
+
+    @staticmethod
+    def cfg_internet_wan(slotno, ponno, onuno, vlan):
+        """
+        函数功能:
+            配置ONU Internet WAN业务
+        函数参数:
+            @param slotno(int): 槽位号
+            @param ponno(int): PON口号
+            @param onuno(int): ONU号
+            @parma vlan(int): VLAN
+        返回值: 
+            命令行列表
+        使用说明:
+        OLT_FH_1\onu\lan#
+        set veip_mgr_par slot 11 pon 16 onu 128 veip_port 1 port_type veip mgr_channel enable model tr069 item 1
+        set veip_mgr_vlan slot 11 pon 16 onu 128 veip_port 1 mgr_id 1 protocol udp priority 0 tag_type tag svlan_label 0x8100 svlanid null svlan_cos null cvlan_label 0x8100 cvlanid 900 cvlan_cos 7
+        apply veip_mgr_vlan slot 11 pon 16 onu 128
+        """
+        cmdlines = ['cd /onu/lan\n']
+        cmdlines.append('set veip_mgr_par slot {0} pon {1} onu {2} veip_port 1 port_type veip mgr_channel enable model tr069 item 1\n'.format(
+            slotno, ponno, onuno))
+        cmdlines.append(
+            'set veip_mgr_vlan slot {0} pon {1} onu {2} veip_port 1 mgr_id 1 protocol udp priority 0 tag_type tag svlan_label 0x8100 svlanid null svlan_cos null cvlan_label 0x8100 cvlanid {3} cvlan_cos 7\n'.
+            format(slotno, ponno, onuno, vlan))
+        cmdlines.append('apply veip_mgr_vlan slot {0} pon {1} onu {2}\n'.format(slotno, ponno, onuno))
+        return cmdlines
+
+    @staticmethod
+    def cfg_voice(slotno, ponno, onuno, voice_vlan, servicename, phone_prefix="", potsnum=2):
+        """
+        函数功能:
+            配置ONU语音业务
+        函数参数:
+            @param slotno(int): 槽位号
+            @param ponno(int): PON口号
+            @param onuno(int): ONU号
+            @parma voice_vlan(int): VLAN 
+            @parma servicename(string): 业务名称
+            @parma phone_prefixe(string):电话号码前缀
+            @parma potsnum(int): pots端口数量，默认为2.
+        返回值: 
+            命令行列表
+        使用说明:
+            Admin\onu\ngn#
+            set ngn_uplink_user_new slot 11 pon 16 onu 128 servicename voip vid 7 ip_mode dhcp domainname @russia.voip protocol_port 5060
+            set ngn_voice_service_new slot 11 pon 16 onu 128 pots 1 username 8888800001 sip_user_name 8888800001 sip_user_password 8888800001
+            set ngn_voice_service_new slot 11 pon 16 onu 128 pots 2 username 8888800002 sip_user_name 8888800002 sip_user_password 8888800002
+        """
+        # phone number prefix
+        prefix = "{phone_prefix}{slot:02}{pon:02}{onu:03}".format(
+            phone_prefix=phone_prefix, slot=slotno, pon=ponno, onu=onuno)
+        cmdlines = ['cd /onu/ngn\n']
+        cmdlines.append(
+            'set ngn_uplink_user_new slot {0} pon {1} onu {2} servicename {4} vid {3} ip_mode dhcp domainname @russia.voip protocol_port 5060\n'.
+            format(slotno, ponno, onuno, voice_vlan, servicename))
+
+        for pots in range(potsnum):
+            cmdlines.append(
+                'set ngn_voice_service_new slot {0} pon {1} onu {2} pots 1 username {3}{4:02} sip_user_name {3}{4:02} sip_user_password {3}{4:02}\n'.
+                format(slotno, ponno, onuno, prefix, pots+1))
 
         return cmdlines
 
@@ -869,14 +1119,14 @@ class OLT_V4_RUSSIA():
             配置lacp系统优先级 <0-65534>
         函数参数：
             @param protocol： 布尔类型
-                True --- 从协议栈获取状态   
+                True --- 从协议栈获取状态
                 False --- 从数据库中获取状态
         返回值：
             命令行列表
 
         参考命令行:
             协议栈：Admin\protocol\lacp# show lacp channel-group trunks看协议栈
-            数据库：Admin# show running-config module rcal_lacp  
+            数据库：Admin# show running-config module rcal_lacp
                    Admin(DEBUG_H)> show lacp running-config
         """
         pass
@@ -888,16 +1138,17 @@ class OLT_V4_RUSSIA():
             配置端口优先级 <0-65534>
         函数参数：
             @param protocol： 布尔类型
-                True --- 从协议栈获取状态   
+                True --- 从协议栈获取状态
                 False --- 从数据库中获取状态
         返回值：
             命令行列表
 
         参考命令行:
             协议栈：Admin\protocol\lacp# show lacp channel-group trunks看协议栈
-            数据库：Admin# show running-config module rcal_lacp  
+            数据库：Admin# show running-config module rcal_lacp
                    Admin(DEBUG_H)> show lacp running-config
         """
+        # TODO
         pass
 
     @staticmethod
@@ -907,16 +1158,17 @@ class OLT_V4_RUSSIA():
             配置端口key值 <1-32768>
         函数参数：
             @param protocol： 布尔类型
-                True --- 从协议栈获取状态   
+                True --- 从协议栈获取状态
                 False --- 从数据库中获取状态
         返回值：
             命令行列表
 
         参考命令行:
             协议栈：Admin\protocol\lacp# show lacp channel-group trunks看协议栈
-            数据库：Admin# show running-config module rcal_lacp  
+            数据库：Admin# show running-config module rcal_lacp
                    Admin(DEBUG_H)> show lacp running-config
         """
+        # TODO
         pass
 
     @staticmethod
@@ -930,14 +1182,15 @@ class OLT_V4_RUSSIA():
             获取lacp状态
         函数参数：
             @param protocol： 布尔类型
-                True --- 从协议栈获取状态   
+                True --- 从协议栈获取状态
                 False --- 从数据库中获取状态
         返回值：
             命令行列表
 
         参考命令行:
             协议栈：Admin\protocol\lacp# show lacp channel-group trunks看协议栈
-            数据库：Admin# show running-config module rcal_lacp  
+            数据库：Admin# show running-config module rcal_lacp
                    Admin(DEBUG_H)> show lacp running-config
         """
+        # TODO
         pass

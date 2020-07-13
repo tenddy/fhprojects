@@ -19,6 +19,7 @@ INFO = 1
 WARNING = 2
 ERROR = 3
 
+
 class Logger():
     def __init__(self, logfile=None, level=logging.DEBUG):
         self.log__ = logging.getLogger(None)
@@ -47,16 +48,16 @@ class Logger():
         self.log__.warning(msg)
 
 
-'''
-功能：打印log装饰器
-'''
+##################
+# log打印装饰器函数
+#################
 def log_decare(func):
     def wraper_func(*args, **kwargs):
         try:
             # print("call", func.__name__)
-            ret = func(*args, **kwargs)
             log = Logger()
-            log.log_info(str(ret))
+            for ret in func(*args, **kwargs):
+                log.log_info(ret)
         except Exception as err:
             print("print log error!", err)
             exit(-1)

@@ -4,7 +4,7 @@ import time
 from functools import wraps
 
 # Fiberhome OLT telnet 登录提示符,用户名及密码
-fh_olt_promot = {'Login': 'GEPON', 'Password': 'GEPON',  '>': 'enable'}
+fh_olt_promot = {'Login': 'GEPON', 'Password': 'GEPON',  'User>': 'enable'}
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -31,12 +31,21 @@ CONNECT_TIMES = 3
 
 def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
     """
-    @函数功能:
+    函数功能:
        通过telnet登录dut设备
-    @param host: dut设备的IP地址, 字符串类型
-    @param port: telnet登录端口号, 范围（0~65535)默认23
-    @param login_promot: telnet登录设备的提示字符及对应用户名和密码, 字典类型
-    @param promot: 设备登录成功提示符,正常输入命令提示符, bytes类型
+
+    参数说明：
+        @param host: string
+            dut设备的IP地址, 字符串类型 
+        @param port: int
+            telnet登录端口号, 范围（0~65535)默认23
+        @param login_promot: dict
+            key为提示字符, value为对应用户名或者密码, 默认采用烽火OLT登录的默认提示符及用户名和密码
+        @param promot: string
+            设备登录成功提示符,正常输入命令提示符
+    
+    使用说明：
+        dut_connect_telnet('10.182.3.100', port=8006, login_promot={"Username:":"admin", "Password:":"12345"}, '#')
     """
     promot_keys = []
     promot_times = {}
@@ -46,20 +55,20 @@ def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
     promot_keys.append(bytes(promot, encoding='utf8'))
 
     try:
-        logger.info("Connect Host(%s) by telnet." % host)
+        logger.info("Connect to Host(%s) by telnet." % host)
         tn = telnetlib.Telnet(host, port=port)
         i, m, data = tn.expect(promot_keys, 5)
         m = str(m.group(), encoding='utf8')
 
         while i != -1:  # 没有登录成功，并且提示符正确
             if m == promot:
-                logger.info("Connect Host(%s) success!\n" % host)   # 登录成功，返回tn
+                logger.info("Connect to Host(%s) success!\n" % host)   # 登录成功，返回tn
                 return tn
 
             if m in promot_times.keys():
                 promot_times[m] += 1
                 if promot_times[m] > 2:
-                    logger.info("Connect Host(%s) Failed!\n" % host)   # 登录失败，返回 None
+                    logger.info("Connect to Host(%s) Failed!\n" % host)   # 登录失败，返回 None
                     tn.close()
                     return None
             else:

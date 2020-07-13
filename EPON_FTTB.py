@@ -5,26 +5,30 @@
 广西EPON MDU 业务模型配置
 @Author:  Teddy.tu
 @Date: 2019-12-29 20:22:02
-@LastEditTime: 2020-05-28 17:09:07
+@LastEditTime: 2020-06-23 18:40:51
 @LastEditors: Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
 
-import math
-import sys
-
-import pandas as pd
-
 from lib import dut_connect
 from lib.fhat import ServiceConfig
 from lib.fhlib import OLT_V5, TL1_CMD
 from lib.log import Logger
+import pandas as pd
+import math
+import os
+import sys
 
 
 def get_onu_info(filename):
     """
-    获取ONU信息，返回格式为DataFrame
+    函数功能:
+       读取excel文件, 获取ONU状态信息
+    函数参数:
+        @param
+    返回值: None
+    使用说明:
     """
     data = pd.read_excel(filename)
     return data
@@ -468,9 +472,9 @@ def get_cmd(**kwargs):
 
                 if kwargs['ONU_LANPORT'] == 6:
                     # 单播：(同一个端口3条业务）
-                    # 1)端口透传2001+使能绑qinq域模板（内翻外加)，变换后vlan为301+2506；
+                    # 1) 端口透传2001+使能绑qinq域模板（内翻外加)，变换后vlan为301+2506；
                     # 2）端口透传45+使能绑qinq域模板（外加），变换后vlan为45+2506；
-                    # 3）端口透传46+使能绑qinq域模板（外加），变换后vlan为46+2506；
+                    # 3）端口透传46+使能绑qinq域模板（外加）, 变换后vlan为46+2506；
                     cmdlines += OLT_V5.onu_lan_service((slotno, ponno, onu.loc[index]['ONU'], portno+1), 3,
                                                        {'cvlan': ('transparent', tcos, cvlan_trans+index*cstep),
                                                         'translate': ('enable', tcos, tvlan+index*tstep+portno),
@@ -483,8 +487,8 @@ def get_cmd(**kwargs):
                 if kwargs['ONU_LANPORT'] == 7:
                     # 单播：（同一个端口3条业务）
                     # 1)端口tag301+使能绑qinq域模板（外加)，变换后vlan为301+2506；
-                    # 2）端口透传45+使能绑qinq域模板（外加），变换后vlan为45+2506；
-                    # 3）端口透传46+使能绑qinq域模板（外加），变换后vlan为46+2506；
+                    # 2）端口透传45+使能绑qinq域模板（外加)，变换后vlan为45+2506；
+                    # 3）端口透传46+使能绑qinq域模板（外加)，变换后vlan为46+2506；
                     cmdlines += OLT_V5.onu_lan_service((slotno, ponno, onu.loc[index]['ONU'], portno+1), 1,
                                                        {'cvlan': ('tag', ccos, cvlan+portno+index*tstep),
                                                         'qinq': ('enable', scos, svlan, qinqprf, svlan_service)},
