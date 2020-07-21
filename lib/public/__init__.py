@@ -6,12 +6,7 @@
 @Version: V1.0
 @EMAIL: teddy_tu@126.com
 @License: (c)Copyright 2019-2020, Teddy.tu
-@Date: 2020-06-08 09:17:48
+@Date: 2020-07-14 09:53:28
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-06-08 09:18:03
+@LastEditTime: 2020-07-14 09:53:29
 '''
-
-import os
-import sys
-from lib import *
-print(sys.path)

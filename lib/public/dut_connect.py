@@ -2,31 +2,9 @@ import logging
 import telnetlib
 import time
 from functools import wraps
-
+from lib.public.fhlog import logger
 # Fiberhome OLT telnet 登录提示符,用户名及密码
 fh_olt_promot = {'Login': 'GEPON', 'Password': 'GEPON',  'User>': 'enable'}
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-# console
-console = logging.StreamHandler()
-console.setLevel(logging.DEBUG)
-fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
-console.setFormatter(fomatter)
-
-# File log
-file_log = logging.FileHandler('./log/dut_log.txt')
-file_log.setLevel(logging.DEBUG)
-fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(message)s')
-file_log.setFormatter(fomatter)
-
-# log.addHandler(file_log)
-logger.addHandler(console)
-
-
-# 重连次数
-CONNECT_TIMES = 3
 
 
 def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
@@ -43,15 +21,16 @@ def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
             key为提示字符, value为对应用户名或者密码, 默认采用烽火OLT登录的默认提示符及用户名和密码
         @param promot: string
             设备登录成功提示符,正常输入命令提示符
-    
+
     使用说明：
         dut_connect_telnet('10.182.3.100', port=8006, login_promot={"Username:":"admin", "Password:":"12345"}, '#')
     """
-    promot_keys = []
-    promot_times = {}
-    for key in login_promot.keys():
-        promot_keys.append(bytes(key, encoding='utf8'))
 
+    # 针对烽火OLT，默认都添加 'User>' 对应命令行'enable'
+    if 'User>' not in login_promot:
+        login_promot['User>'] = 'enable'
+
+    promot_keys = list(bytes(key, encoding='utf8') for key in login_promot.keys())
     promot_keys.append(bytes(promot, encoding='utf8'))
 
     try:
@@ -60,6 +39,7 @@ def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
         i, m, data = tn.expect(promot_keys, 5)
         m = str(m.group(), encoding='utf8')
 
+        promot_times = dict()
         while i != -1:  # 没有登录成功，并且提示符正确
             if m == promot:
                 logger.info("Connect to Host(%s) success!\n" % host)   # 登录成功，返回tn
@@ -74,7 +54,7 @@ def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
             else:
                 promot_times[m] = 1
 
-            # logger.info("%s:%s" % (m, login_promot[m]))
+            logger.debug("%s:%s" % (m, login_promot[m]))
             tn.write(bytes(login_promot[m] + '\n', encoding='utf8'))
             i, m, data = tn.expect(promot_keys, 5)
             m = str(m.group(), encoding='utf8')

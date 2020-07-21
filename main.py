@@ -8,17 +8,23 @@
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2019-08-12 16:47:01
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-09 09:55:36
+@LastEditTime: 2020-07-21 17:12:05
 '''
 
 
 import time
 import pandas as pd
-from lib import dut_connect, log
-from lib.fhat import ServiceConfig, FH_OLT, send_cmd_file
-from lib import fhlib
-import EPON_FTTB
-import gpon
+import os
+import sys
+from lib.public import dut_connect, fhlog
+from lib.oltlib.fhat import FH_OLT
+from lib.oltlib import fhlib
+# import epon
+# import gpon
+
+# sys.path.append(os.getcwd())
+
+# print("path:", sys.path)
 
 
 def epon_service_cfg():
@@ -65,13 +71,18 @@ def russia_cfg():
     russiaOLT.hostip = '10.182.5.156'
     russiaOLT.login_promot = {'Login:': 'fhadmin', 'Password:': 'fholt'}
     russiaOLT.connect_olt()
-    slot, pon = 18, 16
+    slot, pon = 11, 16
     onulists = [1, 2, 3, 4]
     onu_pwd = ('oso_hw', 'oso9d', 'oso2', 'sercom126')
     wan_vlan = 350
     voice_vlan = 7
 
-    for onu in onulists:
+    # for s in range(3, 9):
+    #     for p in range(1, 17):
+    #         for o in range(1, 65):
+    #             russiaOLT.sendcmdlines(fhlib.OLT_V4_RUSSIA.unauth_onu((s, p, o)))
+
+    for onu in onulists[:1]:
         cmds = []
         # 去授权ONU
         cmds += fhlib.OLT_V4_RUSSIA.unauth_onu((slot, pon, onu))
@@ -79,16 +90,17 @@ def russia_cfg():
         cmds += fhlib.OLT_V4_RUSSIA.authorize_onu(fhlib.ONUAuthType.PASSWORD,
                                                   slot, pon, onu, "HG260", password=onu_pwd[onu-1])
         # 配置WAN业务
-        cmds += fhlib.OLT_V4_RUSSIA.cfg_internet_wan(slot, pon, onu, wan_vlan)
+        # cmds += fhlib.OLT_V4_RUSSIA.cfg_internet_wan(slot, pon, onu, wan_vlan)
         # 配置语音业务
-        cmds += fhlib.OLT_V4_RUSSIA.cfg_voice(slot, pon, onu, voice_vlan, phone_prefix="66", servicename='voip')
+        #cmds += fhlib.OLT_V4_RUSSIA.cfg_voice(slot, pon, onu, voice_vlan, phone_prefix="66", servicename='voip')
         # 配置组播业务
-        cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4),
-                                                        600, 3, fhlib.SericeType.MULTICAST, fhlib.VLAN_MODE.TAG)
-        # 单播业务
-        un_vlan = 1010 + onu
-        cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4), un_vlan,
-                                                        3, fhlib.SericeType.UNICAST, fhlib.VLAN_MODE.TAG)
+
+        # cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4),
+        #                                                 600, 3, fhlib.SericeType.MULTICAST, fhlib.VLAN_MODE.TAG)
+        # # 单播业务
+        # un_vlan = 1010 + onu
+        # cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4), un_vlan,
+        #                                                 3, fhlib.SericeType.UNICAST, fhlib.VLAN_MODE.TAG)
         russiaOLT.sendcmdlines(cmds)
         # print(cmds)
 
@@ -135,36 +147,36 @@ def cfg_voice(slot, pon, onu, vlan, phone_prefix="", servicename='eluosisip'):
     return cmds
 
 
-def bactch_cfg():
-    slots = range(2, 8)
-    # pon = range(1, 17)
-    # onu = range(1, 129)
-    cfg_cmds = []
-    wan_vlan = 350
-    mvlan = 3049
-    voice_vlan = 7
-    for s in slots:
-        for p in range(1, 17):
-            cfg_cmds += OLT_V4_RUSSIA.pon_auth_mode(s, p, pontype.PHYID_OR_PSW.value)
-            for o in range(1, 65):
-                sn = 'RS%02d%02d%03d' % (s, p, o)
-                cfg_cmds += auth_onu(s, p, o, sn)
-                cfg_cmds += cfg_internet_wan(s, p, o, wan_vlan)
-                cfg_cmds += cfg_iptv(s, p, o, 4, mvlan)
-                cfg_cmds += cfg_voice(s, p, o, voice_vlan, '%02d%03d%03d0' % (s, p, o))
+# def bactch_cfg():
+#     slots = range(2, 8)
+#     # pon = range(1, 17)
+#     # onu = range(1, 129)
+#     cfg_cmds = []
+#     wan_vlan = 350
+#     mvlan = 3049
+#     voice_vlan = 7
+#     for s in slots:
+#         for p in range(1, 17):
+#             cfg_cmds += fhlib.OLT_V4_RUSSIA.pon_auth_mode(s, p, fhlib.pontype.PHYID_OR_PSW.value)
+#             for o in range(1, 65):
+#                 sn = 'RS%02d%02d%03d' % (s, p, o)
+#                 cfg_cmds += auth_onu(s, p, o, sn)
+#                 cfg_cmds += cfg_internet_wan(s, p, o, wan_vlan)
+#                 cfg_cmds += cfg_iptv(s, p, o, 4, mvlan)
+#                 cfg_cmds += cfg_voice(s, p, o, voice_vlan, '%02d%03d%03d0' % (s, p, o))
 
     # for item in cfg_cmds:
     #     print(item)
 
-    oltip = '10.182.5.156'
-    tn_obj = dut_connect.dut_connect_telnet(oltip, 23, {'Login': 'admin', 'Password': 'admin'}, '#')
-    log_obj = log.Logger(r'./log/russia_cfg.log')
-    cmd_send_obj = ServiceConfig(tn_obj, log_obj)
-    cmd_send_obj.send_cmd(cfg_cmds)
+    # oltip = '10.182.5.156'
+    # tn_obj = dut_connect.dut_connect_telnet(oltip, 23, {'Login': 'admin', 'Password': 'admin'}, '#')
+    # log_obj = log.Logger(r'./log/russia_cfg.log')
+    # cmd_send_obj = ServiceConfig(tn_obj, log_obj)
+    # cmd_send_obj.send_cmd(cfg_cmds)
 
 
 def del_batch_config():
-    slots = [1, 18]
+    slots = [1, 8]
     # pon = range(1, 17)
     # onu = range(1, 129)
     cfg_cmds = []

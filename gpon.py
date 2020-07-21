@@ -5,14 +5,14 @@
 GPON ONU业务模型配置
 @Author:  Teddy.tu
 @Date: 2020-01-19 10:07:02
-@LastEditTime: 2020-06-18 17:00:40
+@LastEditTime: 2020-07-15 13:31:12
 @LastEditors: Teddy.tu
 @Email:  teddy_tu@126.com
 @License:  (c)Copyright 2019-2020 Teddy_tu
 '''
-from lib import fhat
-from lib.fhlib import TL1_CMD
-from lib.fhlib import OLT_V5
+from lib.oltlib import fhat
+from lib.oltlib.fhlib import TL1_CMD
+from lib.oltlib.fhlib import OLT_V5
 
 
 def gpon_service_config_cmd(**kwargs):

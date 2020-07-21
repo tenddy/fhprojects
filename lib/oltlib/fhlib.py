@@ -8,6 +8,8 @@
 @License : (c)Copyright 2019-2020, Teddy.tu
 @Desc    : None
 '''
+
+
 from enum import Enum
 
 
@@ -486,6 +488,17 @@ class OLT_V4():
         使用说明:
         """
         # TODO
+
+    @staticmethod
+    def reboot_onu(slotno, ponno, onuid):
+        """复位ONU"""
+        try:
+            cmdlines = ['cd maintenance\n']
+            cmdlines.append('reboot slot {s} pon {p} onu {o}\n'.format(s=slotno, p=ponno, o=onuid))
+            return cmdlines
+        except Exception as err:
+            print("复位ONU命令失败")
+            print(err)
 
 
 class OLT_V5():
@@ -1107,7 +1120,7 @@ class OLT_V4_RUSSIA(OLT_V4):
 
         for pots in range(potsnum):
             cmdlines.append(
-                'set ngn_voice_service_new slot {0} pon {1} onu {2} pots 1 username {3}{4:02} sip_user_name {3}{4:02} sip_user_password {3}{4:02}\n'.
+                'set ngn_voice_service_new slot {0} pon {1} onu {2} pots {4} username {3}{4:02} sip_user_name {3}{4:02} sip_user_password {3}{4:02}\n'.
                 format(slotno, ponno, onuno, prefix, pots+1))
 
         return cmdlines

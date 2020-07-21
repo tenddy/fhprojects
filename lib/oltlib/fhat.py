@@ -8,66 +8,57 @@
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2020-01-12 21:24:26
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-01 10:33:48
+@LastEditTime: 2020-07-20 17:01:05
 '''
 
-
-from lib import fhlib
-from lib.log import Logger, log_decare
-from lib import dut_connect
+import pandas as pd
 import time
-import argparse
 import configparser
 import os
 import sys
-import numpy as np
-import pandas as pd
+import traceback
 
+try:
+    if os.getcwd() not in sys.path:
+        sys.path.append(os.getcwd())
+    from lib.oltlib import fhlib
+    from lib.public.fhlog import logger, log_decare
+    from lib.public import dut_connect
+    from lib import settings
+except Exception as err:
+    print("添加项目路径失败.")
+    print(err)
 
 MAX_CONNECT_TIMES = 3   # 最大连接次数
 OLT_VERSION_5K = 'V4'
 OLT_VERSION_6K = 'V5'
 
 
-class ServiceConfig():
-    def __init__(self, tn_obj, log_obj):
-        self.log__ = log_obj
-        self.tn__ = tn_obj
-        if self.tn__ is None:
-            print("connect DUT Error!")
-            exit(-1)
+class FHATException(Exception):
+    """Base class for FHSTCException"""
 
-    def __del__(self):
-        pass
 
-    def send_cmd(self, cmdline,  promot=b"#", timeout=5, delay=0):
-        """
-        函数功能：通过Telnet下发命令到设备
-        """
-        try:
-            cmd_ret = "Admin# "  # 返回参数
-            for item in cmdline:
-                if len(item) == 0:
-                    continue
-                print(item)
-                self.tn__.write(bytes(item, encoding='utf8'))
-                ret = self.tn__.read_until(promot, timeout).decode('utf-8')
-                print(ret)
-                self.log__.log_info(ret)
-                cmd_ret = cmd_ret + ret
-                time.sleep(delay)
-            return cmd_ret
-        except Exception as err:
-            print("send cmd Error!!!")
-            self.log__.log_error("Error:" + err)
-            return None
+class FHATCMDError(FHATException):
+    def __init__(self, command, error_message, stderr=''):
+        self.command = command
+        self.error_message = error_message.strip()
+        self.stderr = stderr
+        super().__init__(self.__str__())
+
+    def __str__(self):
+        msg = 'FHATCMDError raised while executing the command:"%s"\n error_message: "%s"' % (
+            self.command, self.error_message)
+        if self.stderr:
+            msg += '\n stderr: %s' % (self.stderr)
+        logger.error(msg)
+        return msg
 
 
 class FH_OLT():
-    def __init__(self, version=OLT_VERSION_6K, logfie=None):
+    def __init__(self, version=OLT_VERSION_6K):
         self.hostip = None  # IP地址
         self.hostport = None  # 连接设备端口号
-        self.login_promot = {}  # 登录提示符
+        self.login_promot = dict()  # 登录提示符
         self.version = version  # 版本信息
 
         # 登录OLT telnet对象
@@ -107,6 +98,19 @@ class FH_OLT():
         self.login_promot['Password'] = parser.get('OLT', 'password')
         self.login_promot['User'] = parser.get('OLT', 'user')
 
+    def init_olt(self):
+        """初始化OLT的配置,获取OLT的登录信息"""
+        self.hostip = settings.OLT_IP
+        self.hostport = settings.TELNET_PORT
+        self.login_promot = settings.OLT_LOGIN
+
+        if settings.OLT_VERSION.startswith("AN55"):
+            self.version = OLT_VERSION_5K
+        elif settings.OLT_VERSION.startswith("AN6"):
+            self.version = OLT_VERSION_6K
+        else:
+            raise FHATCMDError('init_olt', "获取OLT版本异常.")
+
     def connect_olt(self, *args):
         """
         连接OLT
@@ -123,8 +127,7 @@ class FH_OLT():
                     print("Connected to Device(%s) Timeout!" % self.hostip)
                     sys.exit(-1)
         except AttributeError as err:
-            print(err)
-            sys.exit(-1)
+            raise FHATCMDError('connect_olt', "连接OLT失败.")
 
     def disconnet_olt(self):
         """
@@ -163,18 +166,21 @@ class FH_OLT():
         try:
             if self.__tn is None:
                 self.connect_olt()
-            cmdlines = self.__cmdlines if cmdlines is None else cmdlines
+            if cmdlines is not None:
+                self.append_cmdlines(cmdlines)
 
-            if self.version == "V5":
-                cmdlines.insert(0, 'config\n')
-                cmdlines.append("quit\n")
-            # print("[debug]cmdlines:", cmdlines)
-            cmd_rets = ""  # 返回参数
-            print("send command to device...")
-            for item in cmdlines:
+            if self.version == OLT_VERSION_6K:
+                self.append_cmdlines.insert(0, 'config\n')
+                self.append_cmdlines.append("quit\n")
+            logger.debug("send command to device...")
+
+            while len(self.__cmdlines) != 0:
+                item = self.__cmdlines.pop(0)
                 if len(item.strip()) == 0:
                     continue
+                logger.debug("cmd:"+item)
                 self.__tn.write(bytes(item, encoding='utf8'))
+                cmd_rets = ''
                 while True:  # 判断执行命令是否执行完成
                     ret = self.__tn.read_until(promot, timeout)
                     cmd_rets += ret.decode("utf-8")
@@ -182,12 +188,11 @@ class FH_OLT():
                         self.__tn.write(bytes(" ", encoding='utf8'))
                     else:
                         break
-                time.sleep(delay)
+                yield cmd_rets
 
-            yield cmd_rets
+                time.sleep(delay)
         except Exception as err:
-            print("send cmd Failed!\nError:", err)
-            # self.log__.log_error("Error:" + err)
+            raise FHATCMDError("sendcmdlines", "send cmd Failed!", traceback.format_exc())
 
     def verify_cmds_exec(self, err_str=['failed', 'error', 'unknown command']):
         """
@@ -208,7 +213,7 @@ class FH_OLT():
 
     def get_card_status(self, slotno):
         """
-        @函数功能：获取线卡状态
+        获取线卡状态
         """
         show_card_cmd = []
         if self.version == "V4":
@@ -219,7 +224,7 @@ class FH_OLT():
         ret = self.sendcmdlines(show_card_cmd)
         slot_status = ret.split('\n')[4:][slotno-1].strip().split()
         self.disconnet_olt()
-        return {'CARD': slot_status[0], 'EXIST': slot_status[1], 'CONFIG': slot_status[2], 'DETECT': slot_status[3], 'DETAIL': slot_status[4]}
+        return dict(zip(('CARD', 'EXIST', 'CONFIG', 'DETECT', 'DETAIL'), slot_status))
 
     def get_card_version(self, slotno):
         self.disconnet_olt()
@@ -230,15 +235,17 @@ class FH_OLT():
         print("compiled:", version_info)
         self.disconnet_olt()
 
-    def get_cmds_execute(self, cmds_func, *args, **kargs):
-        """ 获取返回状态信息 """
-        try:
-            exec_cmds = cmds_func(*args, **kargs)
-            ret = self.sendcmdlines(exec_cmds)
-            self.disconnet_olt()
-            return ret
-        except Exception as err:
-            print(err)
+        return version_info
+
+    # def get_cmds_execute(self, cmds_func, *args, **kargs):
+    #     """ 获取返回状态信息 """
+    #     try:
+    #         exec_cmds = cmds_func(*args, **kargs)
+    #         ret = self.sendcmdlines(exec_cmds)
+    #         self.disconnet_olt()
+    #         return ret
+    #     except Exception as err:
+    #         raise FHATCMDError('get_cnds_execute', '获取执行命令返回状态信息失败', traceback.format_exc())
 
 
 class FH_UNM():
@@ -286,48 +293,39 @@ def verify_string_match(dst_str, cmp_str):
     return bool(ret == 1)
 
 
-def auth_onu_auto():
-    log = Logger()
-    # host = "35.35.35.109"
-    host = '192.168.0.168'
-    tn_obj = dut_connect.dut_connect_telnet(host, 8003)
-    # a = tn_obj.read_until(b"#")
-    # print(str(a, encoding='utf8'))
-    dut_host = ServiceConfig(tn_obj, log)
+# def auth_onu_auto():
+#     log = Logger()
+#     # host = "35.35.35.109"
+#     host = '192.168.0.168'
+#     tn_obj = dut_connect.dut_connect_telnet(host, 8003)
+#     # a = tn_obj.read_until(b"#")
+#     # print(str(a, encoding='utf8'))
+#     dut_host = ServiceConfig(tn_obj, log)
 
-    cmd_ret = dut_host.send_cmd(["config\n", "t l 0\n"])
-    # s_cmd = cmd_ret.split('\n')
-    onuid = 1
-    while True:
-        cmd_ret = dut_host.send_cmd(["show discovery 1/17/8\n"])
-        s_cmd = cmd_ret.split('\n')
-        print(len(s_cmd))
-        if len(s_cmd) >= 8:
-            for index in range(4, len(s_cmd)-3):
-                # print(len(s_cmd),  s_cmd[index])
-                onu_info = s_cmd[index].split()
-                if len(onu_info) == 0:
-                    break
+#     cmd_ret = dut_host.send_cmd(["config\n", "t l 0\n"])
+#     # s_cmd = cmd_ret.split('\n')
+#     onuid = 1
+#     while True:
+#         cmd_ret = dut_host.send_cmd(["show discovery 1/17/8\n"])
+#         s_cmd = cmd_ret.split('\n')
+#         print(len(s_cmd))
+#         if len(s_cmd) >= 8:
+#             for index in range(4, len(s_cmd)-3):
+#                 # print(len(s_cmd),  s_cmd[index])
+#                 onu_info = s_cmd[index].split()
+#                 if len(onu_info) == 0:
+#                     break
 
-                print("onu_info:", onu_info)
-                print("onuid:", onuid)
-                auth_str = 'whitelist add phy-id %s type %s slot 17 pon 8 onuid %d\n' % (
-                    onu_info[2], onu_info[1], 129-onuid)
-                ret = dut_host.send_cmd([auth_str])
-                if -1 == ret.find("failed") or -1 == ret.find("Unknown"):
-                    onuid = onuid + 1
-                    print("onuid:", onuid)
-        time.sleep(5)
-    tn_obj.close()
-
-
-def send_cmd_file(host, file):
-    with open(file) as f:
-        lines = f.readlines()
-        log = Logger()
-        tn_obj = dut_connect.dut_connect_telnet(host)
-        dut_host = ServiceConfig(tn_obj, log)
-        dut_host.send_cmd(lines)
+#                 print("onu_info:", onu_info)
+#                 print("onuid:", onuid)
+#                 auth_str = 'whitelist add phy-id %s type %s slot 17 pon 8 onuid %d\n' % (
+#                     onu_info[2], onu_info[1], 129-onuid)
+#                 ret = dut_host.send_cmd([auth_str])
+#                 if -1 == ret.find("failed") or -1 == ret.find("Unknown"):
+#                     onuid = onuid + 1
+#                     print("onuid:", onuid)
+#         time.sleep(5)
+#     tn_obj.close()
 
 
 def upgrad_olt_batch(filename, backup=False):
@@ -343,11 +341,5 @@ def upgrad_olt_batch(filename, backup=False):
         print(fholt_obj.cmd_ret)
 
 
-def debug_func():
-    oltip = '10.182.5.156'
-    russia_olt = FH_OLT()
-    russia_olt.oltip = oltip
-    russia_olt.login_promot = {'Login:': 'admin', 'Password:': 'admin'}
-    # print(russia_olt.login_promot)
-    russia_olt.connect_olt()
-    russia_olt.sendcmdlines(['cd onu\n', 'show authorization slot 11 pon all\n'])
+if __name__ == "__main__":
+    debug_func()

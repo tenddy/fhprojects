@@ -107,4 +107,16 @@ venv.bak/
 ./log/
 log/
 
+#instruments
+./instruments
+instruments/
+
+#capture
+./capture
+capture/
+
+#instruments
+./instruments/
+/instruments
+
 
