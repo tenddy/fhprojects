@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 ''' 
-@File    : testcase1.py
+@File    : TestCase_demo1.py
 @Date    : 2020/07/13 15:37:04
 @Author  : Teddy.tu
 @Version : V1.0
@@ -32,16 +32,14 @@ try:
     from lib.oltlib import fhlib
     from lib.oltlib.fhat import FH_OLT
     from lib.stclib.fhstc import FHSTC
-
     from lib.public.fhlog import logger
 except Exception as err:
     print("导入模块异常")
     print(err)
 
+TC_RET = "PASSED"  # 测试结果, 默认为PASSED
 
 fhstc = FHSTC(settings.STCIP)
-
-TC_RET = "PASSED"  # 测试结果
 
 
 def tc_connect_stc():
@@ -53,6 +51,7 @@ def tc_connect_stc():
     fhstc.stc_connect()
     fhstc.stc_createProject()
     fhstc.stc_createPorts(**ports)
+    # fhstc.stc_loadFromXml()
     fhstc.stc_autoAttachPorts()
 
 
@@ -85,26 +84,28 @@ def tc_traffic_config():
             'up_1_%d' % count, 'onu1', cvlan=(2012, 5),
             dstMac="00:00:00:01:01:%0X" % count, srcMac="00:01:94:00:01:%0X" % count, Load=2)
 
+
+def tc_creatDevice():
+    fhstc.stc_createBasicDevice("h1", 'uplink')
+    fhstc.stc_createBasicDevice("h_up", 'onu1')
+    fhstc.stc_apply()
+
+
+def tc_generatorConfig():
     fhstc.stc_generatorConfig('uplink')
     fhstc.stc_generatorConfig('onu1')
     # fhstc.stc_generatorConfig('onu2')
     fhstc.stc_apply()
-    fhstc.stc_saveAsXML()
 
 
 def tc_service_config():
-    if settings.OLT_VERSION.startswith('AN5'):
-        version = 'V4'
-    else:
-        version = 'V5'
-    russiaOLT = FH_OLT(version)
-    russiaOLT.hostip = settings.OLT_IP
-    russiaOLT.login_promot = settings.OLT_LOGIN
+    russiaOLT = FH_OLT()
     russiaOLT.connect_olt()
     cmds = []
     slot, pon, onu = settings.ONU['onu1']
-    cmds += fhlib.OLT_V4_RUSSIA.reboot_onu(slot, pon, onu)
-    # cmds += fhlib.OLT_V4_RUSSIA.del_onu_lan_service((18, 16, 1, 2), 'all')
+    # cmds += fhlib.OLT_V4_RUSSIA.reboot_onu(slot, pon, onu)
+    russiaOLT.sendcmdlines(fhlib.OLT_V4_RUSSIA.reboot_onu(*settings.ONU['onu1']))
+    # cmds += fhlib.OLT_V4_RUSSIA.del_onu_lan_service((*settings.ONU['onu1'], 2), 'all')
 
     # cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((18, 16, 1, 2), 2012,
     #                                                 255, fhlib.SericeType.UNICAST, fhlib.VLAN_MODE.TRANSPARENT)
@@ -169,9 +170,11 @@ def tc_main():
     try:
         logger.info("step 1. connect STC...")
         tc_connect_stc()
-        logger.info("STC traffic config...")
+        # logger.info("STC traffic config...")
         tc_traffic_config()
-
+        tc_creatDevice()
+        fhstc.stc_saveAsXML()
+        tc_generatorConfig()
         tc_capture_start()
         logger.info("start traffic....")
         tc_traffic_start()
@@ -180,7 +183,7 @@ def tc_main():
         tc_get_result()
         tc_get_DataSetResult()
 
-        # logger.info("Service config...")
+        logger.info("Service config...")
         # tc_service_config()
         # logger.info("延时60s")
         # time.sleep(60)
@@ -204,5 +207,13 @@ def tc_main():
     # logger.info("%s用例执行完成" % __name__)
 
 
+def capture_analaye():
+    pcap = r'E:/FHATP/fhprojects/capture/capture.pcap'
+    display_filter = 'vlan.id==22'
+    fhstc.package_analyze(pcap, display_filter)
+
+
 if __name__ == "__main__":
+    # tc_service_config()
     tc_main()
+    # capture_analaye()

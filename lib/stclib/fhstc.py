@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 # coding=UTF-8
 '''
-@Desc: None
+@Desc: FH Sprient TestCenter API function
 @Author: Teddy.tu
 @Version: V1.0
 @EMAIL: teddy_tu@126.com
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2020-07-13 08:31:06
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-21 10:01:40
+@LastEditTime: 2020-07-23 16:50:32
 '''
 
 import time
 import os
 import traceback
+import re
 from lib import settings
 from lib.stclib.pystc import STC
 from lib.public import fhlog
@@ -44,7 +45,11 @@ class FHSTC:
     def __init__(self, stcip):
         self._stc = STC(tcl=settings.TCL_PATH, stcpath=settings.STC_PATH)
         self._stcip = stcip
+        self._project = "project1"
         self._ports = dict()
+        self._hPorts = dict()
+        self._hStreamBlock = dict()
+        self._hDevies = dict()
 
     def __del__(self):
         del self._stc
@@ -247,6 +252,9 @@ class FHSTC:
     def stc_modifyTrafficRaw(self, streamName, portName, **kargs):
         pass
 
+    def stc_RangeModifer(self, streamName, reference):
+        pass
+
     def stc_generatorConfig(self, portName, **generatorConfig):
         """配置仪表端口Generator 参数"""
         try:
@@ -274,6 +282,42 @@ class FHSTC:
             self._stc.perform("SaveAsXml", FileName=filepath)
         except:
             raise FHSTCCmdError('stc_saveAsXML', '保存仪表配置为XML文件(%s)失败', traceback.format_exc())
+
+    def stc_loadFromXml(self, filepath="./instruments/config.xml"):
+        """导入仪表配置，并初始化仪表参数
+            TODO: Device 对象的获取 
+        """
+        try:
+            fhlog.logger.info("导入仪表配置文件")
+            self._stc.perform("LoadFromXml", FileName=filepath)
+            # 获取仪表
+            info = self._stc.perform("GetConfigInfo", QueryRoots="project1")
+
+            # 获取仪表端口数量
+            ports_info = re.findall(r"-Values {(\d*) (\d*) (\d*) (\d*)}", info)
+            portsCount = int(ports_info[0][0])
+            for port in range(portsCount):
+                # 获取端口名称
+                portName = self._stc.get('project1.port(%d)' % (port+1), "Name")
+                portName = portName.split()[0]   # 去掉(offline)字段
+                fhlog.logger.debug("portName:" + portName)
+                # 获取端口操作句柄
+                self._hPorts[portName] = self._stc.get('project1.port(%d)' % (port+1), "Handle")
+                # 获取每个端口下数据流的名称及操作句柄
+                hStreamBlock = self._stc.get(self._hPorts[portName], "Children-StreamBlock")
+                fhlog.logger.debug(hStreamBlock)
+                # 获取数据流名称和对应的操作句柄
+                for item in hStreamBlock.split():
+                    streamName = self._stc.get(item, "Name")
+                    self._hStreamBlock[streamName] = item
+                fhlog.logger.debug(self._hStreamBlock)
+                fhlog.logger.debug(self._hPorts)
+
+            # 获取Device对象
+            # ToDo
+
+        except:
+            raise FHSTCCmdError('stc_loadFromXml', '导入仪表配置文件(%s)失败', traceback.format_exc())
 
     def stc_analyzer(self, portName):
         # todo
@@ -428,15 +472,28 @@ class FHSTC:
         self._hCaptureFilter[portName] = self._stc.get(self._hCapture[portName], 'children-CaptureFilter')
         self._stc.config(self._hCaptureFilter[portName], FilterExpression=filterExp)
 
+    def package_analyze(self, pcapfile, filter_exp):
+        self._stc.cap_general = self._stc._tclsh.eval(
+            "exec {%s} -r {%s} -Y %s" % (settings.TSHARK, pcapfile, filter_exp))
+        print(self._stc.cap_general)
 
-def test_demo():
-    ports = dict()
-    ports["uplink"] = "1/9"
-    ports["onu1"] = "2/9"
-    ports["onu2"] = "2/10"
+    def stc_createBasicDevice(
+            self, deviceName, portName, srcMac="00:10:94:00:00:01", srcMacCount=1, ipv4Addr="192.18.10.1",
+            ipv4gw="192.18.10.1", ipv6Addr="2000::1", ipv6gw="fe80::1", **kargs):
+        """创建基本Device"""
+        try:
+            fhlog.logger.info("创建基本Device")
+            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, DeviceCount=1)
 
-    stc = FHSTC('172.18.1.55')
-    stc.stc_connect()
-    stc.stc_initPorts(**ports)
-    stc.stc_createProject()
-    stc.stc_create_port()
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMac, SrcMacRepeatCount=srcMacCount)
+
+            _hIPv4ClientIf = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4GW, gateway=ipv4GW)
+            self._stc.config(self._hDevices[deviceName], TopLevelIf=_hIPv4ClientIf, PrimaryIf=_hIPv4ClientIf)
+            self._stc.config(_hIPv4ClientIf, stackedOnEndpoint=_hEthClientIf)
+            self._stc.config(self._hDevices[deviceName], AffiliationPort=self._hPorts[portName])
+        except:
+            raise FHSTCCmdError("stc_createBasicDevice", "创建Device失败", traceback.format_exc())

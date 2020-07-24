@@ -2,10 +2,12 @@
 # coding=UTF-8
 
 # global Debug
-DEBUG = False
+DEBUG = True
 
 LOG_PATH = "E:/FHATP/fhprojects/log"
 # LOG_PATH = "E:/log"
+# Tshark安装目录
+TSHARK = "C:/Program Files/Wireshark/tshark"
 # TCL版本只支持8.4
 TCL_PATH = "C:/Tcl/bin/tclsh"
 # Spirent TestCenter的安装目录
@@ -19,7 +21,7 @@ ONU_PORTS = {'onu1': '2/9', 'onu2': ''}
 # OLT信息
 OLT_VERSION = 'AN5516-01'
 OLT_IP = '10.182.5.156'
-OLT_LOGIN = {'Login:': 'fhadmin', 'Password:': 'fholt'}
+OLT_LOGIN = {'Login': 'fhadmin', 'Password': 'fholt'}
 TELNET_PORT = 23
 SSH_PORT = 22
 

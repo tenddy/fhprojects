@@ -8,7 +8,7 @@
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2019-08-12 16:47:01
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-21 17:12:05
+@LastEditTime: 2020-07-21 17:15:44
 '''
 
 
@@ -90,19 +90,19 @@ def russia_cfg():
         cmds += fhlib.OLT_V4_RUSSIA.authorize_onu(fhlib.ONUAuthType.PASSWORD,
                                                   slot, pon, onu, "HG260", password=onu_pwd[onu-1])
         # 配置WAN业务
-        # cmds += fhlib.OLT_V4_RUSSIA.cfg_internet_wan(slot, pon, onu, wan_vlan)
+        cmds += fhlib.OLT_V4_RUSSIA.cfg_internet_wan(slot, pon, onu, wan_vlan)
         # 配置语音业务
-        #cmds += fhlib.OLT_V4_RUSSIA.cfg_voice(slot, pon, onu, voice_vlan, phone_prefix="66", servicename='voip')
+        cmds += fhlib.OLT_V4_RUSSIA.cfg_voice(slot, pon, onu, voice_vlan, phone_prefix="66", servicename='voip')
+
         # 配置组播业务
 
-        # cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4),
-        #                                                 600, 3, fhlib.SericeType.MULTICAST, fhlib.VLAN_MODE.TAG)
-        # # 单播业务
-        # un_vlan = 1010 + onu
-        # cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4), un_vlan,
-        #                                                 3, fhlib.SericeType.UNICAST, fhlib.VLAN_MODE.TAG)
+        cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4),
+                                                        600, 3, fhlib.SericeType.MULTICAST, fhlib.VLAN_MODE.TAG)
+        # 单播业务
+        un_vlan = 1010 + onu
+        cmds += fhlib.OLT_V4_RUSSIA.cfg_onu_lan_service((slot, pon, onu, 4), un_vlan,
+                                                        3, fhlib.SericeType.UNICAST, fhlib.VLAN_MODE.TAG)
         russiaOLT.sendcmdlines(cmds)
-        # print(cmds)
 
 
 def unauth_onu(slot, pon, onu):

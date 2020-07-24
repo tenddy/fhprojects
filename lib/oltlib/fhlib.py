@@ -1054,7 +1054,6 @@ class OLT_V4_RUSSIA(OLT_V4):
             no onu-lan slot <slotno> pon <ponno> onu <onuno> port <portno> vlan [<vlanlist>|all]
         使用示例：
         """
-
         cmdlines = ['cd /onu/lan\n']
         cmdlines.append('no onu-lan slot {0} pon {1} onu {2} port {3} vlan {4}\n'.format(*onu_port_info, vlan))
         cmdlines.append('apply onu {0} {1} {2} vlan\n'.format(*onu_port_info[:3]))
@@ -1063,10 +1062,11 @@ class OLT_V4_RUSSIA(OLT_V4):
         return cmdlines
 
     @staticmethod
-    def cfg_internet_wan(slotno, ponno, onuno, vlan):
+    def cfg_internet_wan(slotno: int, ponno: int, onuuid: int, vlan: int):
         """
         函数功能:
             配置ONU Internet WAN业务
+
         函数参数:
             @param slotno(int): 槽位号
             @param ponno(int): PON口号
@@ -1074,6 +1074,7 @@ class OLT_V4_RUSSIA(OLT_V4):
             @parma vlan(int): VLAN
         返回值: 
             命令行列表
+
         使用说明:
         OLT_FH_1\onu\lan#
         set veip_mgr_par slot 11 pon 16 onu 128 veip_port 1 port_type veip mgr_channel enable model tr069 item 1
@@ -1082,11 +1083,11 @@ class OLT_V4_RUSSIA(OLT_V4):
         """
         cmdlines = ['cd /onu/lan\n']
         cmdlines.append('set veip_mgr_par slot {0} pon {1} onu {2} veip_port 1 port_type veip mgr_channel enable model tr069 item 1\n'.format(
-            slotno, ponno, onuno))
+            slotno, ponno, onuid))
         cmdlines.append(
             'set veip_mgr_vlan slot {0} pon {1} onu {2} veip_port 1 mgr_id 1 protocol udp priority 0 tag_type tag svlan_label 0x8100 svlanid null svlan_cos null cvlan_label 0x8100 cvlanid {3} cvlan_cos 7\n'.
-            format(slotno, ponno, onuno, vlan))
-        cmdlines.append('apply veip_mgr_vlan slot {0} pon {1} onu {2}\n'.format(slotno, ponno, onuno))
+            format(slotno, ponno, onuno, onuid))
+        cmdlines.append('apply veip_mgr_vlan slot {0} pon {1} onu {2}\n'.format(slotno, ponno, onuuid))
         return cmdlines
 
     @staticmethod

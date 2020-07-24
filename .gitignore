@@ -119,4 +119,5 @@ capture/
 ./instruments/
 /instruments
 
-
+#notebook
+.ipynb

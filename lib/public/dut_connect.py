@@ -7,19 +7,19 @@ from lib.public.fhlog import logger
 fh_olt_promot = {'Login': 'GEPON', 'Password': 'GEPON',  'User>': 'enable'}
 
 
-def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
+def dut_connect_telnet(host: str, port=23, login_promot=fh_olt_promot, promot=None):
     """
     函数功能:
-       通过telnet登录dut设备
+       通过telnet连接设备
 
     参数说明：
-        @param host: string
+        @param host(str): 
             dut设备的IP地址, 字符串类型 
-        @param port: int
+        @param port(int): 
             telnet登录端口号, 范围（0~65535)默认23
-        @param login_promot: dict
-            key为提示字符, value为对应用户名或者密码, 默认采用烽火OLT登录的默认提示符及用户名和密码
-        @param promot: string
+        @param login_promot（dict): 
+        key为提示字符, value为对应用户名或者密码, 默认采用烽火OLT登录的默认提示符及用户名和密码
+        @param promot: 
             设备登录成功提示符,正常输入命令提示符
 
     使用说明：
@@ -67,6 +67,7 @@ def dut_connect_telnet(host, port=23, login_promot=fh_olt_promot, promot=None):
 
 
 def dut_disconnect_telnet(tn):
+    """断开连接"""
     try:
         logger.info("Telnet disconnect!")
         tn.close()
@@ -75,17 +76,17 @@ def dut_disconnect_telnet(tn):
 
 
 def dut_connect_tl1(host, port=3337, username='admin', password='admin', timeout=5):
+    """通过TL1连接网管"""
     try:
         tn = telnetlib.Telnet(host, port=port)
         login_str = "LOGIN:::CTAG::UN=%s,PWD=%s;\n" % (username, password)
-        print(login_str)
+        logger.info(login_str)
         tn.write(bytes(login_str, encoding='utf8'))
         line_b = tn.read_until(b';', 5)
-        line_s = str(line_b, encoding='utf8')
-        logger.info(line_s)
+        logger.info(str(line_b, encoding='utf8'))
         return tn
     except Exception as err:
-        print(err)
+        logger.error("TL1 Connect Failed")
         return None
 
 
@@ -116,13 +117,3 @@ def send_cmdlines_tl1(tn_obj, cmds, promot=b';', timeout=5, delay=0):
     except Exception as err:
         print(err)
         return None
-
-
-if __name__ == "__main__":
-    fh_login = {'Login': 'GEPON', 'Password': 'GEPON',  '>': 'enable'}
-    hw_login = {'>': 'system-view'}
-    hw_promot = "]"
-    hostip = '10.182.0.240'
-    dut_tn = dut_connect_telnet(hostip, 23, hw_login, hw_promot)
-    if dut_tn is not None:
-        dut_disconnect_telnet(dut_tn)
