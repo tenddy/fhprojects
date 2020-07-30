@@ -86,7 +86,7 @@ class FHSTC:
         try:
             fhlog.logger.info("创建仪表操作工程")
             self._project = self._stc.create("Project")
-        except Exception as err:
+        except:
             raise FHSTCCmdError('stc_createProject', '创建仪表操作工程失败.', traceback.format_exc())
 
     def stc_createPorts(self, **ports):
@@ -108,12 +108,13 @@ class FHSTC:
         except Exception as err:
             raise FHSTCCmdError('stc_createPorts', '初始化端口失败', stderr=traceback.format_exc())
 
-    def stc_modify_port(self, portName, ethernetType, **portSpeed):
-        """配置仪表端口协商速率属性
-
-           @portName: 端口名称
-
-           @ethernetType: 端口属性 (EthernetCopper, EthernetFiber, EthernetFiber10G, EthernetFiber40G)
+    def stc_modify_port(self, portName:str, ethernetType:str, **portSpeed):
+        """
+        函数功能：
+            配置仪表端口协商速率属性
+        函数参数：
+            @portName: 端口名称
+            @ethernetType: 端口属性 (EthernetCopper, EthernetFiber, EthernetFiber10G, EthernetFiber40G)
         """
         try:
             fhlog.logger.info("修改端口({0})属性为{1}".format(portName, ethernetType))
@@ -154,13 +155,12 @@ class FHSTC:
 
     def stc_createTrafficRaw(self, streamName: str, portName: str, **kargs):
         """
-        函数功能: 创建裸流
-
+        函数功能: 
+            创建裸流
         函数参数:
             @portName: 创建数据流的仪表端口命令
             @streamName: 数据流名称
             @param **kargs(dict):
-
                 frameLengthMode：报文长度模式
                 FixedFrameLength：报文长度为Fixed模式，报文长度
                 Load: 流量大小

@@ -238,21 +238,22 @@ def service_model2_cmd(slotno, ponno, *onu_info):
 
 
 def service_model3_cmd(slotno, ponno, *onu_info):
-    '''
-    函数功能: FTTB 业务模型2
-    ONU端口 transparent + 翻译 + ONU qinq模板
-    函数参数: 
-    @slotno: 槽位号
-    @ponno: PON口号
-    @onu_info: ONU信息, 格式为((onuno, onuports),), onuid为ONU授权ID; onuports，需要配置的端口业务
-    引用命令行:
-    Admin(config-pon)#
-    onu port vlan 1 eth 1 service count 1
-    onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 2001
-    onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301 
-    onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
-    使用说明:
-    '''
+    """
+    @函数功能: 
+        FTTB 业务模型2
+        ONU端口 transparent + 翻译 + ONU qinq模板
+    @函数参数: 
+        @slotno: 槽位号
+        @ponno: PON口号
+        @onu_info: ONU信息, 格式为((onuno, onuports),), onuid为ONU授权ID; onuports，需要配置的端口业务
+    @引用命令行:
+        Admin(config-pon)#
+        onu port vlan 1 eth 1 service count 1
+        onu port vlan 1 eth 1 service 1 transparent priority 1 tpid 33024 vid 2001
+        onu port vlan 1 eth 1 service 1 translate enable priority 1 tpid 33024 vid 301 
+        onu port vlan 1 eth 1 service 1 qinq enable priority 1 tpid 33024 vid 2701 FTTB_QINQ SVLAN2
+    @使用说明:
+    """
     send_cmdlines = []
     print("EPON FTTB Model 3.")
     onu_num = len(onu_info)
