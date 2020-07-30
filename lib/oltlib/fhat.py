@@ -8,7 +8,7 @@
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2020-01-12 21:24:26
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-22 08:22:48
+@LastEditTime: 2020-07-27 13:34:55
 '''
 
 import pandas as pd
@@ -117,7 +117,7 @@ class FH_OLT():
         """
         connectTimes = 0
         try:
-            if self.hostip is None:  # 如果没哟配置hostip,默认调用setting文件中OLT的配置
+            if self.hostip is None:  # 如果没有配置hostip,默认调用setting文件中OLT的配置
                 self.init_olt()
 
             while self.__tn is None and connectTimes < MAX_CONNECT_TIMES:
