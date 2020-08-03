@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding=UTF-8
 '''
-@Desc: None
+@Desc: Sprient TestcCenter Automation API of Python Wrapper
 @Author: Teddy.tu
 @Version: V1.0
 @EMAIL: teddy_tu@126.com
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2020-07-16 08:57:06
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-21 08:37:55
+@LastEditTime: 2020-07-22 16:01:03
 '''
 
 from lib.stclib.tclwrapper import TCLWrapper
@@ -18,9 +18,9 @@ from lib.public import fhlog
 
 class STC:
     def __init__(self, tcl="C:/Tcl/bin/tclsh", stcpath=None):
-        self.tclsh = TCLWrapper(tcl)
-        self.tclsh.start()
-        self._stcpath = stcpath
+        self._tclsh = TCLWrapper(tcl)
+        self._tclsh.start()
+        self._stcpath = settings.STC_PATH
 
     def __del__(self):
         pass
@@ -31,16 +31,17 @@ class STC:
             fhlog.logger.error("Not Found Spirent TestCenter Install Path.")
             exit(-1)
         else:
-            self.tclsh.eval("set auto_path [linsert $auto_path 0 {%s}]" % self._stcpath)
-        return self.tclsh.eval("package require SpirentTestCenter")
+            self._tclsh.eval("set auto_path [linsert $auto_path 0 {%s}]" % self._stcpath)
+            
+        return self._tclsh.eval("package require SpirentTestCenter")
 
     def connect(self, stc_addr):
         """ Establishes a connection with a Spirent TestCenter chassis """
-        return self.tclsh.eval("stc::connect %s" % stc_addr)
+        return self._tclsh.eval("stc::connect %s" % stc_addr)
 
     def disconnect(self, stc_addr):
         """ Removes a connection with a Spirent TestCenter chassis """
-        return self.tclsh.eval("stc::disconnect %s" % stc_addr)
+        return self._tclsh.eval("stc::disconnect %s" % stc_addr)
 
     def reserve(self, portList: tuple):
         """
@@ -52,7 +53,7 @@ class STC:
         """
         ports = ' '.join(portList)
         tcl_cmd = "stc::reserve [list %s]" % ports
-        return self.tclsh.eval(tcl_cmd)
+        return self._tclsh.eval(tcl_cmd)
 
     def release(self, portList: tuple):
         """
@@ -64,16 +65,14 @@ class STC:
         """
         ports = ' '.join(portList)
         tcl_cmd = "stc::release [list %s]" % ports
-        return self.tclsh.eval(tcl_cmd)
+        return self._tclsh.eval(tcl_cmd)
 
     def create(self, object, under=None, **kargs):
         """
             Description:
-
                 stc::create command
 
             Syntax:
-
                 create Project|objectType|Path [-under handle] [[-attr value] ...]   [[-objectTypePath [-attrvalue] ...] ...] –relationRef handleList
         """
         cmds = "stc::create %s" % object
@@ -85,7 +84,7 @@ class STC:
 
         fhlog.logger.debug(cmds)
 
-        return self.tclsh.eval(cmds)
+        return self._tclsh.eval(cmds)
 
     def config(self, handle, **kargs):
         """
@@ -107,7 +106,7 @@ class STC:
         for k in kargs.keys():
             cmds += " -{0} {1}".format(k, kargs[k])
         fhlog.logger.debug(cmds)
-        return self.tclsh.eval(cmds)
+        return self._tclsh.eval(cmds)
 
     def get(self, handle, *args):
         """
@@ -128,7 +127,7 @@ class STC:
             tcl_cmd += " -{0}".format(attr)
 
         fhlog.logger.debug(tcl_cmd)
-        return self.tclsh.eval(tcl_cmd)
+        return self._tclsh.eval(tcl_cmd)
 
     def perform(self, command, **kargs):
         """
@@ -142,7 +141,7 @@ class STC:
         for key in kargs.keys():
             tcl_cmd += " -{0} {1}".format(key, kargs[key])
         fhlog.logger.debug(tcl_cmd)
-        return self.tclsh.eval(tcl_cmd)
+        return self._tclsh.eval(tcl_cmd)
 
     def subscribe(self, Parent: str, resultType: str, configType: str, **kargs):
         """
@@ -164,7 +163,7 @@ class STC:
         for key in kargs.keys():
             tcl_cmd += " -{0} {1}".format(key, kargs[key])
         fhlog.logger.debug(tcl_cmd)
-        return self.tclsh.eval(tcl_cmd)
+        return self._tclsh.eval(tcl_cmd)
 
     def unsubscribe(self, handle):
         """
@@ -174,7 +173,7 @@ class STC:
         返回值: None
         使用说明: unsubscribe handle
         """
-        return self.tclsh.eval("stc::unsubscribe {0}".format(handle))
+        return self._tclsh.eval("stc::unsubscribe {0}".format(handle))
 
     def delete(self, handle: str):
         """
@@ -184,21 +183,21 @@ class STC:
         Syntax
             delete handle
         """
-        return self.tclsh.eval("stc::delete {0}".format(handle))
+        return self._tclsh.eval("stc::delete {0}".format(handle))
 
     def apply(self):
         """Apply  test configuration to the Spirent TestCenter chassis"""
-        self.tclsh.eval("stc::apply")
+        self._tclsh.eval("stc::apply")
 
     def tcl_eval(self, cmds):
-        self.tclsh.eval(cmds)
+        self._tclsh.eval(cmds)
 
     def __setattr__(self, key: str, value):
 
         fhlog.logger.debug("set: key-{0}, value-{1}".format(key, value))
 
-        if key != 'tclsh' and key != '_stcpath':
-            self.tclsh.eval("set {0} {1}".format(key, value))
+        if key != '_tclsh' and key != '_stcpath':
+            self._tclsh.eval("set {0} {1}".format(key, value))
         else:
             super().__setattr__(key, value)
         fhlog.logger.debug(self.__dict__)
@@ -206,8 +205,8 @@ class STC:
     def __getattr__(self, key):
         # print("get: key-{0}".format(key))
 
-        if key != 'tclsh' and key != '_stcpath':
-            ret = self.tclsh.eval("puts ${0}".format(key))
+        if key != '_tclsh' and key != '_stcpath':
+            ret = self._tclsh.eval("puts ${0}".format(key))
             return ret.strip()
         else:
             return self.__dict__[key]

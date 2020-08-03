@@ -8,7 +8,7 @@
 @License: (c)Copyright 2019-2020, Teddy.tu
 @Date: 2020-01-12 21:24:26
 @LastEditors: Teddy.tu
-@LastEditTime: 2020-07-20 17:01:05
+@LastEditTime: 2020-07-27 13:34:55
 '''
 
 import pandas as pd
@@ -104,7 +104,7 @@ class FH_OLT():
         self.hostport = settings.TELNET_PORT
         self.login_promot = settings.OLT_LOGIN
 
-        if settings.OLT_VERSION.startswith("AN55"):
+        if settings.OLT_VERSION.startswith("AN5"):
             self.version = OLT_VERSION_5K
         elif settings.OLT_VERSION.startswith("AN6"):
             self.version = OLT_VERSION_6K
@@ -117,6 +117,9 @@ class FH_OLT():
         """
         connectTimes = 0
         try:
+            if self.hostip is None:  # 如果没有配置hostip,默认调用setting文件中OLT的配置
+                self.init_olt()
+
             while self.__tn is None and connectTimes < MAX_CONNECT_TIMES:
                 connectTimes += 1
                 print("Trying connect  %s of %d times!" % (self.hostip, connectTimes))
@@ -126,7 +129,7 @@ class FH_OLT():
                 if connectTimes >= MAX_CONNECT_TIMES:
                     print("Connected to Device(%s) Timeout!" % self.hostip)
                     sys.exit(-1)
-        except AttributeError as err:
+        except Exception as err:
             raise FHATCMDError('connect_olt', "连接OLT失败.")
 
     def disconnet_olt(self):

@@ -7,9 +7,10 @@ DEBUG = True
 LOG_PATH = "E:/DDTU Workplace/fhprojects/log"
 # TCL版本只支持8.4
 TCL_PATH = "C:/Tcl/bin/tclsh"
+TSHARK = ""
 # Spirent TestCenter的安装目录
 # STC_PATH = "D:/Program Files/Spirent Communications/Spirent TestCenter 4.81/Spirent TestCenter Application"
-STC_PATH = "C:/Program Files/Spirent Communications/Spirent TestCenter 5.02/Spirent TestCenter Application"
+STC_PATH = "D:/Program Files/Spirent Communications/Spirent TestCenter 5.02/Spirent TestCenter Application"
 # TestCenter仪表IP
 STCIP = '172.18.1.18'
 # 仪表端口
