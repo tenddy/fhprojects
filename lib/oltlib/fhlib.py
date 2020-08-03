@@ -499,6 +499,15 @@ class OLT_V4():
         except Exception as err:
             print("复位ONU命令失败")
             print(err)
+    
+    @staticmethod
+    def show_card():
+        """查看业务卡信息"""
+        try:
+            cmdlines = ['showcard\n']
+            return cmdlines
+        except:
+            print("查看卡状态失败")
 
 
 class OLT_V5():
@@ -1062,7 +1071,7 @@ class OLT_V4_RUSSIA(OLT_V4):
         return cmdlines
 
     @staticmethod
-    def cfg_internet_wan(slotno: int, ponno: int, onuuid: int, vlan: int):
+    def cfg_internet_wan(slotno: int, ponno: int, onuid: int, vlan: int):
         """
         函数功能:
             配置ONU Internet WAN业务
@@ -1086,8 +1095,8 @@ class OLT_V4_RUSSIA(OLT_V4):
             slotno, ponno, onuid))
         cmdlines.append(
             'set veip_mgr_vlan slot {0} pon {1} onu {2} veip_port 1 mgr_id 1 protocol udp priority 0 tag_type tag svlan_label 0x8100 svlanid null svlan_cos null cvlan_label 0x8100 cvlanid {3} cvlan_cos 7\n'.
-            format(slotno, ponno, onuno, onuid))
-        cmdlines.append('apply veip_mgr_vlan slot {0} pon {1} onu {2}\n'.format(slotno, ponno, onuuid))
+            format(slotno, ponno, onuid, onuid))
+        cmdlines.append('apply veip_mgr_vlan slot {0} pon {1} onu {2}\n'.format(slotno, ponno, onuid))
         return cmdlines
 
     @staticmethod

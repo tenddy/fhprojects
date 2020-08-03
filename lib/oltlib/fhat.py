@@ -173,8 +173,8 @@ class FH_OLT():
                 self.append_cmdlines(cmdlines)
 
             if self.version == OLT_VERSION_6K:
-                self.append_cmdlines.insert(0, 'config\n')
-                self.append_cmdlines.append("quit\n")
+                self.__cmdlines.insert(0, 'config\n')
+                self.__cmdlines.append("quit\n")
             logger.debug("send command to device...")
 
             while len(self.__cmdlines) != 0:
@@ -191,7 +191,8 @@ class FH_OLT():
                         self.__tn.write(bytes(" ", encoding='utf8'))
                     else:
                         break
-                yield cmd_rets
+                logger.info(cmd_rets)
+                return cmd_rets
 
                 time.sleep(delay)
         except Exception as err:
@@ -345,4 +346,5 @@ def upgrad_olt_batch(filename, backup=False):
 
 
 if __name__ == "__main__":
-    debug_func()
+    # debug_func()
+    pass
