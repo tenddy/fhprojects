@@ -17,8 +17,11 @@ from lib.public import fhlog
 
 
 class STC:
-    def __init__(self, tcl="C:/Tcl/bin/tclsh", stcpath=None):
-        self._tclsh = TCLWrapper(tcl)
+    def __init__(self, tcl=None, stcpath=None):
+        if tcl is None:
+            self._tclsh = TCLWrapper(settings.TCL_PATH)
+        else:
+            self._tclsh = TCLWrapper(tcl)
         self._tclsh.start()
         self._stcpath = settings.STC_PATH
 
