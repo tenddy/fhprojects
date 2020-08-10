@@ -14,7 +14,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -89,6 +88,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.vscode/
 
 # Spyder project settings
 .spyderproject
@@ -107,8 +107,16 @@ venv.bak/
 *.code-workspace
 
 # log
+./log/
 log/
+
+#capture
+./capture
 capture/
+
+#instruments
+./instruments/
 instruments/
-parameters/
-# *log.*
+
+#notebook
+.ipynb
