@@ -19,7 +19,7 @@ import sys
 import traceback
 
 try:
-    print("cwd:", os.getcwd())
+    # print("cwd:", os.getcwd())
     if os.getcwd() not in sys.path:
         sys.path.append(os.getcwd())
     from lib.oltlib import fhlib

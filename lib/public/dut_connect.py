@@ -1,8 +1,10 @@
-import logging
+# import logging
 import telnetlib
 import time
 from functools import wraps
 from lib.public.fhlog import logger
+
+
 # Fiberhome OLT telnet 登录提示符,用户名及密码
 fh_olt_promot = {'Login': 'GEPON', 'Password': 'GEPON',  'User>': 'enable'}
 

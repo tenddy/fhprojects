@@ -40,6 +40,7 @@ logger.setLevel(_log_level)
 # console
 console = logging.StreamHandler()
 console.setLevel(_log_level)
+fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
 fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
 console.setFormatter(fomatter)
 
@@ -51,7 +52,8 @@ filename = time.strftime('%Y%m%d%H%M%S') + '_log.txt'
 #     os.mkdir(settings.LOG_PATH)
 file_log = logging.FileHandler(os.path.join(settings.LOG_PATH, filename), encoding='utf-8')
 file_log.setLevel(_log_level)
-fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
+# fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(filename)s:%(message)s')
+fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
 file_log.setFormatter(fomatter)
 
 

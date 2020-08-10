@@ -25,7 +25,7 @@ import os
 import sys
 import traceback
 try:
-    print("sys path", os.getcwd())
+    # print("sys path", os.getcwd())
     if os.getcwd() not in sys.path:
         sys.path.append(os.getcwd())
         
@@ -39,6 +39,7 @@ try:
     from lib.oltlib.fhat import FH_OLT
     from lib.stclib.fhstc import FHSTC
     from lib.public.fhlog import logger
+    from lib.public.fhTimer import waitTime
 except Exception as err:
     print(__name__ +"导入模块异常")
     print(err)
@@ -48,45 +49,39 @@ TC_RET = "PASSED"  # 测试结果, 默认为PASSED
 # 初始化测试环境
 # init(__file__)
 
+# 创建仪表对象
 fhstc = FHSTC(settings.STCIP)
 
 
-def waitTime(t):
-    """倒计时功能"""
-    for i in range(t, 0, -1):
-        if i > 10:
-            if i == t:
-                logger.info("倒计时{}秒！".format(i))
-                time.sleep(1)
-            else:
-                if i%10 == 0:
-                    logger.info("倒计时{}秒！".format(i))
-                    time.sleep(1)
-        else:
-            logger.info("倒计时{}秒！".format(i))
-            time.sleep(1)
+# def waitTime(t):
+#     """倒计时功能"""
+#     for i in range(t, 0, -1):
+#         if i > 10:
+#             if i == t:
+#                 logger.info("倒计时{}秒！".format(i))
+#                 time.sleep(1)
+#             else:
+#                 if i%10 == 0:
+#                     logger.info("倒计时{}秒！".format(i))
+#                     time.sleep(1)
+#         else:
+#             logger.info("倒计时{}秒！".format(i))
+#             time.sleep(1)
 
 
-def tc_traffic_config():
+def tc_createTrafficDemo():
     dw_1_1 = dict()
     dw_1_1["srcMac"] = "00:00:01:00:00:01"
     dw_1_1["dstMac"] = "00:01:94:00:00:01"
-    # dw_1_1["svlan"] = (20, 1)
     dw_1_1["cvlan"] = (2011, 7)
     dw_1_1["IPv4"] = ("10.10.10.10", "20.20.20.20", "10.10.10.1")
-    # fhstc.stc_createTrafficRaw('dw_1_1', 'uplink', **dw_1_1)
-    # fhstc.stc_createTrafficRaw(
-    #     'dw_1_2', 'uplink', cvlan=(2011, 5),
-    #     srcMac="00:00:00:01:01:02", dstMac="00:01:94:00:01:02")
-
-    # onu1_up1 = "up_1_1"
+    
     up_1_1 = dict()
     up_1_1["srcMac"] = "00:01:94:00:00:01"
     up_1_1["dstMac"] = "00:00:01:00:00:01"
-    # onu_up['svlan'] = (20, 1)
     up_1_1["cvlan"] = (2011, 7)
     up_1_1["IPv4"] = ("10.10.10.10", "20.20.20.20", "10.10.10.1")
-    # fhstc.stc_createTrafficRaw('up_1_1', 'onu1', **up_1_1)
+   
     stream_count = 10
     for count in range(1, stream_count+1):
         fhstc.stc_createRawTraffic(
@@ -95,6 +90,9 @@ def tc_traffic_config():
         fhstc.stc_createRawTraffic(
            'onu1', 'up_1_%d' % count,  cvlan=(2012, 5),
             dstMac="00:00:00:01:01:%0X" % count, srcMac="00:01:94:00:01:%0X" % count, Load=2)
+    
+    fhstc.stc_apply()
+    fhstc.stc_saveAsXML('traffic.xml')
 
 
 def tc_creatDHCPDevice():
@@ -110,20 +108,30 @@ def tc_creatDHCPDevice():
         fhstc.stc_apply()
         fhstc.stc_saveAsXML('DHCP.xml')
 
+    fhstc.stc_startDeviceARP("client")
+    waitTime(3)
+    logger.info("arp:{}".format(fhstc.stc_getDeviceARPResult("client")))
+
     fhstc.stc_startDHCPv4Server('server')
     fhstc.stc_DHCPv4Bind('client')
     
     waitTime(5)
-    fhstc.stc_getDHCPv4BlockResult('client')
-    fhstc.stc_dhcpv4SessionResults('client')
+    logger.info("获取DHCP状态")
+    logger.info(fhstc.stc_getDHCPv4BlockResult('client'))
+    logger.info(fhstc.stc_dhcpv4SessionResults('client'))
+    logger.info("ARP功能测试")
+    fhstc.stc_startDeviceARP("client")
+    waitTime(3)
+    print("arp:", fhstc.stc_getDeviceARPResult("client"))
+    logger.info("创建DHCP绑定流")
     fhstc.stc_streamBlockStart("DHCP_client")
     fhstc.stc_streamBlockStart("DHCP_server")
     waitTime(5)
     tc_get_result()
+    logger.info("释放IP地址")
     fhstc.stc_DHCPv4Release('client')
-    waitTime(5)
+    logger.info("获取DHCP状态")
     fhstc.stc_getDHCPv4BlockResult('client')
-    waitTime(3)
     fhstc.stc_stopDHCPv4Server('server')
 
 
@@ -133,6 +141,7 @@ def tc_createPPPoEdevice():
     fhstc.stc_createBoundTraffic("pppoe_client", 'client', 'server', 'pppoe')
     fhstc.stc_createBoundTraffic("pppoe_server", 'server', 'client', 'pppoe')
     fhstc.stc_apply()
+    fhstc.stc_saveAsXML("pppoe.xml")
     
 
 def tc_createIGMPdeveice():
@@ -145,12 +154,6 @@ def tc_createIGMPdeveice():
     fhstc.stc_streamBlockStart('igmp1')
     tc_get_result()
     fhstc.stc_streamBlockStop('igmp1')
-
-def tc_generatorConfig():
-    fhstc.stc_generatorConfig('uplink')
-    fhstc.stc_generatorConfig('onu1')
-    # fhstc.stc_generatorConfig('onu2')
-    fhstc.stc_apply()
 
 
 def tc_service_config():
@@ -174,8 +177,6 @@ def tc_capture_start():
 
 
 def tc_capture_stop():
-    # print(fhstc.stc_captureStop('uplink', "/".join(__file__.split("/")[:-2]) + '/capture/uplink.pacp'))
-    # print(fhstc.stc_captureStop('onu1', "/".join(__file__.split("/")[:-2]) + '/capture/onu1.pacp'))
     print("capture stop...")
     print(fhstc.stc_captureStop('onu1', 'onu1.pacp'))
 
@@ -226,22 +227,19 @@ def tc_traffic_disconnect():
 
 def tc_main():
     try:
-        logger.info("step 1. connect STC...")
-        # tc_connect_stc()
-        # logger.info("STC traffic config...")
-        tc_traffic_config()
-        # tc_creatDHCPDevice()
+        logger.info("测试创建数据流demo...")
+        tc_createTrafficDemo()
         fhstc.stc_saveAsXML()
-        # tc_generatorConfig()
-        tc_capture_start()
+        fhstc.stc_captureStart('uplink')
+        fhstc.stc_captureStart('onu1')
         logger.info("start traffic....")
         tc_traffic_start()
         tc_traffic_clear()
         logger.info("get traffic result")
         tc_get_result()
-        tc_get_DataSetResult()
+        # tc_get_DataSetResult()
 
-        logger.info("Service config...")
+        # logger.info("Service config...")
         # tc_service_config()
         # logger.info("延时60s")
         # time.sleep(60)
@@ -253,7 +251,6 @@ def tc_main():
         tc_capture_stop()
         logger.info("release ports and disconnet stc.")
         tc_traffic_disconnect()
-
     except:
         logger.error("用例执行失败")
         global TC_RET
@@ -262,7 +259,6 @@ def tc_main():
         logger.info("用例执行成功")
     finally:
         logger.info("\n=======Result=========\n{:^20}\n======================".format(TC_RET))
-    # logger.info("%s用例执行完成" % __name__)
 
 
 def capture_analaye():
@@ -307,9 +303,6 @@ def PPPoe_test():
     # tc_capture_start()
 
 if __name__ == "__main__":
-    # tc_service_config()
-    # tc_main()
-    # print(sys.argv)
     if len(sys.argv) > 1:
         if sys.argv[1] == 'dhcp':
             dhcp_test()
@@ -325,16 +318,5 @@ if __name__ == "__main__":
         if sys.argv[1] == 'load':
             fhstc.stc_loadFromXml('test.xml')
     else:
-       waitTime(30)
-
-    
-    # input("press any key to continue...")
-        # tc_main()
-    # capture_analaye()
-    # print(__file__)
-    # path = __file__
-    # path_s = path.split("/")
-    # print(path_s[:-2])
-    # print(settings.LOG_PATH)
-    # settings.LOG_PATH = os.path.join("/".join(__file__.split("/")[:-2]), 'log')
-    # print(settings.LOG_PATH)
+        logger.info("测试倒计时功能")
+        waitTime(30)

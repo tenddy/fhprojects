@@ -891,7 +891,6 @@ class FHSTC:
         lstDhcpv4SessionResults = self._stc.get(_hDHCPv4BlockConfig, "children-dhcpv4sessionresults")
         dhcpv4SessionResults = []
         for hDhcpv4SessionResult in lstDhcpv4SessionResults.split():
-            print(hDhcpv4SessionResult)
             lstDhcpSessionInfo = self._stc.get(hDhcpv4SessionResult, "SessionInfo")
             # print(lstDhcpSessionInfo)
             fhlog.logger.debug(lstDhcpSessionInfo)
@@ -1295,5 +1294,53 @@ class FHSTC:
             self._stc.perform("IgmpMldLeaveGroups", BlockList = hIgmpHostConfig)
         except:
             raise FHSTCCmdError("stc_igmpJoin", "离开组播组 失败", traceback.format_exc())
+    
+    def stc_startDeviceARP(self, deviceName:str):
+        """
+        功能：
+            开启ARP
+        参数：
+            deviceName(str): device名称
+        返回值：None
+        说明：	
+        """
+        try:
+            fhlog.logger.info("启动ARP（%s)" % deviceName)
+            self._stc.perform("ArpNdStart", HandleList=self._hDevices[deviceName])
+        except:
+            raise FHSTCCmdError("stc_startDeviceARP", "开启ARP 失败", traceback.format_exc())
+
+    def stc_stopDeviceARP(self, deviceName:str):
+        """
+        功能：
+            停止ARP
+        参数：
+            deviceName(str): device名称
+        返回值：None
+        说明：	
+        """
+        try:
+            fhlog.logger.info("停止ARP（%s)" % deviceName)
+            self._stc.perform("ArpNdStop", HandleList=self._hDevices[deviceName])
+        except:
+            raise FHSTCCmdError("stc_startDeviceARP", "停止ARP 失败", traceback.format_exc())
+    
+    def stc_getDeviceARPResult(self, deviceName):
+        """
+        功能：
+            获取ARP解析结果
+        参数：
+            
+        返回值：None
+        说明：	
+        """
+        try:
+            arpstate = bool("RESOLVE_DONE" == self._stc.get(self._hDevices[deviceName],"Ipv4If.GatewayMacResolveState"))
+            if arpstate:
+                return self._stc.get(self._hDevices[deviceName], "Ipv4If.GatewayMac")
+            else:
+                return None
+        except:
+            raise FHSTCCmdError("stc_getDeviceARPResult", "获取ARP解析结果", traceback.format_exc())
 
         
