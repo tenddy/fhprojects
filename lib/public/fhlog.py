@@ -34,7 +34,7 @@ from lib import settings
 _log_level = logging.DEBUG if settings.DEBUG else logging.INFO
 
 # logger = logging.getLogger(time.strftime('%Y%m%d%H%M%S') + 'log')
-logger = logging.getLogger('log')
+logger = logging.getLogger(__name__)
 logger.setLevel(_log_level)
 
 # console

@@ -52,22 +52,19 @@ fhstc = FHSTC(settings.STCIP)
 
 
 def waitTime(t):
+    """倒计时功能"""
     for i in range(t, 0, -1):
-    # print("\r", "倒计时{}秒！".format(i), end="", flush=True)
-        logger.info("倒计时{}秒！".format(i))
-        time.sleep(1)
-
-def tc_connect_stc():
-    logger.info("初始化仪表端口...")
-    ports = dict(settings.UPLINK_PORTS)
-    ports.update(settings.ONU_PORTS)
-
-    # fhstc.stc_init()
-    # fhstc.stc_connect()
-    # fhstc.stc_createProject()
-    # fhstc.stc_createPorts(**ports)
-    # fhstc.stc_loadFromXml()
-    fhstc.stc_autoAttachPorts()
+        if i > 10:
+            if i == t:
+                logger.info("倒计时{}秒！".format(i))
+                time.sleep(1)
+            else:
+                if i%10 == 0:
+                    logger.info("倒计时{}秒！".format(i))
+                    time.sleep(1)
+        else:
+            logger.info("倒计时{}秒！".format(i))
+            time.sleep(1)
 
 
 def tc_traffic_config():
@@ -101,16 +98,21 @@ def tc_traffic_config():
 
 
 def tc_creatDHCPDevice():
-    fhstc.stc_createDHCPv4Client('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.18.10.1", "192.18.10.1"))
-    fhstc.stc_createDHCPv4Server('uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.168.20.1", "192.168.20.1"), pool=("192.168.20.2", 24, 200))
-    
-    fhstc.stc_createBoundTraffic("DHCP_client", 'client', 'server', 'dhcp')
-    fhstc.stc_createBoundTraffic("DHCP_server", 'server', 'client', 'dhcp')
-    fhstc.stc_apply()
-    fhstc.stc_saveAsXML('DHCP.xml')
-    # fhstc.stc_deviceStart('server')
+    LOAD_DHCP = True
+    if LOAD_DHCP:
+        fhstc.stc_loadFromXml('DHCP.xml')
+    else:
+        fhstc.stc_createDHCPv4Client('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.18.10.1", "192.18.10.1"))
+        fhstc.stc_createDHCPv4Server('uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.168.20.1", "192.168.20.1"), pool=("192.168.20.2", 24, 200))
+
+        fhstc.stc_createBoundTraffic("DHCP_client", 'client', 'server', 'dhcp')
+        fhstc.stc_createBoundTraffic("DHCP_server", 'server', 'client', 'dhcp')
+        fhstc.stc_apply()
+        fhstc.stc_saveAsXML('DHCP.xml')
+
     fhstc.stc_startDHCPv4Server('server')
     fhstc.stc_DHCPv4Bind('client')
+    
     waitTime(5)
     fhstc.stc_getDHCPv4BlockResult('client')
     fhstc.stc_dhcpv4SessionResults('client')
@@ -126,27 +128,20 @@ def tc_creatDHCPDevice():
 
 
 def tc_createPPPoEdevice():
-    fhstc.stc_createPPPoEv4Client('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(102,1), svlan=(2001,4), count=10, ipv4=("192.18.10.1", "192.18.10.1"))
-    fhstc.stc_createPPPoEv4Server('uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=10, ipv4=("192.168.20.1", "192.168.20.1"), pool=("192.168.20.1", '192.168.20.2', 24))
+    fhstc.stc_createPPPoEv4Client('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.18.10.1", "192.18.10.1"))
+    fhstc.stc_createPPPoEv4Server('uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.168.20.1", "192.168.20.1"), pool=("192.168.20.1", '192.168.20.2', 24))
     fhstc.stc_createBoundTraffic("pppoe_client", 'client', 'server', 'pppoe')
     fhstc.stc_createBoundTraffic("pppoe_server", 'server', 'client', 'pppoe')
     fhstc.stc_apply()
-    fhstc.stc_PPPoEv4Connect('client')
-    fhstc.stc_PPPoEv4Connect('server')
-    waitTime(3)
-    fhstc.stc_getPPPoEClientStatus("client")
-    fhstc.stc_streamBlockStart("pppoe_client")
-    fhstc.stc_streamBlockStart("pppoe_server")
-    waitTime(5)
-    tc_get_result()
     
 
 def tc_createIGMPdeveice():
     fhstc.stc_createIGMPClient('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.18.10.1", "192.18.10.1", 24), version=2, membership='225.0.0.1')
     fhstc.stc_createIGMPServer('uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=1, ipv4=("192.168.20.1", "192.168.20.1", 24), query=100, robustnesss=1, lastQuery=1)
-    fhstc.stc_createTrafficRaw('uplink', 'igmp1', dstMac='01:00:5e:00:00:01', cvlan=(102,1), svlan=(2002,5), IPv4=("10.185.10.1", "225.0.0.1","10.185.10.1"))
+    fhstc.stc_createRawTraffic('uplink', 'igmp1', dstMac='01:00:5e:00:00:01', cvlan=(102,1), svlan=(2002,5), IPv4=("10.185.10.1", "225.0.0.1","10.185.10.1"))
     fhstc.stc_apply()
     fhstc.stc_saveAsXML("igmp.xml")
+    fhstc.stc_igmpJoin("client")
     fhstc.stc_streamBlockStart('igmp1')
     tc_get_result()
     fhstc.stc_streamBlockStop('igmp1')
@@ -205,7 +200,7 @@ def tc_get_result():
     for key in result:
         traffic_result = result[key]
         tx, rx = tuple(map(int, traffic_result[2:4]))
-        if abs(1 - rx / tx) > 0.05:
+        if abs(1 - rx / (tx+0.00001)) > 0.05:
             global TC_RET
             TC_RET = "Failed"
 
@@ -232,7 +227,7 @@ def tc_traffic_disconnect():
 def tc_main():
     try:
         logger.info("step 1. connect STC...")
-        tc_connect_stc()
+        # tc_connect_stc()
         # logger.info("STC traffic config...")
         tc_traffic_config()
         # tc_creatDHCPDevice()
@@ -277,7 +272,7 @@ def capture_analaye():
 
 def dhcp_test():
     logger.info("DHCP test...")
-    tc_connect_stc()
+    # tc_connect_stc()
     # tc_capture_start()
     # logger.info("STC traffic config...")
     # tc_traffic_config()
@@ -287,8 +282,8 @@ def dhcp_test():
    
 
 def PPPoe_test():
-    logger.info("DHCP test...")
-    tc_connect_stc()
+    logger.info("PPPoE test...")
+    # tc_connect_stc()
     # tc_capture_start()
     # logger.info("STC traffic config...")
     # tc_traffic_config()
@@ -300,6 +295,11 @@ def PPPoe_test():
     time.sleep(5)
     print(fhstc.stc_getPPPoEServerStatus('server'))
     print(fhstc.stc_getPPPoEClientStatus('client'))
+    fhstc.stc_streamBlockStart("pppoe_client")
+    fhstc.stc_streamBlockStart("pppoe_server")
+    waitTime(5)
+    tc_get_result()
+    
     fhstc.stc_PPPoEv4Disconnect('server')
     fhstc.stc_PPPoEv4Disconnect('client')
     print(fhstc.stc_getPPPoESimpleResult('server'))
@@ -313,19 +313,22 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == 'dhcp':
             dhcp_test()
-            tc_traffic_disconnect()
+            # tc_traffic_disconnect()
           
         if sys.argv[1] == 'pppoe':
             PPPoe_test()
-            tc_traffic_disconnect()
+            # tc_traffic_disconnect()
            
         if sys.argv[1] == 'igmp':
             tc_createIGMPdeveice()
             tc_traffic_disconnect()
         if sys.argv[1] == 'load':
-            fhstc.stc_loadFromXml('DHCP.xml')
+            fhstc.stc_loadFromXml('test.xml')
     else:
-        dhcp_test()
+       waitTime(30)
+
+    
+    # input("press any key to continue...")
         # tc_main()
     # capture_analaye()
     # print(__file__)
