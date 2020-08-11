@@ -11,7 +11,6 @@
 @LastEditTime: 2020-07-27 13:34:55
 '''
 
-import pandas as pd
 import time
 import configparser
 import os
@@ -130,7 +129,7 @@ class FH_OLT():
                 if connectTimes >= MAX_CONNECT_TIMES:
                     print("Connected to Device(%s) Timeout!" % self.hostip)
                     sys.exit(-1)
-        except Exception as err:
+        except:
             raise FHATCMDError('connect_olt', "连接OLT失败.")
 
     def disconnet_olt(self):
@@ -192,11 +191,11 @@ class FH_OLT():
                         self.__tn.write(bytes(" ", encoding='utf8'))
                     else:
                         break
-                logger.info(cmd_rets)
-                return cmd_rets
-
                 time.sleep(delay)
-        except Exception as err:
+                logger.info(cmd_rets)
+
+            return cmd_rets        
+        except:
             raise FHATCMDError("sendcmdlines", "send cmd Failed!", traceback.format_exc())
 
     def verify_cmds_exec(self, err_str=['failed', 'error', 'unknown command']):
@@ -271,13 +270,13 @@ class FH_UNM():
         pass
 
 
-def get_data_excel(filename, sheets=0):
-    """
-    函数功能:通过excel文件获取ONU信息，返回格式为DataFrame
-        Excel文件格式为：
-    """
-    data = pd.read_excel(filename, sheet_name=sheets)
-    return data
+# def get_data_excel(filename, sheets=0):
+#     """
+#     函数功能:通过excel文件获取ONU信息，返回格式为DataFrame
+#         Excel文件格式为：
+#     """
+#     data = pd.read_excel(filename, sheet_name=sheets)
+#     return data
 
 
 def verify_string_match(dst_str, cmp_str):

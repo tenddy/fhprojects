@@ -43,9 +43,9 @@ class FHSTCCmdError(FHSTCException):
 
 class FHSTC:
     def __init__(self, stcip=None):
-        self._stc = STC(tcl=settings.TCL_PATH, stcpath=settings.STC_PATH)   #TC 安装路径
-        self._stcip = settings.STCIP if stcip is None else stcip #TC IP
-        self._project = None    
+        self._stc = STC(tcl=settings.TCL_PATH, stcpath=settings.STC_PATH)  # TC 安装路径
+        self._stcip = settings.STCIP if stcip is None else stcip  # TC IP
+        self._project = None
         self._ports = dict()
         self._hPorts = dict()
         self._hStreamBlock = dict()
@@ -57,13 +57,14 @@ class FHSTC:
         self.stc_init()
 
     def __del__(self):
+        # self.stc_disconnect()
         del self._stc
 
     def stc_init(self, stc_path=None, ports=None):
         """ 初始化仪表, 导入仪表库文件 """
         try:
             fhlog.logger.info("初始化仪表，导入仪表库文件...")
-            self._stc.load_stc_lib() 
+            self._stc.load_stc_lib()
             fhlog.logger.info("连接仪表...")
             self.stc_connect()
             self.stc_createProject()
@@ -124,13 +125,13 @@ class FHSTC:
                 self._hPorts[portName] = self._stc.create(
                     "port", under=self._project, location=portLoc, Name=portName, useDefaultHost=False,
                     AppendLocationToPortName=False)
-                
+
                 # 创建端口，初始化端口generator的配置参数
                 self.stc_generatorConfig(portName)
         except:
             raise FHSTCCmdError('stc_createPorts', '初始化端口失败', stderr=traceback.format_exc())
 
-    def stc_modify_port(self, portName:str, ethernetType:str, **portSpeed):
+    def stc_modify_port(self, portName: str, ethernetType: str, **portSpeed):
         """
         函数功能：
             配置仪表端口协商速率属性
@@ -169,7 +170,7 @@ class FHSTC:
                     if "TRUE" == online.upper():
                         self._stc.release(tuple(self._ports.values()))
             else:
-                if  "TRUE" == self._stc.get(self._hPorts[portName], "Online").upper():
+                if "TRUE" == self._stc.get(self._hPorts[portName], "Online").upper():
                     self._stc.release((self._ports[portName],))
         except Exception as err:
             raise FHSTCCmdError("stc_release", "释放端口失败")
@@ -211,7 +212,9 @@ class FHSTC:
 
             if '_ports' in self.__dict__.keys() and portName not in self._ports.keys():
                 fhlog.logger.error("port %s not reserved!!!" % self._ports[portName])
-                raise FHSTCCmdError('stc_createTrafficRaw', "创建数据流，端口名称-{0},数据流名称-{1}失败".format(portName, streamName),stderr=traceback.format_exc())
+                raise FHSTCCmdError(
+                    'stc_createTrafficRaw', "创建数据流，端口名称-{0},数据流名称-{1}失败".format(portName, streamName),
+                    stderr=traceback.format_exc())
 
             keys = kargs.keys()
             # 设置数据流基本属性
@@ -224,7 +227,8 @@ class FHSTC:
             stream_basic['MaxFrameLength'] = kargs['MaxFrameLength'] if 'MaxFrameLength' in keys else '1518'
             stream_basic['Load'] = kargs['Load'] if 'Load' in keys else '100'
             stream_basic['LoadUnit'] = kargs['LoadUnit'] if 'LoadUnit' in keys else 'MEGABITS_PER_SECOND'
-            self._hStreamBlock[streamName] = self._stc.create('streamBlock', under=self._hPorts[portName], **stream_basic)
+            self._hStreamBlock[streamName] = self._stc.create(
+                'streamBlock', under=self._hPorts[portName], **stream_basic)
 
             # L2 header
             srcMac = kargs['srcMac'] if 'srcMac' in keys else '00:00:10:00:00:01'
@@ -263,15 +267,17 @@ class FHSTC:
                 self._hIPv4Header[streamName] = self._stc.create('ipv4:IPv4', under=self._hStreamBlock[streamName],
                                                                  sourceAddr=srcIPv4, destAddr=dstIPv4, gateway=gateway)
         except Exception as err:
-            raise FHSTCCmdError('stc_createRawTraffic', "创建数据流，端口名称-{0},数据流名称-{1}失败".format(portName, streamName),stderr=traceback.format_exc())
-    
+            raise FHSTCCmdError(
+                'stc_createRawTraffic', "创建数据流，端口名称-{0},数据流名称-{1}失败".format(portName, streamName),
+                stderr=traceback.format_exc())
+
     def stc_modifyTrafficRaw(self, streamName, portName, **kargs):
         pass
 
     def stc_RangeModifer(self, streamName, reference):
         pass
-    
-    def stc_createBoundTraffic(self, streamName:str, srcDevice:str, dstDevice:str, protocol="l2", **kargs):
+
+    def stc_createBoundTraffic(self, streamName: str, srcDevice: str, dstDevice: str, protocol="l2", **kargs):
         """
         函数功能: 
             创建绑定流
@@ -291,7 +297,6 @@ class FHSTC:
         """
         try:
             portName = self._stc.get(self._hDevices[srcDevice], "affiliationport-Targets")
-            print("portName:%s" % portName)
             fhlog.logger.info("创建绑定流，数据流名称-{0}".format(streamName))
             # if '_ports' in self.__dict__.keys() and portName not in self._ports.keys():
             #     fhlog.logger.error("port %s not reserved!!!" % self._ports[portName])
@@ -309,31 +314,30 @@ class FHSTC:
             stream_basic['Load'] = kargs['Load'] if 'Load' in keys else '100'
             stream_basic['LoadUnit'] = kargs['LoadUnit'] if 'LoadUnit' in keys else 'MEGABITS_PER_SECOND'
             self._hStreamBlock[streamName] = self._stc.create('streamBlock', under=portName, **stream_basic)
-            
+
             if protocol.lower() == "l2":
                 srcDeviceIf = self._stc.get(self._hDevices[srcDevice], "Children-ethiiIf")
                 dstDeviceIf = self._stc.get(self._hDevices[dstDevice], "Children-ethiiIf")
-                print("deviceIf:%s/%s" %(srcDeviceIf,dstDeviceIf))
             elif protocol.lower() == 'dhcp' or protocol.lower() == "pppoe":
                 srcDeviceIf = self._stc.get(self._hDevices[srcDevice], "Children-Ipv4If")
                 dstDeviceIf = self._stc.get(self._hDevices[dstDevice], "Children-Ipv4If")
                 if protocol.lower() == "pppoe":
                     self._stc.create("pppoe:PPPoESession", under=self._hStreamBlock[streamName])
-                print("deviceIf:%s/%s" %(srcDeviceIf,dstDeviceIf))
             elif protocol.lower() == "igmp":
                 srcDeviceIf = self._stc.get(self._hDevices[srcDevice], "Children-Ipv4If")
                 # igmp 获取客户端中的 Ipv4NetworkBlock
                 igmpHostConfig = self._stc.get(self._hDevices[dstDevice], "Children-igmphostconfig")
                 igmpMembership = self._stc.get(igmpHostConfig, "Children-IgmpGroupMembership")
                 ipv4group = self._stc.get(igmpMembership, "SubscribedGroups-targets")
-                dstDeviceIf = self._stc.get(ipv4group, "Children-Ipv4NetworkBlock")   #Ipv4NetworkBlock
+                dstDeviceIf = self._stc.get(ipv4group, "Children-Ipv4NetworkBlock")  # Ipv4NetworkBlock
             else:
-                raise FHSTCCmdError('stc_createTrafficRaw', "创建绑定流失败,请选择协议类型（l2, dhcp, pppoe, igmp)",stderr=traceback.format_exc())
+                raise FHSTCCmdError('stc_createTrafficRaw', "创建绑定流失败,请选择协议类型（l2, dhcp, pppoe, igmp)",
+                                    stderr=traceback.format_exc())
 
             self._stc.config(self._hStreamBlock[streamName], SrcBinding=srcDeviceIf, DstBinding=dstDeviceIf)
-            
+
         except:
-            raise FHSTCCmdError('stc_createTrafficRaw', "创建绑定流失败",stderr=traceback.format_exc())
+            raise FHSTCCmdError('stc_createTrafficRaw', "创建绑定流失败", stderr=traceback.format_exc())
 
     def stc_generatorConfig(self, portName, **generatorConfig):
         """配置仪表端口Generator 参数"""
@@ -358,9 +362,10 @@ class FHSTC:
 
     def stc_saveAsXML(self, filepath="config.xml"):
         try:
-            fhlog.logger.info("保存仪表配置为XML文件(%s)" % filepath) 
+            fhlog.logger.info("保存仪表配置为XML文件(%s)" % filepath)
             filename = os.path.basename(filepath)
-            path = settings.TESTCASE_PATH + "/instruments" if os.path.dirname(filepath) == "" else os.path.dirname(filepath)
+            path = settings.TESTCASE_PATH + "/instruments" if os.path.dirname(
+                filepath) == "" else os.path.dirname(filepath)
             if not os.path.exists(path):
                 os.makedirs(path)
             self._stc.perform("SaveAsXml", FileName=path + "/" + filename)
@@ -377,7 +382,7 @@ class FHSTC:
             # 获取仪表
             ports = self._stc.get("project1", "Children-Port")
             fhlog.logger.debug(ports)
-    
+
             for port in ports.split():
                 # 获取端口名称
                 fhlog.logger.info(port)
@@ -392,7 +397,7 @@ class FHSTC:
                 # 获取端口操作句柄
                 self._hPorts[portName] = port
                 fhlog.logger.debug(self._hPorts)
-                
+
                 # 获取每个端口下数据流的名称及操作句柄
                 streamBlock = self._stc.get(port, "Children-StreamBlock")
                 fhlog.logger.debug(streamBlock)
@@ -401,15 +406,15 @@ class FHSTC:
                     streamName = self._stc.get(item, "Name")
                     self._hStreamBlock[streamName] = item
                 fhlog.logger.debug(self._hStreamBlock)
-               
 
             # 获取Device
-            objectLists = self._stc.perform("GetObjects", ClassName='EmulatedDevice', Direction="ALL", Rootlist='project1')
-            
+            objectLists = self._stc.perform("GetObjects", ClassName='EmulatedDevice',
+                                            Direction="ALL", Rootlist='project1')
+
             fhlog.logger.debug(objectLists)
             devices = re.findall("-ObjectList {(.*)} -State", objectLists)
             fhlog.logger.debug(devices[0].split())
-            if len(devices) !=0:
+            if len(devices) != 0:
                 for device in devices[0].split():
                     deviceName = self._stc.get(device, 'Name')
                     if deviceName in self._hDevices.keys():
@@ -429,7 +434,7 @@ class FHSTC:
             STC 仪表流量分析功能，
             # ToDo
         参数：
-            
+
         返回值：None
         说明：	
         """
@@ -454,11 +459,16 @@ class FHSTC:
         # hGenerator = "hGenerator_{0}".format(portName)
         self._stc.perform("GeneratorStop", GeneratorList=self._hGenerator[portName])
 
-    def stc_streamBlockStart(self, streamName):
-        """基于streamBlock启动generator"""
-        if self._hdrv is None:
-            self.stc_DRVConfig(LimitSize=100)
-        self._stc.perform("StreamBlockStart", StreamBlockList=self._hStreamBlock[streamName])
+    def stc_streamBlockStart(self, streamName, arp=False):
+        """基于streamBlock发送流量"""
+        try:
+            if self._hdrv is None:
+                self.stc_DRVConfig(LimitSize=100)
+            self._stc.perform("StreamBlockStart", StreamBlockList=self._hStreamBlock[streamName])
+            if arp:
+                self.stc_startARP(streamName)
+        except:
+            raise FHSTCCmdError("stc_streamBlockStart", "基于streamBlock发送流量失败", traceback.format_exc())
 
     def stc_streamBlockStop(self, streamName):
         """基于streamBlock停止generator"""
@@ -474,15 +484,15 @@ class FHSTC:
                 self._stc.perform('ResultsClearAllCommand', PortList=self._hPorts[portName])
         except:
             raise FHSTCCmdError("stc_ClearAllResults", "清空仪表端口流量统计失败", traceback.format_exc())
-    
+
     def stc_DRVConfig(self, **kargs):
         """配置DynamicResultView"""
         self._hdrv = self._stc.create('DynamicResultView', under=self._project,
                                       ResultSourceClass='StreamBlock', Name='DRV1')
         # 配置select 参数
         self.selectProperties = [
-            'Port.Name', 'StreamBlock.Name', 'StreamBlock.TxL1BitRate', 'StreamBlock.RxL1BitRate',
-            'StreamBlock.TxFrameRate', 'StreamBlock.RxFrameRate', 'StreamBlock.DroppedFrameCount',
+            'Port.Name', 'StreamBlock.Name', 'StreamBlock.TxFrameRate', 'StreamBlock.RxFrameRate',
+            'StreamBlock.TxL1BitRate', 'StreamBlock.RxL1BitRate', 'StreamBlock.DroppedFrameCount',
             'StreamBlock.DroppedFramePercent']
         selectParams = "{%s}" % (' '.join(self.selectProperties))
 
@@ -496,37 +506,41 @@ class FHSTC:
         """获取DynamicResultView结果,通过DynamicResultView获取结果，不需要停流;
            通过DynamicResultView获取结果，需要先调用stc_DRVConfig函数。
         """
-        self._hDRVData = self._stc.get(self._hdrv, 'children-PresentationResultQuery')
-        resultsData = {}
-        for loop in range(loops):
-            # Since these are not realtime results, the view has to be manually updated
-            self._stc.perform('UpdateDynamicResultView', DynamicResultView=self._hdrv)
-            time.sleep(2)
+        try:
+            fhlog.logger.info("获取实时流量统计(DynamicResultView)...")
+            self._hDRVData = self._stc.get(self._hdrv, 'children-PresentationResultQuery')
+            resultsData = {}
+            for loop in range(loops):
+                # Since these are not realtime results, the view has to be manually updated
+                self._stc.perform('UpdateDynamicResultView', DynamicResultView=self._hdrv)
+                time.sleep(2)
 
-            _hrvd = self._stc.get(self._hDRVData, 'children-ResultViewData')
-            _hrvd = _hrvd.split()
-            for index in _hrvd:
-                ret = self._stc.get(index, 'ResultData')
-                if loop == loops - 1:
-                    ret_s = ret.split()
-                    key = "%s.%s" % (tuple(ret_s[:2]))
-                    value = tuple(ret_s[2:-2])
-                    resultsData[key] = value
+                _hrvd = self._stc.get(self._hDRVData, 'children-ResultViewData')
+                _hrvd = _hrvd.split()
+                for index in _hrvd:
+                    ret = self._stc.get(index, 'ResultData')
+                    if loop == loops - 1:
+                        ret_s = ret.split()
+                        key = "%s.%s" % (tuple(ret_s[:2]))
+                        value = tuple(ret_s[2:-2])
+                        resultsData[key] = value
 
-        # 打印 DRV_ResulstData结果
-        title = ('StreamName', 'TxL1Rate', 'RxL1Rate', 'TxFrameRate', 'RxFrameRate', 'DropFrame', 'DropPct')
-        result = '\n' + "\t".join(title)
-        for key in resultsData:
-            raw_result = "\t".join(list(map(lambda x: "{0:12}".format(x), resultsData[key])))
-            result += "\n%s\t%s" % (key, raw_result)
-            self._hStreamBlockResult[key] = dict(zip(title[1:], raw_result))    # 保存当前获取的流量统计
-        fhlog.logger.info(result)
+            # 打印 DRV_ResulstData结果
+            title = ('StreamName', 'TxFrameRate', 'RxFrameRate', 'TxL1Rate', 'RxL1Rate', 'DropFrame', 'DropPct')
+            result = '\n' + "\t".join(title)
+            for key in resultsData:
+                raw_result = "\t".join(list(map(lambda x: "{:12}".format(x), resultsData[key])))
+                result += "\n%s\t%s" % (key, raw_result)
+                self._hStreamBlockResult[key] = dict(zip(title[1:], raw_result))    # 保存当前获取的流量统计
+            fhlog.logger.info(result)
 
-        return resultsData
+            return resultsData
+        except:
+            raise FHSTCCmdError("stc_get_DRV_ResulstData", "获取端口实时流量统计失败", traceback.format_exc())
 
     def stc_get_ResultDataSet(self, **kargs):
         """通过ResultDataSet获取流量统计，待完善"""
-        print("Create and subscribe a ResultDataSet...")
+        # print("Create and subscribe a ResultDataSet...")
         self._hRDSTx = self._stc.subscribe(Parent=self._project, resultType='txstreamresults', configType='streamblock')
         totoalPage = int(self._stc.get(self._hRDSTx, 'TotalPageCount'))
         # currentPage = 1
@@ -534,7 +548,7 @@ class FHSTC:
             lstResults = self._stc.get(self._hRDSTx, 'ResultHandleList')
             # print("list:", lstResults)
             lstResults = lstResults.split()
-            fhlog.logger.info("page:%d" % currentPage) 
+            fhlog.logger.info("page:%d" % currentPage)
             for hResult in lstResults:
                 bitrate = self._stc.get(hResult, 'bitrate')
                 # print(bitrate)
@@ -586,8 +600,10 @@ class FHSTC:
                 filename = os.path.basename(filepath)
                 path = settings.CAP_PATH if os.path.dirname(filepath) == "" else os.path.dirname(filepath)
 
-            self._stc.perform('CaptureDataSave', captureProxyId=self._hCapture[portName],FileName=filename,  FileNamePath=path, FileNameFormat='PCAP')
-            
+            self._stc.perform(
+                'CaptureDataSave', captureProxyId=self._hCapture[portName],
+                FileName=filename, FileNamePath=path, FileNameFormat='PCAP')
+
             return self._stc.get(self._hCapture[portName], "PktCount")
         except:
             raise FHSTCCmdError("stc_captureStop", "停止并保存抓包失败", traceback.format_exc())
@@ -617,7 +633,7 @@ class FHSTC:
             analyzeFile = pcapfile
         cap_general = self._stc._tclsh.eval("exec {%s} -r {%s} -Y %s" % (settings.TSHARK, analyzeFile, filter_exp))
         print(cap_general)
-    
+
     def stc_createBasicDevice(self, portName, deviceName, **kargs):
         """
         函数功能:
@@ -640,51 +656,70 @@ class FHSTC:
             fhlog.logger.info("创建基本Device")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:10:94:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             clientHeader = list()
             clientHeader.append(_hEthClientIf)
             # vlan header
-           
+
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 #  clientHeader["SVLAN"] = _hSVlanIf
                 clientHeader.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 # clientHeader["CVLAN"] = _hCVlanIf
                 clientHeader.append(_hCVlanIf)
 
-
             # ipv4 header
             if 'ipv4' in kargs.keys():
-                _hIPv4ClientIf = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=kargs['ipv4'][0], gateway=kargs['ipv4'][1])
+                _hIPv4ClientIf = self._stc.create(
+                    "Ipv4If", under=self._hDevices[deviceName],
+                    address=kargs['ipv4'][0],
+                    gateway=kargs['ipv4'][1])
                 # clientHeader["IPv4"] = _hIPv4ClientIf
                 clientHeader.append(_hIPv4ClientIf)
 
             # ipv6 header
             if 'ipv6' in kargs.keys():
-                _hIPv6ClientIf = self._stc.create("Ipv6If", under=self._hDevices[deviceName],address=kargs['ipv6'][0], gateway=kargs['ipv6'][0])
+                _hIPv6ClientIf = self._stc.create(
+                    "Ipv6If", under=self._hDevices[deviceName],
+                    address=kargs['ipv6'][0],
+                    gateway=kargs['ipv6'][0])
                 # self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': _hIPv6ClientIf, 'PrimaryIf-targets': _hIPv6ClientIf})
                 # clientHeader["IPv6"] = _hIPv6ClientIf
                 clientHeader.append(_hIPv6ClientIf)
-                
+
             for index in range(1, len(clientHeader)):
                 fhlog.logger.debug("HEADER:%s" % clientHeader[index])
                 self._stc.config(clientHeader[index], stackedOn=clientHeader[index-1])
-            
-            self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': clientHeader[-1], 'PrimaryIf-targets': clientHeader[-1]})
+
+            self._stc.config(
+                self._hDevices[deviceName],
+                **{'TopLevelIf-targets': clientHeader[-1],
+                   'PrimaryIf-targets': clientHeader[-1]})
 
             # self._stc.config(_hIPv4ClientIf, **{"stackedOnEndpoint-targets":_hEthClientIf})
             self._stc.config(self._hDevices[deviceName], **{"AffiliationPort-targets": self._hPorts[portName]})
         except:
             raise FHSTCCmdError("stc_createBasicDevice", "创建Device失败", traceback.format_exc())
-    
+
     def stc_createDHCPv4Client(self, portName, deviceName, **kargs):
         """
         函数功能:
@@ -709,40 +744,59 @@ class FHSTC:
             fhlog.logger.info("创建DHCP client")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:10:94:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             clientHeader = list()
             clientHeader.append(_hEthClientIf)
 
             # vlan header
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 clientHeader.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 clientHeader.append(_hCVlanIf)
 
-
             # ipv4 header
-            ipv4Addr, ipv4gw =  kargs['ipv4'] if 'ipv4' in kargs.keys() else ("192.18.0.1", "192.18.10.1")
-            _hIPv4ClientIf = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=ipv4Addr,gateway=ipv4gw)
+            ipv4Addr, ipv4gw = kargs['ipv4'] if 'ipv4' in kargs.keys() else ("192.18.0.1", "192.18.10.1")
+            _hIPv4ClientIf = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4Addr, gateway=ipv4gw)
             clientHeader.append(_hIPv4ClientIf)
-                
+
             for index in range(1, len(clientHeader)):
                 fhlog.logger.debug("HEADER:%s" % clientHeader[index])
                 self._stc.config(clientHeader[index], stackedOn=clientHeader[index-1])
-            
-            self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': clientHeader[-1], 'PrimaryIf-targets': clientHeader[-1]})
+
+            self._stc.config(
+                self._hDevices[deviceName],
+                **{'TopLevelIf-targets': clientHeader[-1],
+                   'PrimaryIf-targets': clientHeader[-1]})
 
             # 创建DHCP client
-            broadcastFlag = kargs['broadcast'] if "broadcast" in kargs.keys() else True
+            if "broadcast" in kargs.keys() and kargs['broadcast']:
+                broadcastFlag = "TRUE"
+            else:
+                broadcastFlag = "FALSE"
             _hDhcpIpv4Client = self._stc.create("Dhcpv4BlockConfig", under=self._hDevices[deviceName])
-            self._stc.config(_hDhcpIpv4Client, UsesIf=_hIPv4ClientIf, EnableAutoRetry="True", RetryAttempts=4, EnableRouterOption="True", UseBroadcastFlag=broadcastFlag)
+            self._stc.config(_hDhcpIpv4Client, UsesIf=_hIPv4ClientIf, EnableAutoRetry="True",
+                             RetryAttempts=4, EnableRouterOption="True", UseBroadcastFlag=broadcastFlag)
 
             # self._hDHCPBlockConfig[deviceName] = _hDhcpIpv4Client
             # 绑定端口
@@ -770,61 +824,77 @@ class FHSTC:
             fhstc.stc_createDHCPv4Server('uplink', 'h1', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=4, ipv4=("192.168.20.1", "192.168.20.1"), pool=("192.168.20.2", 24, 200))
         """
         try:
-            fhlog.logger.info("创建DHCP client")
+            fhlog.logger.info("创建DHCP Server")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:00:01:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             clientHeader = list()
             clientHeader.append(_hEthClientIf)
 
             # vlan header
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 clientHeader.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 clientHeader.append(_hCVlanIf)
 
-
             # ipv4 header
-            ipv4Addr, ipv4gw =  kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.185.10.1", "10.185.10.1")
-            _hIPv4ClientIf = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=ipv4Addr,gateway=ipv4gw)
+            ipv4Addr, ipv4gw = kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.185.10.1", "10.185.10.1")
+            _hIPv4ClientIf = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4Addr, gateway=ipv4gw)
             clientHeader.append(_hIPv4ClientIf)
-                
+
             for index in range(1, len(clientHeader)):
                 fhlog.logger.debug("HEADER:%s" % clientHeader[index])
                 self._stc.config(clientHeader[index], stackedOn=clientHeader[index-1])
-            
-            self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': clientHeader[-1], 'PrimaryIf-targets': clientHeader[-1]})
+
+            self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': clientHeader[-1],
+                                                            'PrimaryIf-targets': clientHeader[-1]})
 
             # 创建DHCP server
             # self._hDHCPv4Server = dict()
-            _hDhcpv4ServerConfig = self._stc.create("Dhcpv4ServerConfig", under=self._hDevices[deviceName], LeaseTime=1800, MinAllowedLeaseTime=60)   
+            _hDhcpv4ServerConfig = self._stc.create(
+                "Dhcpv4ServerConfig", under=self._hDevices[deviceName],
+                LeaseTime=1800, MinAllowedLeaseTime=60)
             _hDhcpv4ServerDefaultPool = self._stc.get(_hDhcpv4ServerConfig, "Children-Dhcpv4ServerDefaultPoolConfig")
             startIP, mask, count = kargs['pool'] if 'pool' in kargs.keys() else ("10.185.10.2", 24, 253)
-            self._stc.config(_hDhcpv4ServerDefaultPool, StartIpList=startIP, PrefixLength=mask, HostAddrCount=count, RouterList=ipv4Addr)
+            self._stc.config(_hDhcpv4ServerDefaultPool, StartIpList=startIP,
+                             PrefixLength=mask, HostAddrCount=count, RouterList=ipv4Addr)
             self._stc.config(_hDhcpv4ServerConfig, UsesIf=_hIPv4ClientIf)
-            
+
             # self._hDHCPBlockConfig[deviceName] = _hDhcpv4ServerConfig
-  
+
             # 绑定端口
             self._stc.config(self._hDevices[deviceName], **{"AffiliationPort-targets": self._hPorts[portName]})
         except:
             raise FHSTCCmdError("stc_createBasicDevice", "创建DHCP Server失败", traceback.format_exc())
-    
+
     def stc_deviceStart(self, deviceName):
         """启动Device"""
         try:
             self._stc.perform("DeviceStart", DeviceList=self._hDevices[deviceName])
         except:
             raise FHSTCCmdError("stc_DeviceStart", "启动Device失败", traceback.format_exc())
-    
+
     def stc_deviceStop(self, deviceName):
         """停止Device"""
         try:
@@ -835,13 +905,13 @@ class FHSTC:
     def stc_DHCPv4Bind(self, deviceName):
         """启动DHCP client, （DHCPv4Bind）"""
         _hDHCPv4BlockConfig = self._stc.get(self._hDevices[deviceName], "Children-Dhcpv4BlockConfig")
-        self._stc.perform("Dhcpv4Bind", BlockList = _hDHCPv4BlockConfig)
-    
+        self._stc.perform("Dhcpv4Bind", BlockList=_hDHCPv4BlockConfig)
+
     def stc_DHCPv4Release(self, deviceName):
         """释放DHCP client, （DHCPv4Release）"""
         _hDHCPv4BlockConfig = self._stc.get(self._hDevices[deviceName], "Children-Dhcpv4BlockConfig")
-        self._stc.perform("Dhcpv4Release", BlockList = _hDHCPv4BlockConfig)
-    
+        self._stc.perform("Dhcpv4Release", BlockList=_hDHCPv4BlockConfig)
+
     def stc_startDHCPv4Server(self, deviceName):
         """启动DHCP server"""
         try:
@@ -849,8 +919,8 @@ class FHSTC:
             self._stc.perform("Dhcpv4StartServer", ServerList=_hDhcpv4Server)
         except:
             raise FHSTCCmdError("stc_StartDHCPv4Server", "启动DHCP server失败", traceback.format_exc())
-    
-    def stc_stopDHCPv4Server(self,deviceName):
+
+    def stc_stopDHCPv4Server(self, deviceName):
         """停止DHCP server"""
         try:
             fhlog.logger.info("停止DHCP Server")
@@ -859,7 +929,7 @@ class FHSTC:
             self._stc.perform("Dhcpv4StopServer", ServerList=_hDhcpv4Server)
         except:
             raise FHSTCCmdError("stc_stopDHCPv4Server", "停止DHCP server失败", traceback.format_exc())
-    
+
     def stc_getDHCPv4BlockResult(self, deviceName):
         """
         函数功能：
@@ -869,14 +939,14 @@ class FHSTC:
         返回值:
                 (CurrentBoundCount,CurrentIdleCount,TxDiscoverCount,TxRequestCount,RxOfferCount,RxAckCount,RxNakCount,TotalBoundCount,TotalFailedCount)
                 # Todo 待优化
-        
+
         """
         _hDHCPv4BlockConfig = self._stc.get(self._hDevices[deviceName], "Children-Dhcpv4BlockConfig")
         dhcpv4BlockResult = self._stc.get(_hDHCPv4BlockConfig, "Children-dhcpv4blockresults")
         dhcpResult = self._stc.get(dhcpv4BlockResult, "CurrentBoundCount")
         fhlog.logger.debug(dhcpResult)
         return dhcpResult
-    
+
     def stc_dhcpv4SessionResults(self, deviceName):
         """
         功能：
@@ -925,63 +995,82 @@ class FHSTC:
             fhlog.logger.info("创建PPPoE Server")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:00:01:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             hIf = list()
             hIf.append(_hEthClientIf)
 
             # vlan header
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 hIf.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 hIf.append(_hCVlanIf)
 
             # pppoe header
             sessionId = kargs['sessionId'] if 'sessionId' in kargs.keys() else 0
-            _hPppoeIf = self._stc.create("PppoeIf", under=self._hDevices[deviceName], SessionId=sessionId, SessionIdStep=1)
+            _hPppoeIf = self._stc.create(
+                "PppoeIf", under=self._hDevices[deviceName],
+                SessionId=sessionId, SessionIdStep=1)
             hIf.append(_hPppoeIf)
             # ppp header
             _hPPPIf = self._stc.create("PppIf", under=self._hDevices[deviceName])
             hIf.append(_hPPPIf)
             # ipv4 header
-            ipv4Addr, ipv4gw =  kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.185.10.1", "10.185.10.1")
-            _hIPv4ClientIf = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=ipv4Addr,gateway=ipv4gw)
+            ipv4Addr, ipv4gw = kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.185.10.1", "10.185.10.1")
+            _hIPv4ClientIf = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4Addr, gateway=ipv4gw)
             hIf.append(_hIPv4ClientIf)
-            
+
             for index in range(1, len(hIf)):
                 fhlog.logger.debug("HEADER:%s" % hIf[index])
                 self._stc.config(hIf[index], stackedOn=hIf[index-1])
-            
-            authType = kargs['authType'] if 'authType' in kargs.keys() else 'AUTO'
-            self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': hIf[-1], 'PrimaryIf-targets': hIf[-1]})
 
-            username = kargs['username'] if 'username' in kargs.keys() else "fiberhome" 
+            authType = kargs['authType'] if 'authType' in kargs.keys() else 'AUTO'
+            self._stc.config(
+                self._hDevices[deviceName],
+                **{'TopLevelIf-targets': hIf[-1],
+                   'PrimaryIf-targets': hIf[-1]})
+
+            username = kargs['username'] if 'username' in kargs.keys() else "fiberhome"
             password = kargs['password'] if 'password' in kargs.keys() else "fiberhome"
 
-            _hPPPoeServerBlockConfig = self._stc.create('PppoeServerBlockConfig', under=self._hDevices[deviceName], Authentication=authType, UserName=username, Password=password)
+            _hPPPoeServerBlockConfig = self._stc.create(
+                'PppoeServerBlockConfig', under=self._hDevices[deviceName],
+                Authentication=authType, UserName=username, Password=password)
 
             # self._hPPPoXBlockConfig[deviceName] = _hPPPoeServerBlockConfig
 
             _hPPPoeServerPool = self._stc.get(_hPPPoeServerBlockConfig, "children-PppoeServerIpv4PeerPool")
-            pool = kargs['pool'] if 'pool' in kargs.keys() else ("10.185.10.1","10.185.10.2", 24)
-            pool_dict = dict(zip(('Ipv4PeerPoolAddr','StartIpList','PrefixLength'), pool))
+            pool = kargs['pool'] if 'pool' in kargs.keys() else ("10.185.10.1", "10.185.10.2", 24)
+            pool_dict = dict(zip(('Ipv4PeerPoolAddr', 'StartIpList', 'PrefixLength'), pool))
             self._stc.config(_hPPPoeServerPool, **pool_dict)
-           
+
             # set device as server
             _hpppoxPortConfig = self._stc.get(self._hPorts[portName], "Children-PppoxPortConfig")
             self._stc.config(_hpppoxPortConfig, EmulationType='SERVER')
 
             self._stc.config(self._hDevices[deviceName], AffiliatedPort=self._hPorts[portName])
         except:
-             raise FHSTCCmdError("stc_createPPPoEv4Server", "创建PPPoE Server失败", traceback.format_exc())
-    
+            raise FHSTCCmdError("stc_createPPPoEv4Server", "创建PPPoE Server失败", traceback.format_exc())
 
     def stc_createPPPoEv4Client(self, portName, deviceName, **kargs):
         """
@@ -1009,50 +1098,70 @@ class FHSTC:
             fhlog.logger.info("创建PPPoE Server")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:01:94:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             hIf = list()
             hIf.append(_hEthClientIf)
 
             # vlan header
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 hIf.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 hIf.append(_hCVlanIf)
 
             # pppoe header
             sessionId = kargs['sessionId'] if 'sessionId' in kargs.keys() else 0
-            _hPppoeIf = self._stc.create("PppoeIf", under=self._hDevices[deviceName], SessionId=sessionId, SessionIdStep=1)
+            _hPppoeIf = self._stc.create(
+                "PppoeIf", under=self._hDevices[deviceName],
+                SessionId=sessionId, SessionIdStep=1)
             hIf.append(_hPppoeIf)
             # ppp header
             _hPPPIf = self._stc.create("PppIf", under=self._hDevices[deviceName])
             hIf.append(_hPPPIf)
             # ipv4 header
-            ipv4Addr, ipv4gw =  kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.190.185.1", "10.190.185.1")
-            _hIPv4ClientIf = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=ipv4Addr,gateway=ipv4gw)
+            ipv4Addr, ipv4gw = kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.190.185.1", "10.190.185.1")
+            _hIPv4ClientIf = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4Addr, gateway=ipv4gw)
             hIf.append(_hIPv4ClientIf)
-            
+
             for index in range(1, len(hIf)):
                 fhlog.logger.debug("HEADER:%s" % hIf[index])
                 self._stc.config(hIf[index], stackedOn=hIf[index-1])
-            
+
             authType = kargs['authType'] if 'authType' in kargs.keys() else 'CHAP_MD5'
-            self._stc.config(self._hDevices[deviceName], **{'TopLevelIf-targets': hIf[-1], 'PrimaryIf-targets': hIf[-1]})
-            username = kargs['username'] if 'username' in kargs.keys() else "fiberhome" 
+            self._stc.config(
+                self._hDevices[deviceName],
+                **{'TopLevelIf-targets': hIf[-1],
+                   'PrimaryIf-targets': hIf[-1]})
+            username = kargs['username'] if 'username' in kargs.keys() else "fiberhome"
             password = kargs['password'] if 'password' in kargs.keys() else "fiberhome"
-            _hPPPoeClientBlockConfig = self._stc.create('PppoeClientBlockConfig', under=self._hDevices[deviceName], Authentication=authType, UserName=username, Password=password)
+            _hPPPoeClientBlockConfig = self._stc.create(
+                'PppoeClientBlockConfig', under=self._hDevices[deviceName],
+                Authentication=authType, UserName=username, Password=password)
             # self._hPPPoXBlockConfig[deviceName] = _hPPPoeClientBlockConfig
 
             self._stc.config(self._hDevices[deviceName], AffiliatedPort=self._hPorts[portName])
         except:
-             raise FHSTCCmdError("stc_createPPPoEv4Server", "创建PPPoE Client失败", traceback.format_exc())
+            raise FHSTCCmdError("stc_createPPPoEv4Server", "创建PPPoE Client失败", traceback.format_exc())
 
     def stc_PPPoEv4Connect(self, deviceName):
         """PPPoE Connect"""
@@ -1060,20 +1169,20 @@ class FHSTC:
             deviceChildren = self._stc.get(self._hDevices[deviceName], 'Children')
             _hPPPoXBlockConfig = deviceChildren.split()[-1]
             fhlog.logger.debug("PPPoXBlocConfig:%s" % _hPPPoXBlockConfig)
-            self._stc.perform("PppoxConnect", BlockList = _hPPPoXBlockConfig)
+            self._stc.perform("PppoxConnect", BlockList=_hPPPoXBlockConfig, ControlType="CONNECT")
         except:
             raise FHSTCCmdError("stc_PPPoEv4Connect", "PPPoE Connect 失败", traceback.format_exc())
-    
+
     def stc_PPPoEv4Disconnect(self, deviceName):
         """PPPoE Connect"""
         try:
             deviceChildren = self._stc.get(self._hDevices[deviceName], 'Children')
             _hPPPoXBlockConfig = deviceChildren.split()[-1]
             fhlog.logger.debug("PPPoXBlocConfig:%s" % _hPPPoXBlockConfig)
-            self._stc.perform("PppoxDisconnect", BlockList = _hPPPoXBlockConfig)
+            self._stc.perform("PppoxDisconnect", BlockList=_hPPPoXBlockConfig)
         except:
             raise FHSTCCmdError("stc_PPPoEv4Connect", "PPPoE Disconnect 失败", traceback.format_exc())
-    
+
     def stc_getPPPoEServerStatus(self, deviceName):
         """
         函数功能：
@@ -1087,14 +1196,15 @@ class FHSTC:
             hPPPoeServerBlockConfig = self._stc.get(self._hDevices[deviceName], 'Children-PPPoeServerBlockConfig')
             fhlog.logger.debug(hPPPoeServerBlockConfig)
             pppoeResultCurrent = self._stc.get(hPPPoeServerBlockConfig, "children-PppoeServerBlockResults")
-            pppoeResult = self._stc.get(pppoeResultCurrent, *("SessionsUp", "State","ConnectedSuccessCount", "FailedConnectCount", "Sessions"))
+            pppoeResult = self._stc.get(pppoeResultCurrent, *("SessionsUp", "State",
+                                                              "ConnectedSuccessCount", "FailedConnectCount", "Sessions"))
             pppoeResult = pppoeResult.split()
-            key = list(map(lambda x: x[1:] , pppoeResult[0:-1:2]))
+            key = list(map(lambda x: x[1:], pppoeResult[0:-1:2]))
             value = pppoeResult[1:len(pppoeResult):2]
-            return dict(zip(key,value))
+            return dict(zip(key, value))
         except:
             raise FHSTCCmdError("stc_getPPPoEServerStatus", "获取PPPoE server 状态 失败", traceback.format_exc())
-    
+
     def stc_getPPPoEClientStatus(self, deviceName):
         """
         函数功能：
@@ -1109,14 +1219,15 @@ class FHSTC:
             hPPPoeClientBlockConfig = self._stc.get(self._hDevices[deviceName], 'Children-PPPoeClientBlockConfig')
             fhlog.logger.debug(hPPPoeClientBlockConfig)
             pppoeResultCurrent = self._stc.get(hPPPoeClientBlockConfig, "children-PppoeClientBlockResults")
-            pppoeResult = self._stc.get(pppoeResultCurrent, *("SessionsUp", "State","ConnectedSuccessCount", "FailedConnectCount", "Sessions"))
+            pppoeResult = self._stc.get(pppoeResultCurrent, *("SessionsUp", "State",
+                                                              "ConnectedSuccessCount", "FailedConnectCount", "Sessions"))
             pppoeResult = pppoeResult.split()
-            key = list(map(lambda x: x[1:] , pppoeResult[0:-1:2]))
+            key = list(map(lambda x: x[1:], pppoeResult[0:-1:2]))
             value = pppoeResult[1:len(pppoeResult):2]
-            return dict(zip(key,value))
+            return dict(zip(key, value))
         except:
             raise FHSTCCmdError("stc_getPPPoEClientStatus", "获取PPPoE client 状态 失败", traceback.format_exc())
-    
+
     def stc_getPPPoESimpleResult(self, deviceName):
         """
         函数功能：
@@ -1130,11 +1241,11 @@ class FHSTC:
             deviceChildren = self._stc.get(self._hDevices[deviceName], 'Children')
             _hPPPoXBlockConfig = deviceChildren.split()[-1]
             pppoeResult = self._stc.get(_hPPPoXBlockConfig, "BlockState")
-        
+
             return pppoeResult
         except:
             raise FHSTCCmdError("stc_getPPPoESimpleResult", "获取PPPoE连接状态 失败", traceback.format_exc())
-    
+
     def stc_createIGMPServer(self, portName, deviceName, **kargs):
         """
         功能：
@@ -1159,47 +1270,61 @@ class FHSTC:
             fhlog.logger.info("创建IGMP Server")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:01:94:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             hIf = list()
             hIf.append(_hEthClientIf)
 
             # vlan header
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 hIf.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 hIf.append(_hCVlanIf)
 
             # ipv4 header
-            ipv4Addr, ipv4gw, mask =  kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.190.185.1", "10.190.185.1", 24)
-            _hIPv4If = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=ipv4Addr, gateway=ipv4gw,PrefixLength=mask)
+            ipv4Addr, ipv4gw, mask = kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.190.185.1", "10.190.185.1", 24)
+            _hIPv4If = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4Addr, gateway=ipv4gw, PrefixLength=mask)
             hIf.append(_hIPv4If)
-            
+
             for index in range(1, len(hIf)):
                 fhlog.logger.debug("HEADER:%s" % hIf[index])
                 self._stc.config(hIf[index], stackedOn=hIf[index-1])
-            self._stc.config(self._hDevices[deviceName],TopLevelIf=_hIPv4If,PrimaryIf=_hIPv4If )
+            self._stc.config(self._hDevices[deviceName], TopLevelIf=_hIPv4If, PrimaryIf=_hIPv4If)
 
             version = kargs['version'] if 'version' in kargs.keys() else 2
-            queryInterval  = kargs['query'] if 'query' in kargs.keys() else 125
+            queryInterval = kargs['query'] if 'query' in kargs.keys() else 125
             robustnessVariable = kargs['robustness'] if 'robustness' in kargs.keys() else 2
             lastMemberQueryCount = kargs['lastQuery'] if 'lastQuery' in kargs.keys() else 2
 
             hIgmpRouterConfig = self._stc.create("IgmpRouterConfig", under=self._hDevices[deviceName])
-            self._stc.config(hIgmpRouterConfig, Version='IGMP_V%d' % version, QueryInterval=queryInterval, RobustnessVariable=robustnessVariable, LastMemberQueryCount=lastMemberQueryCount)
+            self._stc.config(hIgmpRouterConfig, Version='IGMP_V%d' % version, QueryInterval=queryInterval,
+                             RobustnessVariable=robustnessVariable, LastMemberQueryCount=lastMemberQueryCount)
 
             self._stc.config(hIgmpRouterConfig, UsesIf=_hIPv4If)
             self._stc.config(self._hDevices[deviceName], AffiliatedPort=self._hPorts[portName])
         except:
             raise FHSTCCmdError("stc_createIGMPServer", "创建IGMP server 失败", traceback.format_exc())
-    
+
     def stc_createIGMPClient(self, portName, deviceName, **kargs):
         """
         功能：
@@ -1223,33 +1348,46 @@ class FHSTC:
             fhlog.logger.info("创建IGMP client")
             # Create Device
             srcMacCount = kargs['count'] if 'count' in kargs.keys() else 1
-            self._hDevices[deviceName] = self._stc.create("EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount, EnablePingResponse='True')
-            
+            self._hDevices[deviceName] = self._stc.create(
+                "EmulatedDevice", under=self._project, Name=deviceName, DeviceCount=srcMacCount,
+                EnablePingResponse='True')
+
             # Ethernet header
             srcMAC = kargs['srcMAC'] if 'srcMAC' in kargs.keys() else "00:01:94:00:00:01"
-            _hEthClientIf = self._stc.create("EthIIIf", under=self._hDevices[deviceName],IsRange="TRUE",                SourceMac=srcMAC, SrcMacRepeatCount=0,SrcMacStep="00:00:00:00:00:01", SrcMacStepMask="00:00:FF:FF:FF:FF")
+            _hEthClientIf = self._stc.create(
+                "EthIIIf", under=self._hDevices[deviceName],
+                IsRange="TRUE", SourceMac=srcMAC, SrcMacRepeatCount=0, SrcMacStep="00:00:00:00:00:01",
+                SrcMacStepMask="00:00:FF:FF:FF:FF")
 
             hIf = list()
             hIf.append(_hEthClientIf)
 
             # vlan header
             if 'svlan' in kargs.keys():
-                _hSVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['svlan'][0], Priority=kargs['svlan'][1])
+                _hSVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['svlan'][0],
+                    Priority=kargs['svlan'][1])
                 hIf.append(_hSVlanIf)
-            
+
             if 'cvlan' in kargs.keys():
-                _hCVlanIf = self._stc.create('VlanIf', under=self._hDevices[deviceName], Tpid=33024, VlanId=kargs['cvlan'][0], Priority=kargs['cvlan'][1])
+                _hCVlanIf = self._stc.create(
+                    'VlanIf', under=self._hDevices[deviceName],
+                    Tpid=33024, VlanId=kargs['cvlan'][0],
+                    Priority=kargs['cvlan'][1])
                 hIf.append(_hCVlanIf)
 
             # ipv4 header
-            ipv4Addr, ipv4gw, mask =  kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.190.185.1", "10.190.185.1", 24)
-            _hIPv4If = self._stc.create("Ipv4If", under=self._hDevices[deviceName], address=ipv4Addr, gateway=ipv4gw,PrefixLength=mask)
+            ipv4Addr, ipv4gw, mask = kargs['ipv4'] if 'ipv4' in kargs.keys() else ("10.190.185.1", "10.190.185.1", 24)
+            _hIPv4If = self._stc.create(
+                "Ipv4If", under=self._hDevices[deviceName],
+                address=ipv4Addr, gateway=ipv4gw, PrefixLength=mask)
             hIf.append(_hIPv4If)
-            
+
             for index in range(1, len(hIf)):
                 fhlog.logger.debug("HEADER:%s" % hIf[index])
                 self._stc.config(hIf[index], stackedOn=hIf[index-1])
-            self._stc.config(self._hDevices[deviceName],TopLevelIf=_hIPv4If,PrimaryIf=_hIPv4If )
+            self._stc.config(self._hDevices[deviceName], TopLevelIf=_hIPv4If, PrimaryIf=_hIPv4If)
 
             version = kargs['version'] if 'version' in kargs.keys() else 2
             # robustnessVariable = kargs['queryInterval'] if 'queryInterval' in kargs.keys() else 2
@@ -1266,81 +1404,88 @@ class FHSTC:
                 if isinstance(kargs['membership'], str):
                     membership = (kargs['membership'], 1, 1, 24)
                 else:
-                    membership =  kargs['membership']
+                    membership = kargs['membership']
             else:
                 membership = ("255.0.0.1", 1, 10, 24)
 
-            self._stc.config(hIpv4NetworkBlockGroup, **dict(zip(('StartIpList','AddrIncrement','NetworkCount','PrefixLength'), membership)))
+            self._stc.config(hIpv4NetworkBlockGroup, **
+                             dict(zip(('StartIpList', 'AddrIncrement', 'NetworkCount', 'PrefixLength'), membership)))
             self._stc.config(hIgmpGroupMembership, MulticastGroup=hIpv4Group)
 
             self._stc.config(self._hDevices[deviceName], AffiliatedPort=self._hPorts[portName])
         except:
             raise FHSTCCmdError("stc_createIGMPServer", "创建IGMP server 失败", traceback.format_exc())
-    
+
     def stc_igmpJoin(self, deviceName):
         """组播组加入"""
         try:
             fhlog.logger.info("加入组播组")
             hIgmpHostConfig = self._stc.get(self._hDevices[deviceName], "Children-IgmpHostConfig")
-            self._stc.perform("IgmpMldJoinGroups", BlockList = hIgmpHostConfig)
+            self._stc.perform("IgmpMldJoinGroups", BlockList=hIgmpHostConfig)
         except:
             raise FHSTCCmdError("stc_igmpJoin", "加入组播组 失败", traceback.format_exc())
-    
+
     def stc_igmpLeave(self, deviceName):
         """组播组离开"""
         try:
             fhlog.logger.info("离开组播组")
             hIgmpHostConfig = self._stc.get(self._hDevices[deviceName], "Children-IgmpHostConfig")
-            self._stc.perform("IgmpMldLeaveGroups", BlockList = hIgmpHostConfig)
+            self._stc.perform("IgmpMldLeaveGroups", BlockList=hIgmpHostConfig)
         except:
             raise FHSTCCmdError("stc_igmpJoin", "离开组播组 失败", traceback.format_exc())
-    
-    def stc_startDeviceARP(self, deviceName:str):
+
+    def stc_startARP(self,  objName: str):
         """
         功能：
             开启ARP
         参数：
-            deviceName(str): device名称
+            objName(str): device或者stream名称
         返回值：None
         说明：	
         """
         try:
-            fhlog.logger.info("启动ARP（%s)" % deviceName)
-            self._stc.perform("ArpNdStart", HandleList=self._hDevices[deviceName])
+            fhlog.logger.info("启动ARP（%s)" % objName)
+            if objName in self._hDevices.keys():
+                self._stc.perform("ArpNdStart", HandleList=self._hDevices[objName])
+            if objName in self._hStreamBlock.keys():
+                self._stc.perform("ArpNdStart", HandleList=self._hStreamBlock[objName])
         except:
-            raise FHSTCCmdError("stc_startDeviceARP", "开启ARP 失败", traceback.format_exc())
+            raise FHSTCCmdError("stc_startARP", "开启ARP 失败", traceback.format_exc())
 
-    def stc_stopDeviceARP(self, deviceName:str):
+    def stc_stopARP(self, objName: str):
         """
         功能：
             停止ARP
         参数：
-            deviceName(str): device名称
+            objName(str): device或者stream名称
         返回值：None
         说明：	
         """
         try:
-            fhlog.logger.info("停止ARP（%s)" % deviceName)
-            self._stc.perform("ArpNdStop", HandleList=self._hDevices[deviceName])
+            fhlog.logger.info("停止ARP（%s)" % objName)
+            if objName in self._hDevices.keys():
+                self._stc.perform("ArpNdStop", HandleList=self._hDevices[objName])
+            if objName in self._hStreamBlock.keys():
+                self._stc.perform("ArpNdStop", HandleList=self._hStreamBlock[objName])
         except:
             raise FHSTCCmdError("stc_startDeviceARP", "停止ARP 失败", traceback.format_exc())
-    
+
     def stc_getDeviceARPResult(self, deviceName):
         """
         功能：
             获取ARP解析结果
         参数：
-            
+
         返回值：None
         说明：	
         """
         try:
-            arpstate = bool("RESOLVE_DONE" == self._stc.get(self._hDevices[deviceName],"Ipv4If.GatewayMacResolveState"))
+            arpstate = bool("RESOLVE_DONE" == self._stc.get(
+                self._hDevices[deviceName],
+                "Ipv4If.GatewayMacResolveState"))
             if arpstate:
                 return self._stc.get(self._hDevices[deviceName], "Ipv4If.GatewayMac")
             else:
                 return None
         except:
             raise FHSTCCmdError("stc_getDeviceARPResult", "获取ARP解析结果", traceback.format_exc())
-
-        
