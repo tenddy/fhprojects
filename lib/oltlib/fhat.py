@@ -84,41 +84,39 @@ class FH_OLT():
     def __getattribute__(self, name):
         return super().__getattribute__(name)
 
-    def parser_fholt_logincfg(self, configfile=r'config/config.ini'):
+    def init_olt(self, **kargs):
+        """从配置文件中获取OLT信息，并初始化OLT的相关参数；
+        格式如下：
+            "OLT": {
+                "OLT_VERSION": "AN6000-17",
+                "OLT_IP": "10.182.33.185",
+                "OLT_LOGIN": {'Login:': 'GEPON', 'Password:': 'GEPON'},
+                "TELNET_PORT": 23,
+            }
         """
-        解析配置文件/etc/config.ini, 获取OLT的登录信息
-        """
-        parser = configparser.ConfigParser()
-        parser.read(os.path.join(os.getcwd(), self.configfile))
+        try:
+            self.hostip = kargs['OLT_IP']
+            self.hostport = kargs['TELNET_PORT']
+            self.login_promot = kargs['OLT_LOGIN']
 
-        self.hostip = parser.get('OLT', 'ip')
-        self.hostport = parser.get('OLT', 'port')
-        self.login_promot = {}
-        self.login_promot['Login'] = parser.get('OLT', 'username')
-        self.login_promot['Password'] = parser.get('OLT', 'password')
-        self.login_promot['User'] = parser.get('OLT', 'user')
+            if kargs['OLT_VERSION'].startswith("AN5"):
+                self.version = OLT_VERSION_5K
+            elif kargs['OLT_VERSION'].startswith("AN6"):
+                self.version = OLT_VERSION_6K
+            else:
+                raise FHATCMDError('init_olt', "获取OLT版本异常.")
 
-    def init_olt(self):
-        """初始化OLT的配置,获取OLT的登录信息"""
-        self.hostip = settings.OLT_IP
-        self.hostport = settings.TELNET_PORT
-        self.login_promot = settings.OLT_LOGIN
+        except:
+            raise FHATCMDError("init_olt", "初始化OLT失败")
 
-        if settings.OLT_VERSION.startswith("AN5"):
-            self.version = OLT_VERSION_5K
-        elif settings.OLT_VERSION.startswith("AN6"):
-            self.version = OLT_VERSION_6K
-        else:
-            raise FHATCMDError('init_olt', "获取OLT版本异常.")
-
-    def connect_olt(self, *args):
+    def connect_olt(self, **kargs):
         """
         连接OLT
         """
         connectTimes = 0
         try:
             if self.hostip is None:  # 如果没有配置hostip,默认调用setting文件中OLT的配置
-                self.init_olt()
+                self.init_olt(**kargs)
 
             while self.__tn is None and connectTimes < MAX_CONNECT_TIMES:
                 connectTimes += 1
@@ -168,7 +166,7 @@ class FH_OLT():
         """
         try:
             if self.__tn is None:
-                self.connect_olt()
+                raise FHATCMDError("sendcmdlines", "Please connect OLT before sendcmdlines.", traceback.format_exc())
             if cmdlines is not None:
                 self.append_cmdlines(cmdlines)
 
@@ -194,7 +192,7 @@ class FH_OLT():
                 time.sleep(delay)
                 logger.info(cmd_rets)
 
-            return cmd_rets        
+            return cmd_rets
         except:
             raise FHATCMDError("sendcmdlines", "send cmd Failed!", traceback.format_exc())
 
@@ -335,7 +333,7 @@ def verify_string_match(dst_str, cmp_str):
 def upgrad_olt_batch(filename, backup=False):
     for ip in range(8):
         fholt_obj = FH_OLT()
-        fholt_obj.oltip = '10.182.33.%d' % (182+ip)
+        fholt_obj.hostip = '10.182.33.%d' % (182+ip)
         fholt_obj.connect_olt()
         # backup_status = bool(fholt_obj.get_card_status(10)['EXIST'] == "YES")
         cmds = fhlib.OLT_V5.load_program(filename, backup=backup)

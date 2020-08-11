@@ -45,7 +45,7 @@ fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s
 console.setFormatter(fomatter)
 
 # File log
-filename = time.strftime('%Y%m%d%H%M%S') + '_log.txt'
+filename = time.strftime('%Y%m%d%H%M%S') + '.log'
 # logger.info(filename)
 # 判断log目录是否存在，如果不存在就新创建文件夹
 # if not os.path.isdir(settings.LOG_PATH):
