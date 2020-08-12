@@ -57,7 +57,6 @@ class FHSTC:
         self.stc_init()
 
     def __del__(self):
-        # self.stc_disconnect()
         del self._stc
 
     def stc_init(self, stc_path=None, ports=None):
@@ -90,6 +89,7 @@ class FHSTC:
         """端口仪表连接"""
         try:
             fhlog.logger.info("断开仪表连接")
+            self._stc.perform("DetachPorts", PortList="{%s}" % (' '.join(self._hPorts.values())))
             self._stc.disconnect(self._stcip)
         except:
             raise FHSTCCmdError('stc_disconnect', '断开仪表失败.', traceback.format_exc())

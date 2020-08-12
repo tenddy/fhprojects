@@ -499,7 +499,7 @@ class OLT_V4():
         except Exception as err:
             print("复位ONU命令失败")
             print(err)
-    
+
     @staticmethod
     def show_card():
         """查看业务卡信息"""
@@ -534,7 +534,7 @@ class OLT_V5():
     def load_program(
             filename, program_type='system', protocol='ftp', serverinfo=('10.182.5.213', '1', '1'),
             backup=False):
-        '''
+        """
         函数功能：升级系统版本
 
         函数参数：
@@ -551,7 +551,7 @@ class OLT_V5():
         Admin(config)
         # load program backup [system|patch|cpld|boot|fpga] <filename> [tftp|ftp|sftp]<ipaddr> {<username> <password>}*1
         Admin(config)
-        '''
+        """
         cmdlines = ['config\n']
         if backup:
             cmdlines.append("load  program backup {0} {1} {2} {3} {4} {5}\n".format(
@@ -612,16 +612,31 @@ class OLT_V5():
         return cmdlines
 
     @staticmethod
+    def showDiscovery(slotno, ponno):
+        """获取未授权ONU列表"""
+        cmdlines = []
+        cmdlines.append('show discovery 1/{s}/{p}\n'.format(s=slotno, p=ponno))
+        return cmdlines
+
+    @staticmethod
+    def showAuthorization(slotno, ponno):
+        """获取已授权ONU列表"""
+        cmdlines = []
+        cmdlines.append('show authorization 1/{s}/{p}\n'.format(s=slotno, p=ponno))
+        return cmdlines
+
+    @staticmethod
     def authorize_onu(auth_type: ONUAuthType, onu_sn, onutype, *onu):
         """
-        函数功能：授权ONU
+        函数功能：
+            授权ONU
         函数参数:
-        @auth_type(string):phy-id,logic-id,password
-        @onu_sn(string):onu physics address or logic sn
-        @onutye: Type of onu, eg. 5006-10, OTHER2
-        @*onu: (slotno, ponno, onuno)
+            @auth_type(string):phy-id,logic-id,password
+            @onu_sn(string):onu physics address or logic sn
+            @onutye: Type of onu, eg. 5006-10, OTHER2
+            @*onu: (slotno, ponno, onuno)
         参考命令行：
-        whitelist add <phy-id/logic-id/password> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
+            whitelist add <phy-id/logic-id/password> <sn> [type <onutype>] slot [slotno] pon <ponno> onuid <onuno>
 
         引用函数：
         """

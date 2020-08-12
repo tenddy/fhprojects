@@ -68,8 +68,8 @@ class FH_OLT():
         # 需要执行的命令行
         self.__cmdlines = []
 
-        # 保存命令行运行log
-        # self.__ret = ""
+        # 命令行执行log记录
+        self.__exec_cmd_ret = ""
 
         # 命令执行结果, True -- 命令行执行成功； False -- 命令行执行失败
         self.cmd_ret = True
@@ -149,8 +149,7 @@ class FH_OLT():
             else:
                 self.__cmdlines.append(item)
 
-    @log_decare
-    def sendcmdlines(self, cmdlines=None, promot=b"#", timeout=5, delay=0):
+    def sendcmdlines(self, cmdlines=None, promot=b"#", timeout=5, delay=0.1):
         """
         函数功能
             下发命令到设备
@@ -175,24 +174,26 @@ class FH_OLT():
                 self.__cmdlines.append("quit\n")
             logger.debug("send command to device...")
 
+            self.__exec_cmd_ret = ""
             while len(self.__cmdlines) != 0:
                 item = self.__cmdlines.pop(0)
                 if len(item.strip()) == 0:
                     continue
                 logger.debug("cmd:"+item)
                 self.__tn.write(bytes(item, encoding='utf8'))
-                cmd_rets = ''
+
                 while True:  # 判断执行命令是否执行完成
                     ret = self.__tn.read_until(promot, timeout)
-                    cmd_rets += ret.decode("utf-8")
+                    self.__exec_cmd_ret += ret.decode("utf-8")
                     if promot not in ret:
                         self.__tn.write(bytes(" ", encoding='utf8'))
                     else:
                         break
                 time.sleep(delay)
-                logger.info(cmd_rets)
 
-            return cmd_rets
+            logger.info(self.__exec_cmd_ret)
+
+            return self.__exec_cmd_ret
         except:
             raise FHATCMDError("sendcmdlines", "send cmd Failed!", traceback.format_exc())
 
@@ -209,7 +210,7 @@ class FH_OLT():
             检查返回的结果中是否存在err_str中的字符串；
             如果不存在，命令执行成功，返回True；否则命令执行失败，返回False
         """
-        rets = self.__ret.lower()
+        rets = self.__exec_cmd_ret.lower()
         self.cmd_ret = not verify_string_match(rets, err_str)
         return self.cmd_ret
 
@@ -238,6 +239,59 @@ class FH_OLT():
         self.disconnet_olt()
 
         return version_info
+
+    def get_discovery_onu(self, slotno, ponno):
+        """
+        功能：
+            获取未授权列表
+        参数：
+            @slotno：槽位号
+            @ponno：pon口号
+        返回值：dict()
+            返回未授权ONU信息，格式为{"PhyId":("No", "OnuType", "PhyId", "PhyPwd", "LogicId", "LogicPwd", "Why")}
+        """
+        ret = self.sendcmdlines(fhlib.OLT_V5.showDiscovery(slotno, ponno))
+        ret_lines = ret.split("\r\n")
+        p_len = list(map(len, ret_lines[4].split()))  # 获取占位长度
+        unauthList = ret_lines[5:-4]  # 未授权ONU列表
+        # title = ("No", "OnuType", "PhyId", "PhyPwd", "LogicId", "LogicPwd", "Why")
+        unauthONU = dict()
+        for item in unauthList:
+            onuInfo = []
+            start = end = 0
+            for index in p_len:
+                end = start + index
+                onuInfo.append(item[start:end].rstrip())
+                start = end + 1
+            unauthONU[onuInfo[2]] = tuple(onuInfo)
+        return unauthONU
+
+    def get_authorization_onu(self, slotno, ponno):
+        """
+        功能：
+            获取未授权列表
+        参数：
+            @slotno：槽位号
+            @ponno：pon口号
+        返回值：dict()
+            返回未授权ONU信息，格式为{"PhyId":("No", "OnuType", "PhyId", "PhyPwd", "LogicId", "LogicPwd", "Why")}
+            ("Slot","Pon","Onu","OnuType","ST","Lic", "OST", "PhyId","PhyPwd","LogicId","LogicPwd") 
+        """
+        ret = self.sendcmdlines(fhlib.OLT_V5.showAuthorization(slotno, ponno))
+        ret_lines = ret.split("\r\n")
+        # print(ret_lines)
+        p_len = list(map(len, ret_lines[8].split()))  # 获取占位长度
+        authList = ret_lines[9:-3]  # 未授权ONU列表
+        authONU = dict()
+        for item in authList:
+            onuInfo = []
+            start = end = 0
+            for index in p_len:
+                end = start + index
+                onuInfo.append(item[start:end].rstrip())
+                start = end + 1
+            authONU[onuInfo[7]] = tuple(onuInfo)
+        return authONU
 
     # def get_cmds_execute(self, cmds_func, *args, **kargs):
     #     """ 获取返回状态信息 """

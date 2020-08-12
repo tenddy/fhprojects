@@ -56,18 +56,20 @@ SETTINGS = {
     # ONU信息
     "ONU1": {
         'ONUID': (4, 8, 65),
-        'ONUTYPE': '',
-        'PHYSN': '',
-        'SN': '',
+        'ONUTYPE': '5506-02-F ',
+        'PHYID': 'FHTT0274ab18',
+        'PHYPWD': '',
+        'LOGICID': '',
         'PASSWORD': ''
     },
 
     "ONU2": {
-        'ONUID': (4, 8, 1),
-        'ONUTYPE': '',
-        'PHYSN': '',
-        'SN': '',
-        'PASSWORD': ''
+        'ONUID': (4, 8, 128),
+        'ONUTYPE': '5506-02-B',
+        'PHYID': 'FHTT026e9a38',
+        'PHYPWD': '',
+        'LOGICID': 'fiberhome5',
+        'PASSWORD': 'fiberhome5'
     },
 
 }
