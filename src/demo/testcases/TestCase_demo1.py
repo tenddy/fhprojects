@@ -306,17 +306,21 @@ def dhcp_test():
 
 def PPPoe_test():
     logger.info("PPPoE test...")
-    logger.info("创建pppoE device...")
-    fhstc.stc_createPPPoEv4Client('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(
-        1000, 1),  count=1, ipv4=("192.18.10.1", "192.18.10.1"))
-    fhstc.stc_createPPPoEv4Server(
-        'uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(1000, 1),
-        count=1, ipv4=("192.168.20.1", "192.168.20.1"),
-        pool=("192.168.20.1", '192.168.20.2', 24))
-    fhstc.stc_createBoundTraffic("pppoe_client", 'client', 'server', 'pppoe')
-    fhstc.stc_createBoundTraffic("pppoe_server", 'server', 'client', 'pppoe')
-    fhstc.stc_apply()
-    fhstc.stc_saveAsXML("pppoe.xml")
+    Load = False
+    if Load:
+        logger.info("创建pppoE device...")
+        fhstc.stc_createPPPoEv4Client('onu1', 'client', srcMAC="00:00:00:00:00:02", cvlan=(
+            1000, 1),  count=1, ipv4=("192.18.10.1", "192.18.10.1"))
+        fhstc.stc_createPPPoEv4Server(
+            'uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(1000, 1),
+            count=1, ipv4=("192.168.20.1", "192.168.20.1"),
+            pool=("192.168.20.1", '192.168.20.2', 24))
+        fhstc.stc_createBoundTraffic("pppoe_client", 'client', 'server', 'pppoe')
+        fhstc.stc_createBoundTraffic("pppoe_server", 'server', 'client', 'pppoe')
+        fhstc.stc_apply()
+        fhstc.stc_saveAsXML("pppoe.xml")
+    else:
+        fhstc.stc_loadFromXml("pppoe.xml")
 
     # tc_createPPPoEdevice()
     # tc_capture_stop()
@@ -357,5 +361,5 @@ if __name__ == "__main__":
             fhstc.stc_loadFromXml('test.xml')
     else:
         logger.info("测试倒计时功能")
-        waitTime(30)
+        waitTime(5)
         tc_traffic_disconnect()

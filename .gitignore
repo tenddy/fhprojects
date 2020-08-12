@@ -120,3 +120,6 @@ instruments/
 
 #notebook
 .ipynb
+
+# csv
+*.csv
