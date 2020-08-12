@@ -178,6 +178,7 @@ class FHSTC:
     def stc_AttachPorts(self, **kargs):
         """绑定端口属性，并连接端口"""
         try:
+            fhlog.logger.info("占用仪表端口...")
             self._stc.perform("AttachPorts", AutoConnect="True", **kargs)
         except Exception as err:
             raise FHSTCCmdError('stc_autoAttachPorts', '绑定端口失败', traceback.format_exc())
@@ -1190,14 +1191,29 @@ class FHSTC:
         函数参数：
             @deviceName(str): device名称
         返回值:
-            dict(), 格式为 {'sessionsup': '4', 'state': 'CONNECTED', 'connectedsuccesscount': '4', 'failedconnectcount': '0', 'sessions': '4'}
+            dict(), 格式为 
+            {'parent': 'pppoeclientblockconfig1', 'Name': '{}', 'PppoeSessionId': '1', 'PeerMacAddr': '00:10:94:01:66:0a', 
+            'TxPadtCount': '0', 'RxPadtCount': '0', 'TxPadiCount': '1', 'RxPadoCount': '1', 'TxPadrCount': '1', 'RxPadsCount': '1', 
+            'RxPadiCount': '0', 'TxPadoCount': '0', 'RxPadrCount': '0', 'TxPadsCount': '0', 'MacAddr': '00:10:94:01:66:08', 
+            'VlanId': '1002', 'InnerVlanId': '1002', 'SessionState': 'CONNECTED', 'Ipv4CpSessionState': 'CONNECTED', 
+            'Ipv6CpSessionState': 'IDLE', 'FailureCode': 'NULL', 'Ipv4CpFailureCode': 'NULL', 'Ipv6CpFailureCode': 'NULL', 
+            'Ipv4Addr': '192.0.1.0', 'PeerIpv4Addr': '192.85.1.3', 'Ipv6Addr': '::', 'Ipv6GlobalAddr': '::', 
+            'Ipv6GlobalAddrResolveState': 'NONE', 'PeerIpv6Addr': '::', 'SetupTime': '993', 'AttemptedCount': '1', 'RetryCount': '0',
+            'ConnectedSuccessCount': '1', 'DisconnectedSuccessCount': '0', 'FailedConnectCount': '0', 'FailedDisconnectCount': '0', 
+            'TxLcpConfigRequestCount': '1', 'RxLcpConfigRequestCount': '1', 'TxLcpConfigRejectCount': '0', 'RxLcpConfigRejectCount': '0', 
+            'TxLcpConfigAckCount': '1', 'RxLcpConfigAckCount': '1', 'TxLcpConfigNakCount': '0', 'RxLcpConfigNakCount': '0', 
+            'TxLcpTermRequestCount': '0', 'RxLcpTermRequestCount': '0', 'TxLcpTermAckCount': '0', 'RxLcpTermAckCount': '0',
+            'TxLcpEchoRequestCount': '0', 'RxLcpEchoRequestCount': '0', 'TxLcpEchoReplyCount': '0', 'RxLcpEchoReplyCount': '0', 
+            'TxIpcpCount': '3', 'RxIpcpCount': '3', 'TxIpv6cpCount': '0', 'RxIpv6cpCount': '0', 'TxPapCount': '0', 'RxPapCount': '0',
+            'TxChapCount': '1', 'RxChapCount': '2', 'Active': 'true'}
         """
         try:
             hPPPoeServerBlockConfig = self._stc.get(self._hDevices[deviceName], 'Children-PPPoeServerBlockConfig')
             fhlog.logger.debug(hPPPoeServerBlockConfig)
-            pppoeResultCurrent = self._stc.get(hPPPoeServerBlockConfig, "children-PppoeServerBlockResults")
-            pppoeResult = self._stc.get(pppoeResultCurrent, *("SessionsUp", "State",
-                                                              "ConnectedSuccessCount", "FailedConnectCount", "Sessions"))
+            self._stc.perform("PppoxSessionInfo", blockList=hPPPoeServerBlockConfig)
+            hSessionResult = self._stc.get(hPPPoeServerBlockConfig, "children-PppoeSessionResults")
+            fhlog.logger.debug(hSessionResult)
+            pppoeResult = self._stc.get(hSessionResult)
             pppoeResult = pppoeResult.split()
             key = list(map(lambda x: x[1:], pppoeResult[0:-1:2]))
             value = pppoeResult[1:len(pppoeResult):2]
@@ -1212,15 +1228,31 @@ class FHSTC:
         函数参数：
             @deviceName(str): device名称
         返回值:
-            dict(), 格式为 {'sessionsup': '4', 'state': 'CONNECTED', 'connectedsuccesscount': '4', 'failedconnectcount': '0', 'sessions': '4'}
+            dict(), 格式为
+            {'parent': 'pppoeclientblockconfig1', 'Name': '{}', 'PppoeSessionId': '1', 'PeerMacAddr': '00:10:94:01:66:0a', 
+            'TxPadtCount': '0', 'RxPadtCount': '0', 'TxPadiCount': '1', 'RxPadoCount': '1', 'TxPadrCount': '1', 'RxPadsCount': '1', 
+            'RxPadiCount': '0', 'TxPadoCount': '0', 'RxPadrCount': '0', 'TxPadsCount': '0', 'MacAddr': '00:10:94:01:66:08', 
+            'VlanId': '1002', 'InnerVlanId': '1002', 'SessionState': 'CONNECTED', 'Ipv4CpSessionState': 'CONNECTED', 
+            'Ipv6CpSessionState': 'IDLE', 'FailureCode': 'NULL', 'Ipv4CpFailureCode': 'NULL', 'Ipv6CpFailureCode': 'NULL', 
+            'Ipv4Addr': '192.0.1.0', 'PeerIpv4Addr': '192.85.1.3', 'Ipv6Addr': '::', 'Ipv6GlobalAddr': '::', 
+            'Ipv6GlobalAddrResolveState': 'NONE', 'PeerIpv6Addr': '::', 'SetupTime': '993', 'AttemptedCount': '1', 'RetryCount': '0',
+            'ConnectedSuccessCount': '1', 'DisconnectedSuccessCount': '0', 'FailedConnectCount': '0', 'FailedDisconnectCount': '0', 
+            'TxLcpConfigRequestCount': '1', 'RxLcpConfigRequestCount': '1', 'TxLcpConfigRejectCount': '0', 'RxLcpConfigRejectCount': '0', 
+            'TxLcpConfigAckCount': '1', 'RxLcpConfigAckCount': '1', 'TxLcpConfigNakCount': '0', 'RxLcpConfigNakCount': '0', 
+            'TxLcpTermRequestCount': '0', 'RxLcpTermRequestCount': '0', 'TxLcpTermAckCount': '0', 'RxLcpTermAckCount': '0',
+            'TxLcpEchoRequestCount': '0', 'RxLcpEchoRequestCount': '0', 'TxLcpEchoReplyCount': '0', 'RxLcpEchoReplyCount': '0', 
+            'TxIpcpCount': '3', 'RxIpcpCount': '3', 'TxIpv6cpCount': '0', 'RxIpv6cpCount': '0', 'TxPapCount': '0', 'RxPapCount': '0',
+            'TxChapCount': '1', 'RxChapCount': '2', 'Active': 'true'}
         """
         try:
             fhlog.logger.info("获取PPPoE客户端连接状态")
             hPPPoeClientBlockConfig = self._stc.get(self._hDevices[deviceName], 'Children-PPPoeClientBlockConfig')
             fhlog.logger.debug(hPPPoeClientBlockConfig)
-            pppoeResultCurrent = self._stc.get(hPPPoeClientBlockConfig, "children-PppoeClientBlockResults")
-            pppoeResult = self._stc.get(pppoeResultCurrent, *("SessionsUp", "State",
-                                                              "ConnectedSuccessCount", "FailedConnectCount", "Sessions"))
+            self._stc.perform("PppoxSessionInfo", blockList=hPPPoeClientBlockConfig)
+            hSessionResult = self._stc.get(hPPPoeClientBlockConfig, "children-PppoeSessionResults")
+            fhlog.logger.debug(hSessionResult)
+            pppoeResult = self._stc.get(hSessionResult)
+            fhlog.logger.debug(pppoeResult)
             pppoeResult = pppoeResult.split()
             key = list(map(lambda x: x[1:], pppoeResult[0:-1:2]))
             value = pppoeResult[1:len(pppoeResult):2]

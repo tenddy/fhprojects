@@ -757,12 +757,12 @@ class OLT_V5():
         """
         cmdlines = []
         if len(lan_service) < ser_count:
-            print("Error: service count(%d) > lan_service(%d)" % ser_count, len(lan_service))
+            print("Error: service count(%d) > lan_service(%d)" % (ser_count, len(lan_service)))
             return cmdlines
 
         onuno, port = onu_port[2:]
         # cmdlines.append('config\n')
-        # cmdlines.append('interface pon 1/%d/%d\n' % (slotno, ponno))
+        cmdlines.append('interface pon 1/%d/%d\n' % (onu_port[:2]))
         cmdlines.append('onu port vlan {0} eth {1} service count {2}\n'.format(onuno, port, ser_count))
         for index in range(ser_count):
             # cvlan service
@@ -780,6 +780,7 @@ class OLT_V5():
                 cmdlines.append(
                     'onu port vlan {0} eth {1} service {2} qinq {3} priority {4} tpid 33024 vid {5} {6} {7}\n'.format(
                         onuno, port, index + 1, *lan_service[index]['qinq']))
+        cmdlines.append('quit\n')
 
         return cmdlines
 

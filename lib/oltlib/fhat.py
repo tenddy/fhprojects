@@ -12,10 +12,10 @@
 '''
 
 import time
-import configparser
 import os
 import sys
 import traceback
+import re
 
 try:
     # print("cwd:", os.getcwd())
@@ -55,7 +55,7 @@ class FHATCMDError(FHATException):
 
 
 class FH_OLT():
-    def __init__(self, version=OLT_VERSION_6K):
+    def __init__(self, version=OLT_VERSION_6K, oltinfo=None):
         self.hostip = None  # IP地址
         self.hostport = None  # 连接设备端口号
         self.login_promot = dict()  # 登录提示符
@@ -165,7 +165,9 @@ class FH_OLT():
         """
         try:
             if self.__tn is None:
-                raise FHATCMDError("sendcmdlines", "Please connect OLT before sendcmdlines.", traceback.format_exc())
+                self.connect_olt()
+                # raise FHATCMDError("sendcmdlines", "Please connect OLT before sendcmdlines.", traceback.format_exc()
+
             if cmdlines is not None:
                 self.append_cmdlines(cmdlines)
 
@@ -192,7 +194,6 @@ class FH_OLT():
                 time.sleep(delay)
 
             logger.info(self.__exec_cmd_ret)
-
             return self.__exec_cmd_ret
         except:
             raise FHATCMDError("sendcmdlines", "send cmd Failed!", traceback.format_exc())
@@ -264,6 +265,7 @@ class FH_OLT():
                 onuInfo.append(item[start:end].rstrip())
                 start = end + 1
             unauthONU[onuInfo[2]] = tuple(onuInfo)
+        self.disconnet_olt()
         return unauthONU
 
     def get_authorization_onu(self, slotno, ponno):
@@ -277,21 +279,31 @@ class FH_OLT():
             返回未授权ONU信息，格式为{"PhyId":("No", "OnuType", "PhyId", "PhyPwd", "LogicId", "LogicPwd", "Why")}
             ("Slot","Pon","Onu","OnuType","ST","Lic", "OST", "PhyId","PhyPwd","LogicId","LogicPwd") 
         """
-        ret = self.sendcmdlines(fhlib.OLT_V5.showAuthorization(slotno, ponno))
-        ret_lines = ret.split("\r\n")
-        # print(ret_lines)
-        p_len = list(map(len, ret_lines[8].split()))  # 获取占位长度
-        authList = ret_lines[9:-3]  # 未授权ONU列表
-        authONU = dict()
-        for item in authList:
-            onuInfo = []
-            start = end = 0
-            for index in p_len:
-                end = start + index
-                onuInfo.append(item[start:end].rstrip())
-                start = end + 1
-            authONU[onuInfo[7]] = tuple(onuInfo)
-        return authONU
+        try:
+            ret = self.sendcmdlines(fhlib.OLT_V5.showAuthorization(slotno, ponno))
+            authnum = re.findall(r'Total ITEM = (\d*)', ret)[0]
+            if authnum == "0":    # 如果已授权ONU列表为空，则直接返回空字典
+                return {}
+
+            ret_lines = ret.split("\r\n")
+            # print(ret_lines)
+            p_len = list(map(len, ret_lines[8].split()))  # 获取占位长度
+            authList = ret_lines[9:-3]  # 未授权ONU列表
+            # print(authList)
+            authONU = {}
+            for item in authList:
+                onuInfo = []
+                start = end = 0
+                for index in p_len:
+                    end = start + index
+                    onuInfo.append(item[start:end].rstrip())
+                    start = end + 1
+                authONU[onuInfo[7]] = tuple(onuInfo)
+            self.disconnet_olt()
+            return authONU
+        except:
+            logger.info("获取已授权ONU失败")
+            return None
 
     # def get_cmds_execute(self, cmds_func, *args, **kargs):
     #     """ 获取返回状态信息 """
