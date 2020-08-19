@@ -2,7 +2,7 @@
 # coding=UTF-8
 
 # global Debug
-DEBUG = False
+DEBUG = True
 
 TESTCASE_PATH = ""
 CAP_PATH = ""

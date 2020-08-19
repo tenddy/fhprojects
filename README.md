@@ -18,5 +18,15 @@ F:\FHAT\fhprojects>
 │      ├─parameters （其他配置文件）
 │      └─testcases （测试用例）
 
+# 项目依赖
+
+1. [pyshark](https://github.com/KimiNewt/pyshark/) 
+
+   安装pyshark时, 可能提示需要按照lxml，需要根据python版本，安装相应的依赖包。
+
+   下载对应的*.whl文件，[Unofficial Windows Binaries for Python Extension Packages](https://www.lfd.uci.edu/~gohlke/pythonlibs/) 
+
+   
+
 # 使用说明
 

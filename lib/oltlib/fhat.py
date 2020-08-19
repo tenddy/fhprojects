@@ -202,7 +202,6 @@ class FH_OLT():
         """
         函数功能：
             校验命令执行是否成功;
-
         函数参数：
             @para err_str: 字符串
             校验匹配的字符串
@@ -213,6 +212,9 @@ class FH_OLT():
         """
         rets = self.__exec_cmd_ret.lower()
         self.cmd_ret = not verify_string_match(rets, err_str)
+        if not self.cmd_ret:
+            logger.error("命令执行失败")
+
         return self.cmd_ret
 
     def get_card_status(self, slotno):
@@ -276,8 +278,7 @@ class FH_OLT():
             @slotno：槽位号
             @ponno：pon口号
         返回值：dict()
-            返回未授权ONU信息，格式为{"PhyId":("No", "OnuType", "PhyId", "PhyPwd", "LogicId", "LogicPwd", "Why")}
-            ("Slot","Pon","Onu","OnuType","ST","Lic", "OST", "PhyId","PhyPwd","LogicId","LogicPwd") 
+            返回已授权ONU信息，格式为{"PhyId":("Slot","Pon","Onu","OnuType","ST","Lic", "OST", "PhyId","PhyPwd","LogicId","LogicPwd")}
         """
         try:
             ret = self.sendcmdlines(fhlib.OLT_V5.showAuthorization(slotno, ponno))

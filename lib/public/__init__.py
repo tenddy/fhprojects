@@ -10,3 +10,7 @@
 @LastEditors: Teddy.tu
 @LastEditTime: 2020-07-14 09:53:29
 '''
+import os
+import sys
+# sys.path.append(os.path.dirname(__file__))
+# print(sys.path)

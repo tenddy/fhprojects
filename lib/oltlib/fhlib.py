@@ -737,7 +737,7 @@ class OLT_V5():
         函数参数:
             @onu_port: (slotno, ponno, onuno, port)
             @ser_count : ONU端口业务数量，0表示删除端口业务
-            @lan_service: ({'cvlan':(cvlan_mode, ccos, cvlan), 'translate':(tflag, tcos, tvid), 'qinq':(sflag, scos, svlan, qinqprf, svlan_service)},)
+            @lan_service: ({'cvlan':(cvlan_mode, cvlan, ccos), 'translate':(tflag, tvlan, tcos), 'qinq':(sflag, svlan, scos, qinqprf, svlan_service), 'multicast':True},)
 
         参考命令行:
             Admin(config-pon)#
@@ -766,22 +766,109 @@ class OLT_V5():
         cmdlines.append('onu port vlan {0} eth {1} service count {2}\n'.format(onuno, port, ser_count))
         for index in range(ser_count):
             # cvlan service
-            cmdlines.append('onu port vlan {0} eth {1} service {2} {3} priority {4} tpid 33024 vid {5}\n'.format(
+            cmdlines.append('onu port vlan {0} eth {1} service {2} {3} priority {5} tpid 33024 vid {4}\n'.format(
                 onuno, port, index + 1, *lan_service[index]['cvlan']))
 
             # translate
             if 'translate' in lan_service[index]:
                 cmdlines.append(
-                    'onu port vlan {0} eth {1} service {2} translate {3} priority {4} tpid 33024 vid {5}\n'.format(
+                    'onu port vlan {0} eth {1} service {2} translate {3} priority {5} tpid 33024 vid {4}\n'.format(
                         onuno, port, index + 1, *lan_service[index]['translate']))
 
             # qinq
             if 'qinq' in lan_service[index]:
                 cmdlines.append(
-                    'onu port vlan {0} eth {1} service {2} qinq {3} priority {4} tpid 33024 vid {5} {6} {7}\n'.format(
+                    'onu port vlan {0} eth {1} service {2} qinq {3} priority {5} tpid 33024 vid {4} {6} {7}\n'.format(
                         onuno, port, index + 1, *lan_service[index]['qinq']))
+
+            # multicast
+            if 'multicast' in lan_service[index] and lan_service[index]['multicast']:
+                cmdlines.append('onu port vlan {0} eth {1} service {2} type multicast\n'.format(
+                    onuno, port, index + 1))
+
         cmdlines.append('quit\n')
 
+        return cmdlines
+
+    @staticmethod
+    def onu_wan_service(onu, index, cvlan, dsp, **kargs):
+        """
+        函数功能： 配置ONU wan业务
+        函数参数：
+            @onu(tuple): ONU信息, (slotno, ponno, onuid)
+            @index(int): WAN业务序号， 
+            @cvlan(tuple): cvlan和cos值，(vlan, cos)
+            @dsp(dict): 业务类型， 如下配置方法，三选一
+                      {'mode':'dhcp', 'remoteid':''}
+                      {'mode':'static', 'ip': '', 'mask':'', 'gate':'', 'dns_m': '', 'dns_s': ''} 
+                      {'mode':'pppoe', 'proxy':'enable|disable', 'username':'', 'password':'', 'name':'', 'auth':'auto|payload|manual'}  
+
+            @**kargs(dict): 
+                mode: tr069|internet|tr069-internet|other|multi|voip|voip-internet|iptv|radius|radius-internet|unicast-iptv|multicast-iptv
+                type: bridge|route
+                nat: enable|disable
+                qos: enable|disable
+                vlanmode: {'mode':'tag|transparent', 'tvlan':'', 'tvid':'', 'tcos':'')} 
+                qinq, ([enable|disable], stpid,svlan,scos)
+                service_type: NONE|DATA|IPTV|MANAGEMENT|VOIP
+                upnp_switch: enable|disable
+                entries: ('fe1', 'ssid2')  fe1|fe2|fe3|fe4|ssid1|ssid2|ssid3|ssid4 ssid5|ssid6|ssid7|ssid8|10glan
+
+                ipv6: {'ip-stack-mode': 'ipv4|ipv4&ipv6|ipv6', 'ipv6-src-type': 'ipv6', 'prefix-src-type': 'delegate' }
+        返回值: None
+        使用说明:
+        onu wan-cfg 1 ind 1 mode inter ty r 1000 3 nat en qos dis dsp pppoe pro dis fiberhome key:85<9,6/19 null auto entries 1 ssid1  
+        onu ipv6-wan-cfg 1 ind 1 ip-stack-mode ipv4 ipv6-src-type dhcpv6 prefix-src-type delegate 
+
+        """
+        cmdlines = []
+        slotno, ponno, onuid = onu
+        cmdlines.append('interface pon 1/%d/%d\n' % (onu[:2]))
+        mode = kargs['mode'] if "mode" in kargs.keys() else 'internet'
+        s_type = kargs['type'] if 'type' in kargs.keys() else "route"
+        nat = kargs['nat'] if 'nat' in kargs.keys() else 'enable'
+        qos = kargs['qos'] if 'qos' in kargs.keys() else 'disable'
+        wan_cmd = "onu wan-cfg {o} index {ind} mode {m} type {t} {cvlan} {ccos} nat {n} qos {q} ".format(
+            o=onu[2], ind=index, m=mode, t=s_type, cvlan=cvlan[0], ccos=cvlan[1], n=nat, q=qos)
+
+        if 'vlanmode' in kargs.keys():
+            wan_cmd += 'vlanmode {mode} tvlan {tvlan} {tvid} {tcos} '.format(**kargs['vlanmode'])
+
+        if 'qinq' in kargs.keys():
+            wan_cmd += 'qinq {en} {tpid} {svlan} {scos}'.format(dict(zip('en', 'tpid', 'svlan', 'sco'), kargs['qinq']))
+
+        # dsp
+        if dsp['mode'] == 'dhcp':
+            if 'remoteid' in dsp.keys():
+                wan_cmd += 'dsp dhcp dhcp-remoteid {} '.format(dsp['remoteid'])
+            else:
+                wan_cmd += 'dsp dhcp '
+
+        if dsp['mode'] == 'static':
+            master = dsp['dns_m'] if 'dns_m' in dsp.keys() else '0.0.0.0'
+            slave = dsp['dns_s'] if 'dns_s' in dsp.keys() else '0.0.0.0'
+            wan_cmd += 'dsp static ip {ip} mask {mask} gate {gate} master {dns_m} slave {dns_s} '.format(
+                ip=dsp['ip'], mask=dsp['mask'], gate=dsp['gate'], dns_m=master, dns_s=slave)
+
+        if dsp['mode'] == 'pppoe':
+            proxy = dsp['proxy'] if 'proxy' in dsp.keys() else 'disable'
+            name = dsp['name'] if 'name' in dsp.keys() else 'null'
+            auth = dsp['auth'] if 'auth' in dsp.keys() else 'auto'
+            wan_cmd += 'dsp pppoe proxy {p} {user} {pwd} {name} {auth} '.format(
+                p=proxy, user=dsp['username'], pwd=dsp['password'], name=name, auth=auth)
+
+        if 'service_type' in kargs.keys():
+            wan_cmd += 'service-type {} '.format(kargs['service_type'])
+
+        if 'upnp_switch' in kargs.keys():
+            wan_cmd += 'upnp_switch {} '.format(kargs['upnp_switch'])
+
+        entries = kargs['entries'] if 'entries' in kargs.keys() else('fe1',)
+        entries = (entries,) if isinstance(entries, str) else entries
+        wan_cmd += "entries {0} {1}\n".format(len(entries), " ".join(entries))
+
+        cmdlines.append(wan_cmd)
+        cmdlines.append('quit\n')
         return cmdlines
 
     @staticmethod

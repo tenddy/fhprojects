@@ -40,20 +40,23 @@ logger.setLevel(_log_level)
 # console
 console = logging.StreamHandler()
 console.setLevel(_log_level)
-fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
-fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
+if settings.DEBUG:
+    fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
+else:
+    fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
+# fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
 console.setFormatter(fomatter)
 
 # File log
 filename = time.strftime('%Y%m%d%H%M%S') + '.log'
-# logger.info(filename)
-# 判断log目录是否存在，如果不存在就新创建文件夹
-# if not os.path.isdir(settings.LOG_PATH):
-#     os.mkdir(settings.LOG_PATH)
+
 file_log = logging.FileHandler(os.path.join(settings.LOG_PATH, filename), encoding='utf-8')
+# file_log = logging.FileHandler(settings.LOG_PATH, encoding='utf-8')
 file_log.setLevel(_log_level)
-# fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(filename)s:%(message)s')
-fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
+# if settings.DEBUG:
+#     fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(filename)s:%(message)s')
+# else:
+#     fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
 file_log.setFormatter(fomatter)
 
 

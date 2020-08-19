@@ -313,8 +313,8 @@ def PPPoe_test():
             1000, 1),  count=1, ipv4=("192.18.10.1", "192.18.10.1"))
         fhstc.stc_createPPPoEv4Server(
             'uplink', 'server', srcMAC="00:00:00:00:00:01", cvlan=(1000, 1),
-            count=1, ipv4=("192.168.20.1", "192.168.20.1"),
-            pool=("192.168.20.1", '192.168.20.2', 24))
+            count=1, ipv4=("192.168.20.1", "192.168.20.2"),
+            pool=('192.168.20.2', 24))
         fhstc.stc_createBoundTraffic("pppoe_client", 'client', 'server', 'pppoe')
         fhstc.stc_createBoundTraffic("pppoe_server", 'server', 'client', 'pppoe')
         fhstc.stc_apply()
