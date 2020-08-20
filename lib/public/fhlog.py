@@ -20,20 +20,10 @@ import traceback
 import time
 import random
 from lib import settings
-# CRITICAL = 0
-# ERROR = 1
-# WARNING = 2
-# INFO = 3
-# DEBUG = 4
 
-# LEVEL = (logging.CRITICAL, logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG)
-
-# LEVEL = {'CRITICAL': logging.Level, 'ERROR': logging.ERROR,
-#          'WARNING': logging.WARNING, 'INFO': logging.INFO, 'DEBUG': logging.DEBUG}
 
 _log_level = logging.DEBUG if settings.DEBUG else logging.INFO
 
-# logger = logging.getLogger(time.strftime('%Y%m%d%H%M%S') + 'log')
 logger = logging.getLogger(__name__)
 logger.setLevel(_log_level)
 
@@ -44,14 +34,11 @@ if settings.DEBUG:
     fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
 else:
     fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(message)s')
-# fomatter = logging.Formatter('%(asctime)s-%(levelname)s:%(filename)s:%(message)s')
 console.setFormatter(fomatter)
 
 # File log
 filename = time.strftime('%Y%m%d%H%M%S') + '.log'
-
 file_log = logging.FileHandler(os.path.join(settings.LOG_PATH, filename), encoding='utf-8')
-# file_log = logging.FileHandler(settings.LOG_PATH, encoding='utf-8')
 file_log.setLevel(_log_level)
 # if settings.DEBUG:
 #     fomatter = logging.Formatter('%(asctime)s-[%(levelname)s]:%(filename)s:%(message)s')
@@ -62,16 +49,6 @@ file_log.setFormatter(fomatter)
 
 logger.addHandler(file_log)
 logger.addHandler(console)
-
-
-# console.close()
-# file_log.close()
-
-# for f in os.listdir(settings.LOG_PATH):
-#     if os.path.getsize(os.path.join(settings.LOG_PATH, f)) == 0:
-#         os.remove(os.path.join(settings.LOG_PATH, f))
-
-# print(os.listdir(settings.LOG_PATH))
 
 
 def log_decare(func):

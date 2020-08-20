@@ -72,25 +72,40 @@ def olt_init():
     global TC_RET
     slotno = SETTINGS['SLOTNO']
     ponno = SETTINGS['PONNO']
-    # 授权待测试ONU，如果已经授权将不进行授权，只更新onuid
-    logger.info("授权待测ONU")
+    #  去授权ONU
+    logger.info("去授权ONU")
     oltobj.connect_olt()
     authONUlist = oltobj.get_authorization_onu(slotno, ponno)
-    authONUIDs = []
-    for sn in authONUlist.keys():
-        authONUIDs.append(int(authONUlist[sn][2]))
+    for key in authONUlist.keys():
+        oltobj.sendcmdlines(AN6K.unauth_onu(ONUAuthType.PHYID, authONUlist[key][0], authONUlist[key][1], key))
+        if TC_RET:
+            TC_RET = oltobj.verify_cmds_exec()
+
+    # 授权待测试ONU，如果已经授权将不进行授权，只更新onuid
+    logger.info("授权待测ONU")
+    # oltobj.connect_olt()
+    # authONUlist = oltobj.get_authorization_onu(slotno, ponno)
+    # authONUIDs = []
+    # for sn in authONUlist.keys():
+    #     authONUIDs.append(int(authONUlist[sn][2]))
     # 授权待测试ONU
+    # for item in SETTINGS['ONU']:
+    #     phyid = item['PHYID']
+    #     onuid = int(item['ONUID'])
+    #     if phyid not in authONUlist.keys():
+    #         while onuid in authONUIDs:
+    #             onuid = random.randint(1, 128)  # 如果ONU id冲突，将随机分配一个未被占用的onuid
+    #         oltobj.sendcmdlines(
+    #             AN6K.authorize_onu(
+    #                 ONUAuthType.PHYID, phyid, item['ONUTYPE'],
+    #                 *(slotno, ponno, onuid)))
+    #         waitTime(5)
+
     for item in SETTINGS['ONU']:
         phyid = item['PHYID']
         onuid = int(item['ONUID'])
-        if phyid not in authONUlist.keys():
-            while onuid in authONUIDs:
-                onuid = random.randint(1, 128)  # 如果ONU id冲突，将随机分配一个未被占用的onuid
-            oltobj.sendcmdlines(
-                AN6K.authorize_onu(
-                    ONUAuthType.PHYID, phyid, item['ONUTYPE'],
-                    *(slotno, ponno, onuid)))
-            waitTime(5)
+        oltobj.sendcmdlines(AN6K.authorize_onu(ONUAuthType.PHYID, phyid, item['ONUTYPE'], *(slotno, ponno, onuid)))
+        # waitTime(5)
 
     oltobj.disconnet_olt()
 
@@ -98,7 +113,7 @@ def olt_init():
     logger.info("验证待测试ONU是否可正常上线")
     online = 1
     while online > 0:
-        online = len(SETTINGS['ONU'])
+        online = len(SETTINGS['ONU'])   # 待测ONU个数
         oltobj.connect_olt()
         authONUlist = oltobj.get_authorization_onu(slotno, ponno)
         oltobj.disconnet_olt()
@@ -110,7 +125,6 @@ def olt_init():
                     online -= 1
                 else:
                     logger.error("ONU(%s)授权成功,无法上线" % item['PHYID'])
-                    TC_RET = False
                     waitTime(30)
                     break
             else:
@@ -119,7 +133,7 @@ def olt_init():
                 online = 0
                 break
     # logger.info(SETTINGS['ONU'])
-    return TC_RET
+    return (TC_RET and bool(online == 0))
 
 
 def main():
@@ -131,10 +145,10 @@ def main():
         # 仪表初始化
         stc_init(False)
         # OLT初始化
-        olt_init()
+        # olt_init()
 
         # 业务模型
-        ser_type = 'm1'
+        ser_type = 'm3'
         step = 0
         slotno = SETTINGS['SLOTNO']
         ponno = SETTINGS['PONNO']
@@ -157,6 +171,7 @@ def main():
                     internet['vlan']['svlan'] = ((svlan[0] + slotno + ponno + onuid) % 4096, random.randint(0, 7))
                     vlanlists += ",%d" % internet['vlan']['svlan'][0]
 
+            # igmp vlan配置
             iptv_service = MODEL[ser_type]['iptv']
             mvlan = iptv_service['multicast']['vlan']['cvlan'][0]  # 组播VLAN
             if 'tvlan' in iptv_service['multicast']['vlan']:
@@ -182,6 +197,7 @@ def main():
             oltobj.disconnet_olt()
             TC_RET = oltobj.verify_cmds_exec() if TC_RET else TC_RET
 
+            print(TC_RET)
             #　Internet 业务验证
             for internet in internet_services:
                 # print(internet)
@@ -194,10 +210,40 @@ def main():
                             if lan_str in onu['SW_PORT'].keys():       # ONU端口连接交换机
                                 onu_vlan = {'cvlan': (100+onu['SW_PORT'][lan_str], 1)}
 
-                            ret = serviceModel.verifyPPPoEWanService(
+                            TC_RET &= serviceModel.verifyPPPoEWanService(
                                 stc, stc_uplink, stc_onu, internet['vlan'],
-                                onu_vlan, (slotno, ponno, onuid), stop=True)
-                            TC_RET = ret if TC_RET else TC_RET
+                                onu_vlan, (slotno, ponno, onuid), stop=False)
+                            # up:100M down:100M
+                            # up:2253k down:11264k
+                            # up:4506k down:22528k
+                            rates = [(100000, 100000), (2253, 11264), (4506, 22528)]
+                            for index in range(len(rates)):
+                                rate_limit = rates[index]
+                                prf_id = 100+index
+                                if 1 <= prf_id <= 1024:
+                                    cmds = AN6K.add_bandwidth_prf(
+                                        "b_prf_%d" % prf_id, prf_id, rate_limit[0],
+                                        rate_limit[1])
+                                    cmds += AN6K.onu_layer3_ratelimit(slotno, ponno, onuid, [(1, prf_id, prf_id)])
+                                else:
+                                    cmds = AN6K.onu_layer3_ratelimit(slotno, ponno, onuid, [(1, 65535, 65535)])
+
+                                oltobj.connect_olt()
+                                oltobj.sendcmdlines(cmds)
+                                oltobj.disconnet_olt()
+                                TC_RET &= oltobj.verify_cmds_exec()
+                                TC_RET &= serviceModel.wan_ratelimit(
+                                    stc, 'pppoe', (slotno, ponno, onuid),
+                                    rate_limit, load=(200, 200))
+
+                                # 去绑定限速模板
+                                oltobj.connect_olt()
+                                cmds = AN6K.onu_layer3_ratelimit(slotno, ponno, onuid, [(1, 65535, 65535)])
+                                cmds += AN6K.delete_bandwidth_prf(name="b_prf_%d" % prf_id)
+                                oltobj.sendcmdlines(cmds)
+                                oltobj.disconnet_olt()
+                                TC_RET &= oltobj.verify_cmds_exec()
+
                             break  # wan 业务只验证一个端口
 
                 elif internet['type'] == 'wan_dhcp':
@@ -274,6 +320,8 @@ def main():
         TC_RET = False
         logger.error(traceback.format_exc())
     finally:
+        stc.stc_apply()
+        stc.stc_saveAsXML("tc3.xml")
         result = "PASS" if TC_RET else "FAILED"
         logger.info("AN5506-04F/HG6243C/HG5255ST模型1 测试结果:%s" % result)
         return TC_RET

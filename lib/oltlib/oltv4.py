@@ -13,3 +13,12 @@
 # @Descption   : 
 ###############################################################################
 """
+
+
+class AN5K():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def show_card():
+        pass

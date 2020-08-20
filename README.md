@@ -1,6 +1,6 @@
 # 项目说明
 ​	烽火通信宽带接入产出线接入网自动化测试框架
-
+  Git地址：git@10.182.32.235:/home/git/fhat/fhat.git, 密码git
 # 文件说明
 
 F:\FHAT\fhprojects>

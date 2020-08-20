@@ -348,7 +348,7 @@ def verifyPPPoEWanService(stc: FHSTC, stc_uplink, stc_onu, uplink_vlan: dict, on
     # logger.info(onuinfo)
     slotno, ponno, onuid = tuple(map(int, onuinfo))
     logger.info("创建pppoE服务器配置...")
-    pppoeDeviceName = 'pppoe_w_{:0>2}{:0>2}{:0>3}'.format(slotno, ponno, onuid)
+    pppoeDeviceName = 'pppwan_server_{:0>2}{:0>2}{:0>3}'.format(slotno, ponno, onuid)
     pppServerMac = "00:01:{:0>2X}:{:0>2X}:{:0>2X}:{:0>2X}".format(slotno, ponno, onuid, random.randint(1, 255))
 
     service_param = {}
@@ -362,8 +362,11 @@ def verifyPPPoEWanService(stc: FHSTC, stc_uplink, stc_onu, uplink_vlan: dict, on
     ppp_pool = '10.185.%d.100' % ip_r
     service_param['ipv4'] = (pppServerIP, ppp_pool)
     service_param['pool'] = (ppp_pool, 24)
-    if pppoeDeviceName not in stc._hDevices:
-        stc.stc_createPPPoEv4Server(stc_uplink, pppoeDeviceName, **service_param)  # 创建PPPoE server Device
+    logger.debug("device:{}".format(stc._hDevices))
+
+    # 创建PPPoE server Device
+    if pppoeDeviceName not in stc._hDevices.keys():
+        stc.stc_createPPPoEv4Server(stc_uplink, pppoeDeviceName, **service_param)
 
     logger.info("创建下行三层数据流")
     pppoedwName = 'pppwan_dw_{:0>2}{:0>2}{:0>3}'.format(slotno, ponno, onuid)
@@ -378,8 +381,12 @@ def verifyPPPoEWanService(stc: FHSTC, stc_uplink, stc_onu, uplink_vlan: dict, on
     traffic_param['ipv4'] = (pppServerIP, ppp_pool, ppp_pool)
     udp_dw = (random.randint(1025, 49151), random.randint(1025, 49151))
     traffic_param['udp'] = udp_dw
+
+    # 创建下行数据流
     if pppoedwName not in stc._hStreamBlock:
         stc.stc_createRawTraffic(stc_uplink, pppoedwName, **traffic_param)
+    else:
+        stc.stc_modifyTraffic(pppoedwName, **traffic_param)
 
     logger.info("创建上行三层数据流")
     up_traffic_param = {}
@@ -396,6 +403,9 @@ def verifyPPPoEWanService(stc: FHSTC, stc_uplink, stc_onu, uplink_vlan: dict, on
     up_traffic_param['udp'] = tuple(reversed(udp_dw))
     if pppoeupName not in stc._hStreamBlock:
         stc.stc_createRawTraffic(stc_onu, pppoeupName, **up_traffic_param)
+    else:
+        stc.stc_modifyTraffic(pppoeupName, **traffic_param)
+
     stc.stc_apply()
 
     logger.info("业务验证")
@@ -455,6 +465,69 @@ def verifyPPPoEWanService(stc: FHSTC, stc_uplink, stc_onu, uplink_vlan: dict, on
 
     stc.stc_saveAsXML("pppoe_wan.xml")
     logger.info("pppoe WAN 业务验证通过！")
+    return True
+
+
+def wan_ratelimit(stc: FHSTC, wanType, onuinfo, ratelimit, load=None, **kargs):
+    """
+    功能：
+        测试WAN业务三层限速
+    参数：
+        @stc: FHSTC对象
+        @wanType: 三层业务类型，pppoe，dhcp，static
+        @onuinfo：（slotno, ponno, onuno)
+        @ratelimit(tuple): 上下行限速速率(kb)
+        @load(tuple):上下行仪表打流速率（Mb）,默认都是100Mb
+        @**kargs:
+            stop: 测试完成之后是否停止本次测试的device和数据，默认False-不停止，True-停止
+            threshold: 流量验证阈值，默认0.05
+    返回值：None
+    说明：
+        测试wan_ratelimit, 需要先verifyPPPoEWanService
+    """
+    if wanType == "pppoe":
+        pppoeupName = 'pppwan_up_{:0>2}{:0>2}{:0>3}'.format(*onuinfo)
+        pppoedwName = 'pppwan_dw_{:0>2}{:0>2}{:0>3}'.format(*onuinfo)
+    elif wanType == "dhcp":
+        pppoeupName = 'dhcpwan_up_{:0>2}{:0>2}{:0>3}'.format(*onuinfo)
+        pppoedwName = 'dhcpwan_dw_{:0>2}{:0>2}{:0>3}'.format(*onuinfo)
+    else:
+        pppoeupName = 'staticwan_up_{:0>2}{:0>2}{:0>3}'.format(*onuinfo)
+        pppoedwName = 'staticwan_dw_{:0>2}{:0>2}{:0>3}'.format(*onuinfo)
+
+    if load is not None:
+        logger.info("修改数据流大小")
+        up_load, dw_load = load
+        stc.stc_stopStreamBlock(pppoeupName)
+        stc.stc_stopStreamBlock(pppoedwName)
+        stc.stc_modifyTraffic(pppoeupName, Load=up_load)
+        stc.stc_modifyTraffic(pppoedwName, Load=dw_load)
+        waitTime(10)
+        stc.stc_apply()
+
+    logger.info("验证限速结果")
+    # up_limit, dw_limit = ratelimit
+    rate_limit = dict(zip((pppoeupName, pppoedwName), ratelimit))
+    stc.stc_startStreamBlock(pppoeupName, arp=True)
+    stc.stc_startStreamBlock(pppoedwName, arp=True)
+    waitTime(10)
+    filter_param = (pppoedwName, pppoeupName)
+    logger.debug("filter:{}".format(filter_param))
+    result = stc.stc_get_DRV_ResulstData(streamNames=filter_param)
+    traffic_result = {}
+    for key in result:
+        streamName = key.split(".")[1]
+        traffic_result[streamName] = result[key][5]
+        threshold = kargs['threshold'] if 'threshold' in kargs.keys() else 0.05
+        tx, rx = int(traffic_result[streamName]), rate_limit[streamName] * 1000
+        print(tx, rx, abs(tx - rx) / (rx + 0.00001))
+        if (abs(tx - rx) / (rx + 0.00001)) > threshold:
+            logger.error("三层限速测试正常,业务类型：{}，数据流{}, 限速值{}".format(wanType, key, rx))
+            if 'stop' in kargs.keys() and kargs['stop']:
+                stc.stc_stopStreamBlock(pppoedwName)
+                stc.stc_stopStreamBlock(pppoeupName)
+            return False
+    logger.info("三层限速测试正常,业务类型：{}，限速值{}".format(wanType, ratelimit))
     return True
 
 

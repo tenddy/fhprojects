@@ -87,7 +87,7 @@ SETTINGS = {
             'PHYPWD': 'fiberhome',
             'LOGICID': 'fiberhome',
             'PASSWORD': 'fiberhome',
-            "MODEL": ['m1', 'm2'],
+            "MODEL": ['m1', 'm2', 'm3'],
             "STC_PORT": {'1': "onu2", '2': '', '3': '', '4': 'onu3'},
             'SW_PORT': {'3': 7, '4': 8}  # ONU 端口是否连接仪表
         },
@@ -100,8 +100,8 @@ SETTINGS = {
             'LOGICID': 'fiberhome',
             'PASSWORD': 'fiberhome',
             'MODEL': ['m1'],
-            "STC_PORT": {'1': "onu3", '2': '', '3': '', '4': 'onu3'},
-            'SW_PORT': {'1': 5, '4': 8}  # ONU 端口是否连接仪表
+            "STC_PORT": {'1': "", '2': 'onu3', '3': '', '4': 'onu3'},
+            'SW_PORT': {'2': 6, '4': 8}  # ONU 端口是否连接仪表
         },
 
         {
@@ -111,7 +111,7 @@ SETTINGS = {
             'PHYPWD': '',
             'LOGICID': '',
             'PASSWORD': '',
-            'MODEL': ['m3'],
+            'MODEL': [''],
             "STC_PORT": {'1': "onu3"},
             'SW_PORT': {'1': 5, '4': 8}  # ONU 端口是否连接仪表
         }
@@ -214,16 +214,6 @@ MODEL = {
                 'lan': [1],
                 'wlan': ['ssid1'],
             },
-            {
-                'type': 'fe',        # fe, wan_dhcp, wan_pppoe, wan_static, veip
-                'mode': 'tag',
-                'vlan': {
-                    'cvlan': (1010, 4),  # ,      # cvlan, (cvid, cos)
-                },
-
-                'lan': [2],
-                'wlan': [],
-            },
         ],
 
         'iptv': {           # 组播
@@ -249,15 +239,23 @@ MODEL = {
         'internet': [
             {
                 'type': 'wan_pppoe',        # fe, wan_dhcp, wan_pppoe, wan_static, veip
-                'mode': 'transparent',
+                'mode': 'tag',
                 'vlan': {
-                    'cvlan': (100, 3),  # ,      # cvlan, (cvid, cos)
-                    # 'tvlan': (1001, 4),         # tvlan, (tvid, tcos)
-                    # 'svlan':(2000, 4),      # 'qinq':(svlan, scos), 如果是wan业务，不需要qinqprf和svlan_service
+                    'cvlan': (1000, 3),  # ,      # cvlan, (cvid, cos)
+                },
+                'lan': [3],
+                'wlan': ['ssid1'],
+            },
+
+            {
+                'type': 'fe',        # fe, wan_dhcp, wan_pppoe, wan_static, veip
+                'mode': 'tag',
+                'vlan': {
+                    'cvlan': (1010, 4),  # ,      # cvlan, (cvid, cos)
                 },
 
-                'lan': [1, 2, 3],
-                'wlan': ['ssid1'],
+                'lan': [2],
+                'wlan': [],
             },
         ],
         'iptv': {
@@ -286,19 +284,10 @@ MODEL = {
                 'type': 'wan_pppoe',        # fe, wan_dhcp, wan_pppoe, wan_static, veip
                 'mode': 'transparent',
                 'vlan': {
-                    'cvlan': (100, 3),      # cvlan, (cvid, cos)
+                    'cvlan': (1000, 3),      # cvlan, (cvid, cos)
                 },
-                'lan': [3],
+                'lan': [1],
                 'wlan': ['ssid1']
-            },
-            {
-                'type': 'fe',        # fe, wan_dhcp, wan_pppoe, wan_static, veip
-                'mode': 'tag',
-                'vlan': {
-                    'cvlan': (100, 3),       # cvlan, (cvid, cos)
-                },
-                'lan': [2],
-                'wlan': []
             },
         ],
         'iptv': {
@@ -315,7 +304,7 @@ MODEL = {
                     'cvlan': (111, 4),
                 },
             },
-            'lan': [1, 4],
+            'lan': []
         },
         'voip': {}
     },

@@ -405,6 +405,130 @@ class AN6K():
         return cmdlines
 
     @staticmethod
+    def add_bandwidth_prf(prf_name, prf_id=None, up_pir=1000000, dw_pir=1000000, **kargs):
+        """
+        功能：
+            创建带宽模板
+        参数：
+            @prf_name(str): 带宽模板名称
+            @prf_id(int): 模板ID（1~1024), 默认为None, 自动添加模板ID
+            @up_pir(int): 上行最大带宽(kb)，默认为1000000
+            @dw_pir(int): 下行最大带宽(kb)，默认为1000000
+            @kargs:
+                up_fir(int): 上行固定带宽(kb)
+                up_cir(int): 上行保证带宽(kb)
+                dw_cir(int): 下行保证带宽(kb)
+        返回值：命令行列表
+        说明：
+            Admin(config)# bandwidth-profile add <profile-name> {[id] <profile-id>}*1 {upstream-pir <us-pir> downstream-pir
+             <ds-pir>}*1 {upstream-cir <us-cir> downstream-cir <ds-cir> upstream-fir <us-fir>}*1
+        """
+        cmdlines = []
+        profile = ["bandwidth-profile add {}".format(prf_name)]
+        profile.append("id {}".format(prf_id) if prf_id is not None else "")
+        profile.append("upstream-pir {} downstream-pir {}".format(up_pir, dw_pir))
+
+        up_cir = kargs['up_cir'] if 'up_cir' in kargs.keys() else 0
+        profile.append('upstream-cir {}'.format(up_cir))
+
+        dw_cir = kargs['dw_cir'] if 'dw_cir' in kargs.keys() else 0
+        profile.append('downstream-cir {}'.format(dw_cir))
+
+        up_fir = kargs['up_fir'] if 'up_fir' in kargs.keys() else 0
+        profile.append('upstream-fir {}'.format(up_fir))
+
+        profile.append("\n")
+        cmdlines.append(" ".join(profile))
+        return cmdlines
+
+    @staticmethod
+    def modify_bandwidth_prf(prf_id_name, up_pir, dw_pir, **kargs):
+        """
+        功能：
+            修改带宽模板
+        参数：
+            @prf_id_name(int/str): 带宽模板ID（1~1024）或者名称
+            @up_pir(int): 上行最大带宽(kb)
+            @dw_pir(int): 下行最大带宽(kb)
+            @kargs:   
+                up_fir(int): 上行固定带宽(kb)
+                up_cir(int): 上行保证带宽(kb)
+                dw_cir(int): 下行保证带宽(kb)
+        返回值：命令行列表
+        说明：
+            bandwidth-profile modify [id|name] <id-or-name> {upstream-pir <us-pir> downstream-pir <ds-pir>}*1 
+            {upstream-cir <us-cir> downstream-cir <ds-cir> upstream_fir <us-fir>}*1
+        """
+        cmdlines = []
+        if isinstance(prf_id_name, int):
+            profile = [
+                "bandwidth-profile modify id {} upstream-pir {} downstream-pir {}".format(prf_id_name, up_pir, dw_pir)]
+        else:
+            profile = [
+                "bandwidth-profile modify name {} upstream-pir {} downstream-pir {}".format(prf_id_name, up_pir, dw_pir)]
+
+        up_cir = kargs['up_cir'] if 'up_cir' in kargs.keys() else 0
+        profile.append('upstream-cir {}'.format(up_cir))
+
+        dw_cir = kargs['dw_cir'] if 'dw_cir' in kargs.keys() else 0
+        profile.append('downstream-cir {}'.format(dw_cir))
+
+        up_fir = kargs['up_fir'] if 'up_fir' in kargs.keys() else 0
+        profile.append('upstream_fir {}'.format(up_fir))
+
+        profile.append("\n")
+        cmdlines.append(" ".join(profile))
+        return cmdlines
+
+    @staticmethod
+    def delete_bandwidth_prf(**bandwidth_prf_id_name):
+        """
+        功能：
+            删除带宽模板
+        参数：
+            @bandwidth_prf_id_name: {'id': ''} 或者 {'name': ''}
+                通过带宽模板id或者名称删除带宽模板
+        返回值：
+            命令行列表
+        说明：	
+            bandwidth-profile delete [id|name] <id-or-name>
+        """
+        cmdlines = []
+        for key in bandwidth_prf_id_name:
+            cmdlines.append("bandwidth-profile delete {} {}\n".format(key, bandwidth_prf_id_name[key]))
+        return cmdlines
+
+    @staticmethod
+    def show_bandwidth_prf():
+        """获取带宽模板"""
+        return ['show bandwidth-profile all\n']
+
+    @staticmethod
+    def onu_layer3_ratelimit(slotno, ponno, onuid, bandwidth_prf_id):
+        """
+        功能：
+            配置ONU三层流限速
+        参数：
+            @slotno(int):槽位号
+            @ponno(int):PON 口号
+            @onuid(int):ONU ID
+            @bandwidth_prf_id(tuple): [(wan_index, up_prf, dw_prf)], WAN index，上行带宽模板，下行带宽模板
+        返回值：
+            命令行列表
+        说明：	
+            Admin(config-if-pon-)#onu layer3-ratelimit-profile <onuno> {<wanindex> upstream-profile-id <upbandwidthprfid> downstream-profile-id <dwbandwidthprfid>}*8
+        """
+        cmdlines = []
+        cmdlines.append("interface pon 1/{}/{}\n".format(slotno, ponno))
+        ratelimit = ["onu layer3-ratelimit-profile {}".format(onuid)]
+        for item in bandwidth_prf_id:
+            ratelimit.append("{0} upstream-profile-id {1} downstream-profile-id {2}".format(*item))
+        ratelimit.append("\n")
+        cmdlines.append(" ".join(ratelimit))
+        cmdlines.append("quit\n")
+        return cmdlines
+
+    @staticmethod
     def create_oltqinq_domain(qinq_name, *vlanrule):
         """
         功能:

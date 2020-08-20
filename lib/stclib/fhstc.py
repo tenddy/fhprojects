@@ -414,7 +414,7 @@ class FHSTC:
                 self._stc.config(hstreamBlock, **kargs)
             fhlog.logger.debug("apply...")
             self._stc.apply()
-            fhlog.logger.debug("修改数据流{}配置成功".format(streamName))
+            fhlog.logger.info("修改数据流{}配置成功".format(streamName))
         except:
             raise FHSTCCmdError('stc_modifyTraffic', "修改数据流{}失败".format(streamName), traceback.format_exc())
 
@@ -681,12 +681,15 @@ class FHSTC:
         """
         功能：
             获取DynamicResultView结果,通过DynamicResultView获取结果，不需要停流;
-            通过DynamicResultView获取结果，需要先调用stc_DRVConfig函数。
+            通过DynamicResultView获取结果，需要先调用stc_DRVConfig函数.
+
         参数：
             @ports(tuple):基于端口过滤数据流，例如("uplink", "onu1")
             @streamNames(tuple): 基于数据流的名称过滤数据流, 例如（"dw", "up")
             @loops(int): 刷新结果次数，默认为5
-        返回值：None
+        返回值：
+            数据流量字典格式。
+         {'StreamName': ['TxFrameRate', 'RxFrameRate', 'TxL1Rate','RxL1Rate', 'TxRate', 'RxRate', 'DropFrame', 'DropPct']}
         """
         try:
             fhlog.logger.info("获取实时流量统计(DynamicResultView)...")
@@ -716,7 +719,7 @@ class FHSTC:
                 # 占位符空间
                 placeholder = placeholder if len(key) < placeholder else len(key)+4
 
-            fhlog.logger.info("holder:%d" % placeholder)
+            # fhlog.logger.info("holder:%d" % placeholder)
             # 打印 DRV_ResulstData结果
             title = ('StreamName', 'TxFrameRate', 'RxFrameRate', 'TxL1Rate',
                      'RxL1Rate', 'TxRate', 'RxRate', 'DropFrame', 'DropPct')
@@ -1285,7 +1288,7 @@ class FHSTC:
         函数说明:
 
         使用示例:
-            fhstc.stc_createPPPoEv4Server('uplink', 'h1', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=4, ipv4=("192.168.20.1", "192.168.20.1"), pool=("10.185.10.1","10.185.10.2", 24))
+            fhstc.stc_createPPPoEv4Client('uplink', 'h1', srcMAC="00:00:00:00:00:01", cvlan=(102,1), svlan=(2001,4), count=4, ipv4=("192.168.20.1", "192.168.20.1"), pool=("10.185.10.1","10.185.10.2", 24))
         """
         try:
             fhlog.logger.info("创建PPPoE Server")
@@ -1622,7 +1625,6 @@ class FHSTC:
             self._stc.config(hIgmpHostConfig, UsesIf=_hIPv4If)
 
             hIgmpGroupMembership = self._stc.create("IgmpGroupMembership", under=hIgmpHostConfig)
-            
 
             hIpv4Group = self._stc.create("Ipv4Group", under=self._project)
             hIpv4NetworkBlockGroup = self._stc.get(hIpv4Group, "children-Ipv4NetworkBlock")
@@ -1636,10 +1638,9 @@ class FHSTC:
 
             self._stc.config(hIpv4NetworkBlockGroup, **
                              dict(zip(('StartIpList', 'AddrIncrement', 'NetworkCount', 'PrefixLength'), membership)))
-            
+
             # if 'membership' in kargs.keys():
             #     for group in kargs['membership'].split(","):
-
 
             self._stc.config(hIgmpGroupMembership, MulticastGroup=hIpv4Group)
 

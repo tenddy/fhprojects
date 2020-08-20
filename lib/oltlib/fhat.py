@@ -21,7 +21,8 @@ try:
     # print("cwd:", os.getcwd())
     if os.getcwd() not in sys.path:
         sys.path.append(os.getcwd())
-    from lib.oltlib import fhlib
+    from lib.oltlib.oltv5 import AN6K
+    from lib.oltlib.oltv4 import AN5K
     from lib.public.fhlog import logger, log_decare
     from lib.public import dut_connect
     from lib import settings
@@ -223,9 +224,9 @@ class FH_OLT():
         """
         show_card_cmd = []
         if self.version == "V4":
-            show_card_cmd = fhlib.OLT_V4.show_card()
+            show_card_cmd = AN5K.show_card()
         if self.version == "V5":
-            show_card_cmd = fhlib.OLT_V5.show_card()
+            show_card_cmd = AN6K.show_card()
 
         ret = self.sendcmdlines(show_card_cmd)
         slot_status = ret.split('\n')[4:][slotno-1].strip().split()
@@ -236,7 +237,7 @@ class FH_OLT():
         self.disconnet_olt()
 
     def get_maincard_version(self, backup=False):
-        ret = self.sendcmdlines(fhlib.OLT_V5.show_debugversion(backup))
+        ret = self.sendcmdlines(AN6K.show_debugversion(backup))
         version_info = ret.split('\n')[-2].strip()[-20:]
         print("compiled:", version_info)
         self.disconnet_olt()
@@ -253,7 +254,7 @@ class FH_OLT():
         返回值：dict()
             返回未授权ONU信息，格式为{"PhyId":("No", "OnuType", "PhyId", "PhyPwd", "LogicId", "LogicPwd", "Why")}
         """
-        ret = self.sendcmdlines(fhlib.OLT_V5.showDiscovery(slotno, ponno))
+        ret = self.sendcmdlines(AN6K.showDiscovery(slotno, ponno))
         ret_lines = ret.split("\r\n")
         p_len = list(map(len, ret_lines[4].split()))  # 获取占位长度
         unauthList = ret_lines[5:-4]  # 未授权ONU列表
@@ -281,7 +282,7 @@ class FH_OLT():
             返回已授权ONU信息，格式为{"PhyId":("Slot","Pon","Onu","OnuType","ST","Lic", "OST", "PhyId","PhyPwd","LogicId","LogicPwd")}
         """
         try:
-            ret = self.sendcmdlines(fhlib.OLT_V5.showAuthorization(slotno, ponno))
+            ret = self.sendcmdlines(AN6K.showAuthorization(slotno, ponno))
             authnum = re.findall(r'Total ITEM = (\d*)', ret)[0]
             if authnum == "0":    # 如果已授权ONU列表为空，则直接返回空字典
                 return {}
@@ -306,15 +307,17 @@ class FH_OLT():
             logger.info("获取已授权ONU失败")
             return None
 
-    # def get_cmds_execute(self, cmds_func, *args, **kargs):
-    #     """ 获取返回状态信息 """
-    #     try:
-    #         exec_cmds = cmds_func(*args, **kargs)
-    #         ret = self.sendcmdlines(exec_cmds)
-    #         self.disconnet_olt()
-    #         return ret
-    #     except Exception as err:
-    #         raise FHATCMDError('get_cnds_execute', '获取执行命令返回状态信息失败', traceback.format_exc())
+    def get_bandwithProfile(self):
+        """获取所有的带宽模板"""
+        try:
+            ret = self.sendcmdlines(AN6K.show_bandwidth_prf())
+            ret_lines = ret.split("\r\n")
+            print(ret_lines)
+            band_prf = {}
+            return band_prf
+        except:
+            logger.info("获取带宽模板失败")
+            return None
 
 
 class FH_UNM():
@@ -362,48 +365,13 @@ def verify_string_match(dst_str, cmp_str):
     return bool(ret == 1)
 
 
-# def auth_onu_auto():
-#     log = Logger()
-#     # host = "35.35.35.109"
-#     host = '192.168.0.168'
-#     tn_obj = dut_connect.dut_connect_telnet(host, 8003)
-#     # a = tn_obj.read_until(b"#")
-#     # print(str(a, encoding='utf8'))
-#     dut_host = ServiceConfig(tn_obj, log)
-
-#     cmd_ret = dut_host.send_cmd(["config\n", "t l 0\n"])
-#     # s_cmd = cmd_ret.split('\n')
-#     onuid = 1
-#     while True:
-#         cmd_ret = dut_host.send_cmd(["show discovery 1/17/8\n"])
-#         s_cmd = cmd_ret.split('\n')
-#         print(len(s_cmd))
-#         if len(s_cmd) >= 8:
-#             for index in range(4, len(s_cmd)-3):
-#                 # print(len(s_cmd),  s_cmd[index])
-#                 onu_info = s_cmd[index].split()
-#                 if len(onu_info) == 0:
-#                     break
-
-#                 print("onu_info:", onu_info)
-#                 print("onuid:", onuid)
-#                 auth_str = 'whitelist add phy-id %s type %s slot 17 pon 8 onuid %d\n' % (
-#                     onu_info[2], onu_info[1], 129-onuid)
-#                 ret = dut_host.send_cmd([auth_str])
-#                 if -1 == ret.find("failed") or -1 == ret.find("Unknown"):
-#                     onuid = onuid + 1
-#                     print("onuid:", onuid)
-#         time.sleep(5)
-#     tn_obj.close()
-
-
 def upgrad_olt_batch(filename, backup=False):
     for ip in range(8):
         fholt_obj = FH_OLT()
         fholt_obj.hostip = '10.182.33.%d' % (182+ip)
         fholt_obj.connect_olt()
         # backup_status = bool(fholt_obj.get_card_status(10)['EXIST'] == "YES")
-        cmds = fhlib.OLT_V5.load_program(filename, backup=backup)
+        cmds = AN6K.load_program(filename, backup=backup)
         print("upgrade %s\n" % fholt_obj.oltip, cmds)
         fholt_obj.append_cmdlines(cmds)
         fholt_obj.sendcmdlines()

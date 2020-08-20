@@ -141,7 +141,7 @@ class TCLWrapper:
         stderr_start_key = gen_unique_string()
         stderr_delimiter_key = gen_unique_string()
         stderr_done_key = gen_unique_string()
-        print("key:", stdout_start_key, stdout_done_key)
+        # print("key:", stdout_start_key, stdout_done_key, stderr_start_key, stderr_done_key)
         # print("tclwrapper")
         main_tcl_code = '\n'.join(['if { [ catch {',
                                    command,
@@ -152,16 +152,12 @@ class TCLWrapper:
                                    '} else {',
                                    '    puts -nonewline stdout $' + TCLWrapper.reserved_variable_name,
                                    '}\n'])
-        print("main_tcl_code:", main_tcl_code)
+        # print("main_tcl_code:", main_tcl_code)
         self._process.stdin.write(b'puts -nonewline stdout "' + stdout_start_key + b'"\n')
-        # self._process.stdin.write(b'puts -nonewline stdout "%b"\n' % stdout_start_key.decode('ascii'))
         self._process.stdin.write(b'puts -nonewline stderr "' + stderr_start_key + b'"\n')
-        # self._process.stdin.write(b'puts -nonewline stderr "%b"\n' % stderr_start_key.decode('ascii'))
         self._process.stdin.write(bytearray(main_tcl_code, 'utf-8'))
         self._process.stdin.write(b'puts -nonewline stdout "' + stdout_done_key + b'"\n')
-        # self._process.stdin.write(b'puts -nonewline stdout "%b"\n' % stdout_done_key.decode('ascii'))
         self._process.stdin.write(b'puts -nonewline stderr "' + stderr_done_key + b'"\n')
-        # self._process.stdin.write(b'puts -nonewline stderr "%b"\n' % stderr_done_key.decode('ascii'))
         self._process.stdin.write(b'flush stdout\nflush stderr\n')
         self._process.stdin.flush()
 
@@ -173,41 +169,42 @@ class TCLWrapper:
         try:
             while fetching_stdout or fetching_stderr:
                 return_code = self._process.poll()
-                print("return_code:", return_code)
                 if return_code is not None:
                     raise TCLWrapperInstanceError('tcl process finished unexpectedly with return code %d' % return_code)
                 if fetching_stdout:
                     try:
                         # nonblocking reads raise an IOError if there is nothing to read
-                        stdout += self._process.stdout.read1(1)
-                        print("debug-stdout:%s" % stdout)
+                        stdout += self._process.stdout.read1()
+                        # print("debug-stdout:%s" % stdout)
                     except IOError:
                         fetching_stdout = False
                         raise TCLWrapperInstanceError("Fetching stdout error.")
                 if fetching_stderr:
                     try:
                         # nonblocking reads raise an IOError if there is nothing to read
-                        stderr += self._process.stderr.read1(1)
-                        print("debug-stderr:%s" % stderr)
+                        stderr += self._process.stderr.read1()
+                        # print("debug-stderr:%s" % stderr)
                     except IOError:
                         fetching_stderr = False
-
-                if len(stdout)>=key_string_length and not stdout.startswith(stdout_start_key):
-                    print("not match")
-                    # self._process.stdin.flush()
-                    # self._process.stdin.write(b'flush stdout\nflush stderr\n')
-                    # self._process.stdin.flush()
-                    # stdout = b''
-                    # fetching_stdout = False
-                    stdout = stdout_start_key + stdout_done_key
-                    print(stdout)
+                        raise TCLWrapperInstanceError("Fetching stderr error.")
+                # if len(stdout)>=key_string_length and not stdout.startswith(stdout_start_key):
+                #     print("not match:%s,%s" %(stdout, stderr))
+                #     self._process.stdin.write(b'puts -nonewline stdout "' + stdout_start_key + b'"\n')
+                #     self._process.stdin.write(b'puts -nonewline stderr "' + stderr_start_key + b'"\n')
+                #     self._process.stdin.write(bytearray(main_tcl_code, 'utf-8'))
+                #     self._process.stdin.write(b'puts -nonewline stdout "' + stdout_done_key + b'"\n')
+                #     self._process.stdin.write(b'puts -nonewline stderr "' + stderr_done_key + b'"\n')
+                #     self._process.stdin.write(b'flush stdout\nflush stderr\n')
+                #     self._process.stdin.flush()
+                #     stdout = b''
+                #     stderr = b''
 
                 if stdout.endswith(stdout_done_key):
                     fetching_stdout = False
                 if stderr.endswith(stderr_done_key):
                     fetching_stderr = False
 
-            print("stdout:%s,stderr:%s" % (stdout.decode('utf-8'), stderr.decode('utf-8')))
+            # print("stdout:%s,stderr:%s" % (stdout.decode('utf-8'), stderr.decode('utf-8')))
         except KeyboardInterrupt as e:
             print("KeyboardInterrupt raised while trying to read from stdout and stderr in TCLWrapper('%s')" % self.tcl_exe)
             print('command = ' + repr(command))
